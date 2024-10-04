@@ -1,0 +1,103 @@
+.coverRow {
+    display: grid;
+}
+
+.item {
+    color: var(--color-text);
+
+    :global {
+        .text {
+            margin-top: 8px;
+
+            .title {
+                font-size: 16px;
+                font-weight: 600;
+                line-height: 20px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                word-break: break-all;
+            }
+
+            .info {
+                font-size: 12px;
+                opacity: 0.68;
+                line-height: 18px;
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 2;
+                overflow: hidden;
+                word-break: break-word;
+
+                .play-count {
+                    font-weight: 600;
+                    opacity: 0.58;
+                    color: var(--color-text);
+                    font-size: 12px;
+
+                    .svg-icon {
+                        margin-right: 3px;
+                        height: 8px;
+                        width: 8px;
+                    }
+                }
+            }
+
+            .lock-icon {
+                opacity: 0.28;
+                color: var(--color-text);
+                margin-right: 4px;
+
+                // float: right;
+                .svg-icon {
+                    height: 12px;
+                    width: 12px;
+                }
+            }
+        }
+    }
+}
+
+.item.artist {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+
+    .cover {
+        display: flex;
+    }
+
+    .title {
+        margin-top: 4px;
+    }
+}
+
+@media (max-width: 834px) {
+    .item .text .title {
+        font-size: 14px;
+    }
+}
+
+.explicit-symbol {
+    opacity: 0.28;
+    color: var(--color-text);
+    float: right;
+
+    .svg-icon {
+        margin-bottom: -3px;
+    }
+}
+
+.play-count {
+    font-weight: 600;
+    opacity: 0.58;
+    color: var(--color-text);
+    font-size: 12px;
+
+    .svg-icon {
+        margin-right: 3px;
+        height: 8px;
+        width: 8px;
+    }
+}

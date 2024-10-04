@@ -1,0 +1,342 @@
+{
+    "artist": {
+        "artist": "艺人",
+        "withAlbums": "张专辑",
+        "videos": "个 MV",
+        "follow": "关注",
+        "following": "正在关注",
+        "latestRelease": "最新发布",
+        "popularSongs": "热门歌曲",
+        "showMore": "显示更多",
+        "albums": "专辑",
+        "EPsSingles": "EP 和单曲",
+        "latestMV": "最新 MV",
+        "similarArtists": "相似艺人"
+    },
+    "dailyTracks": {
+        "dailySongRecommendations": "每日歌曲推荐",
+        "generatedBasedOnYourMusicalTastes": "根据你的音乐口味生成",
+        "updatedDaily": "每天6:00更新"
+    },
+    "home": {
+        "recommendPlaylist": "Recommend Playlist",
+        "seeMore": "See More",
+        "recommendArtist": "Recommend Artist",
+        "newAlbum": "New Album",
+        "rankingList": "Ranking List"
+    },
+    "library": {
+        "sLibrary": "'s Library",
+        "likedSongs": "Liked Songs",
+        "cardiacMode": "Cardiac Mode",
+        "cloudDisk": "Cloud Disk",
+        "newPlayList": "New Playlist",
+        "uploadSongs": "Upload Songs",
+        "playHistory": {
+            "title": "Play History",
+            "week": "Latest Week",
+            "all": "All Time"
+        },
+        "contextMenu": {
+            "allPlaylists": "All Playlists",
+            "minePlaylists": "My Playlists",
+            "likedPlaylists": "'Liked Playlists"
+        }
+    },
+    "login": {
+        "usernameLogin": "用户名登录",
+        "searchHolder": "请输入你的网易云用户名",
+        "enterTip": "按 Enter 搜索",
+        "choose": "在列表中选中你的账号",
+        "confirm": "确认"
+    },
+    "settings": {
+        "language": "Language",
+        "appearance": {
+            "text": "Appearance",
+            "auto": "Auto",
+            "light": "Light",
+            "dark": "Dark"
+        },
+        "musicGenrePreference": {
+            "text": "Music Language Preference",
+            "none": "No preferences",
+            "mandarin": "Mandarin",
+            "western": "Europe & America",
+            "korean": "Korean",
+            "japanese": "Japanese"
+        },
+        "musicQuality": {
+            "text": "Music Quality",
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High",
+            "lossless": "Lossless"
+        },
+        "cacheTitle": "Cache",
+        "automaticallyCacheSongs": "Automatically Cache Songs",
+        "cacheLimit": {
+            "text": "Songs Cache limit",
+            "none": "None"
+        },
+        "cacheCount": "Cached {{song}} Songs ({{size}})",
+        "clearSongsCache": "Clear Songs Cache",
+        "lyric": {
+            "text": "Lyric",
+            "showLyricsTranslation": "Show Lyrics Translation",
+            "lyricsBackground": {
+                "text": "Show Lyrics Background",
+                "off": "Off",
+                "on": "On",
+                "blur": "Blur",
+                "dynamic": "Dynamic (High GPU usage)"
+            },
+            "showLyricsTime": "Display Current Time"
+        },
+        "lyricFontSize": {
+            "text": "Lyric Font Size",
+            "small": "Small",
+            "medium": "Medium",
+            "large": "Large (Default)",
+            "xlarge": "X-Large"
+        },
+        "unm": {
+            "enable": "Enable ",
+            "audioSource": {
+                "title": "Audio Sources",
+                "desc1": "The specific code name of the sound source",
+                "desc2": " You can click here to go to UNM's description page.",
+                "desc3": "Please separate multiple audio sources with ",
+                "desc4": " commas.",
+                "desc5": "Leave blank to use UNM's built-in default value."
+            },
+            "enableFlac": {
+                "title": "Enable FLAC Sources",
+                "desc": "To take effect, it may be required to clear the cache after enabling this function."
+            },
+            "searchMode": {
+                "title": "Audio Search Mode",
+                "fast": "Speed Priority",
+                "order": "Order Priority"
+            },
+            "cookie": {
+                "joox": "Cookie for Joox use",
+                "qq": "Cookie for QQ use",
+                "desc1": "Click here for the configuration instruction. ",
+                "desc2": "Leave empty to pick up the default value"
+            },
+            "ytdl": "The youtube-dl Executable File for YtDl",
+            "proxy": {
+                "title": "Proxy Server for UNM",
+                "desc1": "The proxy server to use for requesting services such as YouTube",
+                "desc2": "Leave empty to pick up the default value"
+            }
+        },
+        "thirdParty": {
+            "text": "Third Party",
+            "lastfm": {
+                "connectTo": "Connect To Last.fm ",
+                "connectedTo": "Connected To Last.fm ({{name}})",
+                "disconnect": "Disconnect",
+                "authorizeTheConnection": "Authorize The Connection"
+            }
+        },
+        "others": "Others",
+        "closeAppOption": {
+            "text": "Close App...",
+            "ask": "Ask",
+            "exit": "Exit",
+            "minimizeToTray": "Minimize to tray"
+        },
+        "showLibraryDefault": "Show Library after App Launched",
+        "showPlaylistsByAppleMusic": "Show playlists by Apple Music",
+        "subTitleDefault": "Show Alias for Subtitle by default",
+        "enableReversedMode": "Enable Reversed Mode (Experimental)",
+        "proxy": {
+            "text": "Proxy",
+            "proxyProtocol": "Proxy Protocol",
+            "noProxy": "No Proxy",
+            "http": "HTTP",
+            "https": "HTTPS",
+            "proxyServer": "Proxy Server(192.168.1.1)",
+            "proxyPort": "Proxy Port",
+            "updateProxy": "Update Proxy"
+        },
+        "shortcut" : {
+            "text": "Shortcut",
+            "enableGlobalShortcut": "Enable Global Shortcut",
+            "function": "Function",
+            "globalShortcut": "Global Shortcut",
+            "playOrPause": "Play/Pause",
+            "nextSong": "Next Song",
+            "prevSong": "Previous Song",
+            "increaseVolume": "Increase Volume",
+            "decreaseVolume": "Decrease Volume",
+            "likeOrNotLike": "Like/Not Like",
+            "hideOrShowPlayer": "Hide/Show Player",
+            "hotkeyIsOccupied": "Hotkey is occupied",
+            "restoreDefaultShortcuts": "Restore default shortcut keys"
+        }
+    },
+    "next": {
+        "nowPlaying": "正在播放",
+        "nextUp": "即将播放"
+    },
+    "explore": {
+        "explore": "Explore",
+        "bigCat": {
+            "language": "Language",
+            "style": "Style",
+            "scenes": "Scenes",
+            "emotion": "Emotion",
+            "theme": "Theme"
+        },
+        "category": {
+            "all": "All",
+            "recommendPlaylists": "Recommend playlists",
+            "premiumPlaylist": "Premium playlist",
+            "official": "Official",
+            "rankingList": "Ranking list",
+            "western": "Europe & America",
+            "mandarin": "Mandarin",
+            "japanese": "Japanese",
+            "korean": "Korean",
+            "cantonese": "Cantonese",
+            "popular": "Popular",
+            "rock": "Rock",
+            "ballad": "Ballad",
+            "electron": "Electron",
+            "danceMusic": "Dance Music",
+            "rap": "Rap",
+            "lightMusic": "Light Music",
+            "sir": "Sir",
+            "country": "Country",
+            "R&B/Soul": "R&B/Soul",
+            "classical": "Classical",
+            "nation": "Nation",
+            "british": "British",
+            "metal": "Metal",
+            "punk": "Punk",
+            "blues": "Blues",
+            "reggae": "Reggae",
+            "worldMusic": "World Music",
+            "latin": "Latin",
+            "newAge": "New Age",
+            "ancientry": "Ancientry",
+            "rockBack": "Rock Back",
+            "bossaNova": "Bossa Nova",
+            "earlyMorning": "Early Morning",
+            "night": "Night",
+            "learn": "Learn",
+            "work": "Work",
+            "siesta": "Siesta",
+            "afternoonTea": "Afternoon Tea",
+            "subway": "Subway",
+            "drive": "Drive",
+            "movement": "Movement",
+            "travel": "Travel",
+            "takeAWalk": "Take A Walk",
+            "bar": "Bar",
+            "reminiscence": "Reminiscence",
+            "fresh": "Fresh",
+            "romantic": "Romantic",
+            "sad": "Sad",
+            "cure": "Cure",
+            "relax": "Relax",
+            "lonely": "Lonely",
+            "move": "Move",
+            "beExcited": "Be Excited",
+            "happy": "Happy",
+            "quiet": "Quiet",
+            "miss": "Miss",
+            "varietyShow": "Variety Show",
+            "filmAndTelevisionSoundtrack": "Film and Television Soundtrack",
+            "ACG": "ACG",
+            "child": "Child",
+            "campus": "Campus",
+            "game": "Game",
+            "post-70s": "Post-70s",
+            "post-80s": "Post-80s",
+            "post-90s": "Post-90s",
+            "internetSongs": "Internet songs",
+            "KTV": "KTV",
+            "classic": "Classic",
+            "cover": "Cover",
+            "guitar": "Guitar",
+            "piano": "Piano",
+            "instrumentalMusic": "Instrumental Music",
+            "list": "List",
+            "post-00s": "Post-00s"
+        },
+        "loadMore": "Load More"
+    },
+    "toast": {
+        "needToLogin": "This operation requires logging in to a NetEase Cloud account",
+        "copied": "Copied successfully",
+        "copyFailed": "Copy failed"
+    },
+    "playlist": {
+        "search": "Search playlist music",
+        "savedToMusicLibrary": "Saved to music library",
+        "removedFromMusicLibrary": "Removed from music library",
+        "saveToMusicLibrary": "Save to music library",
+        "removeFromMusicLibrary": "Remove from music library",
+        "updatedAt": "Last updated on",
+        "favoriteMusic": "Favorite Music",
+        "searchWithinPlaylist": "Search within playlist",
+        "editPlaylistInformation": "编辑歌单信息",
+        "deletePlaylist": "Edit playlist information",
+        "playlistDelete": "Are you sure you want to delete the playlist of {{name}}？",
+        "playlistDeleted": "{{name}} Playlist deleted",
+        "playlistIntroduction": "Playlist introduction"
+    },
+    "mv": {
+        "moreVideo": "更多视频"
+    },
+    "search": {
+        "song": "Song",
+        "noResult": "No Result",
+        "searchFor": "搜索"
+    },
+    "common": {
+        "play": "PLAY",
+        "songs": "Songs",
+        "logout": "Logout",
+        "example": "Example",
+        "settings": "Settings",
+        "login": "Login",
+        "logOutSure": "Are you sure you want to log out?",
+        "album": "Album",
+        "artist": "Artist",
+        "delete": "Delete",
+        "loadMore": "Load more",
+        "tip": "Tip",
+        "anErrorOccurred": "An error occurred",
+        "functionUnderDevelopment": "Function under development"
+    },
+    "contextMenu": {
+        "copyUrl": "Copy Url",
+        "openInBrowser": "Open in browser"
+    },
+    "nav": {
+        "goBack": "Go Back",
+        "advance": "Advance",
+        "home": "Home",
+        "explore": "Explore",
+        "library": "Library",
+        "search": "Search"
+    },
+    "trackList": {
+        "playlistDeleted": "Confirm to delete {{name}} from playlist？",
+        "removedFromPlaylist": "Removed from playlist",
+        "cloudDiskDeleted": "Confirm to delete {{songName}} from cloud disk？",
+        "removedFromCloudDisk": "Deleted from cloud disk",
+        "addToQueue": "Add to queue",
+        "removeFromQueue": "Remove from queue",
+        "saveToMyLikedSongs": "Add to my favorite music",
+        "removeFromMyLikedSongs": "Remove from favorite music",
+        "removeFromPlaylist": "Remove from playlist",
+        "addToPlaylist": "Add to playlist",
+        "removeFromCloudDisk": "Delete from cloud disk"
+    }
+}

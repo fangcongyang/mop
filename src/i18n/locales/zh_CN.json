@@ -1,0 +1,356 @@
+{
+    "artist": {
+        "artist": "艺人",
+        "withAlbums": "张专辑",
+        "videos": "个 MV",
+        "follow": "关注",
+        "following": "正在关注",
+        "latestRelease": "最新发布",
+        "popularSongs": "热门歌曲",
+        "showMore": "显示更多",
+        "albums": "专辑",
+        "EPsSingles": "EP 和单曲",
+        "latestMV": "最新 MV",
+        "similarArtists": "相似艺人"
+    },
+    "dailyTracks": {
+        "dailySongRecommendations": "每日歌曲推荐",
+        "generatedBasedOnYourMusicalTastes": "根据你的音乐口味生成",
+        "updatedDaily": "每天6:00更新"
+    },
+    "home": {
+        "recommendPlaylist": "推荐歌单",
+        "seeMore": "查看全部",
+        "recommendArtist": "推荐艺人",
+        "newAlbum": "新专速递",
+        "rankingList": "排行榜"
+    },
+    "library": {
+        "sLibrary": "的音乐库",
+        "likedSongs": "我喜欢的音乐",
+        "cardiacMode": "心动模式",
+        "cloudDisk": "云盘",
+        "newPlayList": "新建歌单",
+        "uploadSongs": "上传歌曲",
+        "playHistory": {
+            "title": "听歌排行",
+            "week": "最近一周",
+            "all": "所有时间"
+        },
+        "contextMenu": {
+            "allPlaylists": "全部歌单",
+            "minePlaylists": "创建的歌单",
+            "likedPlaylists": "收藏的歌单"
+        }
+    },
+    "login": {
+        "usernameLogin": "用户名登录",
+        "searchHolder": "请输入你的网易云用户名",
+        "enterTip": "按 Enter 搜索",
+        "choose": "在列表中选中你的账号",
+        "confirm": "确认"
+    },
+    "settings": {
+        "logout": "登出",
+        "language": "语言",
+        "appearance": {
+            "text": "外观",
+            "auto": "自动",
+            "light": "浅色",
+            "dark": "深色"
+        },
+        "musicGenrePreference": {
+            "text": "音乐语种偏好",
+            "none": "无偏好",
+            "mandarin": "华语",
+            "western": "欧美",
+            "korean": "韩语",
+            "japanese": "日语"
+        },
+        "musicQuality": {
+            "text": "音质",
+            "low": "普通",
+            "medium": "较高",
+            "high": "极高",
+            "lossless": "无损"
+        },
+        "cacheTitle": "缓存",
+        "automaticallyCacheSongs": "自动缓存歌曲",
+        "cacheLimit": {
+            "text": "歌曲缓存上限",
+            "none": "无限制"
+        },
+        "cacheCount": "已缓存 {{song}} 首 ({{size}})",
+        "clearSongsCache": "清除歌曲缓存",
+        "lyric": {
+            "text": "歌词",
+            "showLyricsTranslation": "显示歌词翻译",
+            "lyricsBackground": {
+                "text": "显示歌词背景",
+                "off": "关闭",
+                "on": "开启",
+                "blur": "模糊封面",
+                "dynamic": "动态 (GPU占用高)"
+            },
+            "showLyricsTime": "显示当前时间"
+        },
+        "lyricFontSize": {
+            "text": "歌词字体大小",
+            "small": "小",
+            "medium": "中",
+            "large": "大（默认）",
+            "xlarge": "超大"
+        },
+        "unm": {
+            "enable": "启用 ",
+            "audioSource": {
+                "title": "备选音源",
+                "desc1": "音源的具体代号",
+                "desc2": "可以点此到 UNM 的说明页面查询。",
+                "desc3": "多个音源请用",
+                "desc4": "逗号分隔。",
+                "desc5": "留空则使用 UNM 内置的默认值。"
+            },
+            "enableFlac": {
+                "title": "启用 FLAC",
+                "desc": "启用后需要清除歌曲缓存才能生效"
+            },
+            "searchMode": {
+                "title": "音源搜索模式",
+                "fast": "速度优先",
+                "order": "顺序优先"
+            },
+            "cookie": {
+                "joox": "Joox 引擎的 Cookie",
+                "qq": "QQ 引擎的 Cookie",
+                "desc1": "设置说明请参见此处",
+                "desc2": "，留空则不进行相关设置"
+            },
+            "ytdl": "YtDl 引擎要使用的 youtube-dl 可执行文件",
+            "proxy": {
+                "title": "用于 UNM 的代理服务器",
+                "desc1": "请求如 YouTube 音源服务时要使用的代理服务器",
+                "desc2": "留空则不进行相关设置"
+            }
+        },
+        "thirdParty": {
+            "text": "第三方",
+            "lastfm": {
+                "connectTo": "连接 Last.fm ",
+                "connectedTo": "已连接到 Last.fm ({{name}})",
+                "disconnect": "断开连接",
+                "authorizeTheConnection": "授权连接"
+            }
+        },
+        "others": "其他",
+        "closeAppOption": {
+            "text": "关闭主面板时...",
+            "ask": "询问",
+            "exit": "退出",
+            "minimizeToTray": "最小化到托盘"
+        },
+        "showLibraryDefault": "启动后显示音乐库",
+        "showPlaylistsByAppleMusic": "首页显示来自 Apple Music 的歌单",
+        "subTitleDefault": "副标题使用别名",
+        "enableReversedMode": "启用倒序播放功能 (实验性功能)",
+        "proxy": {
+            "text": "代理",
+            "proxyProtocol": "代理协议",
+            "noProxy": "关闭代理",
+            "http": "HTTP 代理",
+            "https": "HTTPS 代理",
+            "proxyServer": "代理服务器(192.168.1.1)",
+            "proxyPort": "代理端口",
+            "updateProxy": "更新代理"
+        },
+        "shortcut": {
+            "text": "快捷键",
+            "enableGlobalShortcut": "启用全局快捷键",
+            "function": "功能",
+            "globalShortcut": "全局快捷键",
+            "playOrPause": "播放/暂停",
+            "nextSong": "下一首",
+            "prevSong": "上一首",
+            "increaseVolume": "增加音量",
+            "decreaseVolume": "减少音量",
+            "likeOrNotLike": "喜欢歌曲/取消喜欢歌曲",
+            "hideOrShowPlayer": "隐藏/显示播放器",
+            "hotkeyIsOccupied": "热键被占用",
+            "restoreDefaultShortcuts": "恢复默认快捷键"
+        }
+    },
+    "next": {
+        "nowPlaying": "正在播放",
+        "nextUp": "即将播放"
+    },
+    "explore": {
+        "explore": "发现",
+        "bigCat": {
+            "language": "语种",
+            "style": "风格",
+            "scenes": "场景",
+            "emotion": "情感",
+            "theme": "主题"
+        },
+        "category": {
+            "all": "全部",
+            "recommendPlaylists": "推荐歌单",
+            "premiumPlaylist": "精品歌单",
+            "official": "官方",
+            "rankingList": "排行榜",
+            "mandarin": "华语",
+            "western": "欧美",
+            "japanese": "日语",
+            "korean": "韩语",
+            "cantonese": "粤语",
+            "popular": "流行",
+            "rock": "摇滚",
+            "ballad": "民谣",
+            "electron": "电子",
+            "danceMusic": "舞曲",
+            "rap": "说唱",
+            "lightMusic": "轻音乐",
+            "sir": "爵士",
+            "country": "乡村",
+            "R&B/Soul": "R&B/Soul",
+            "classical": "古典",
+            "nation": "民族",
+            "british": "英伦",
+            "metal": "金属",
+            "punk": "朋克",
+            "blues": "蓝调",
+            "reggae": "雷鬼",
+            "worldMusic": "世界音乐",
+            "latin": "拉丁",
+            "newAge": "New Age",
+            "ancientry": "古风",
+            "rockBack": "后摇",
+            "bossaNova": "Bossa Nova",
+            "earlyMorning": "清晨",
+            "night": "夜晚",
+            "learn": "学习",
+            "work": "工作",
+            "siesta": "午休",
+            "afternoonTea": "下午茶",
+            "subway": "地铁",
+            "drive": "驾车",
+            "movement": "运动",
+            "travel": "旅行",
+            "takeAWalk": "散步",
+            "bar": "酒吧",
+            "reminiscence": "怀旧",
+            "fresh": "清新",
+            "romantic": "浪漫",
+            "sad": "伤感",
+            "cure": "治愈",
+            "relax": "放松",
+            "lonely": "孤独",
+            "move": "感动",
+            "beExcited": "兴奋",
+            "happy": "快乐",
+            "quiet": "安静",
+            "miss": "思念",
+            "varietyShow": "综艺",
+            "filmAndTelevisionSoundtrack": "影视原声",
+            "ACG": "ACG",
+            "child": "儿童",
+            "campus": "校园",
+            "game": "游戏",
+            "post-70s": "70后",
+            "post-80s": "80后",
+            "post-90s": "90后",
+            "internetSongs": "网络歌曲",
+            "KTV": "KTV",
+            "classic": "经典",
+            "cover": "翻唱",
+            "guitar": "吉他",
+            "piano": "钢琴",
+            "instrumentalMusic": "器乐",
+            "list": "榜单",
+            "post-00s": "00后"
+        }
+    },
+    "toast": {
+        "needToLogin": "此操作需要登录网易云帐号",
+        "copied": "复制成功",
+        "copyFailed": "复制失败"
+    },
+    "playlist": {
+        "search": "搜索歌单音乐",
+        "savedToMusicLibrary": "已保存到音乐库",
+        "removedFromMusicLibrary": "已从音乐库删除",
+        "saveToMusicLibrary": "保存到音乐库",
+        "removeFromMusicLibrary": "从音乐库删除",
+        "updatedAt": "最后更新于",
+        "favoriteMusic": "喜欢的音乐",
+        "searchWithinPlaylist": "歌单内搜索",
+        "editPlaylistInformation": "编辑歌单信息",
+        "deletePlaylist": "删除歌单",
+        "playlistDelete": "确定要删除歌单 {{name}}？",
+        "playlistDeleted": "已删除歌单 {{name}}？",
+        "playlistIntroduction": "歌单介绍"
+    },
+    "mv": {
+        "moreVideo": "更多视频"
+    },
+    "search": {
+        "song": "歌曲",
+        "noResult": "无结果",
+        "searchFor": "搜索"
+    },
+    "common": {
+        "play": "播放",
+        "songs": "首歌",
+        "logout": "退出登录",
+        "example": "例",
+        "settings": "设置",
+        "login": "登录",
+        "logOutSure": "确定要退出登录吗？",
+        "album": "专辑",
+        "artist": "艺人",
+        "delete": "删除",
+        "loadMore": "加载更多",
+        "tip": "提示",
+        "anErrorOccurred": "发生错误",
+        "functionUnderDevelopment": "功能开发中"
+    },
+    "contextMenu": {
+        "copyUrl": "复制链接",
+        "openInBrowser": "在浏览器中打开",
+        "addToPlaylist": "添加到歌单",
+        "like": "喜欢"
+    },
+    "nav": {
+        "goBack": "回退",
+        "advance": "前进",
+        "home": "首页",
+        "explore": "发现",
+        "library": "音乐库",
+        "search": "搜索"
+    },
+    "trackList": {
+        "playlistDeleted": "确定要从歌单删除 {{name}}？",
+        "removedFromPlaylist": "已从歌单中删除",
+        "cloudDiskDeleted": "确定要从云盘删除 {{songName}}？",
+        "removedFromCloudDisk": "已从云盘中删除",
+        "addToQueue": "添加到队列",
+        "removeFromQueue": "从队列删除",
+        "saveToMyLikedSongs": "添加到我喜欢的音乐",
+        "removeFromMyLikedSongs": "从喜欢的音乐中删除",
+        "removeFromPlaylist": "从歌单中删除",
+        "addToPlaylist": "添加到歌单",
+        "removeFromCloudDisk": "从云盘中删除"
+    },
+    "player": {
+        "shuffle": "随机播放",
+        "repeat": "列表循环",
+        "repeatOne": "单曲循环",
+        "volume": "音量",
+        "translationLyric": "翻译歌词",
+        "pronunciationLyric": "发音歌词",
+        "volumeMute": "静音",
+        "volumeUnmute": "取消静音",
+        "pause": "暂停",
+        "next": "下一首"
+    }
+}

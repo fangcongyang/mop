@@ -1,0 +1,71 @@
+.newPlaylistButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text);
+    background: var(--color-secondary-bg-for-transparent);
+    border-radius: 8px;
+    height: 48px;
+    margin-bottom: 16px;
+    margin-right: 6px;
+    margin-left: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    .svgIcon {
+        width: 16px;
+        height: 16px;
+        margin-right: 8px;
+    }
+
+    &:hover {
+        color: var(--color-primary);
+        background: var(--color-primary-bg-for-transparent);
+    }
+}
+
+.playlist {
+    display: flex;
+    padding: 6px;
+    border-radius: 8px;
+    cursor: pointer;
+
+    &:hover {
+        background: var(--color-secondary-bg-for-transparent);
+    }
+
+    img {
+        border-radius: 8px;
+        height: 42px;
+        width: 42px;
+        margin-right: 12px;
+        border: 1px solid rgba(0, 0, 0, 0.04);
+    }
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .title {
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--color-text);
+        padding-right: 16px;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        overflow: hidden;
+        word-break: break-all;
+    }
+
+    .trackCount {
+        margin-top: 2px;
+        font-size: 13px;
+        opacity: 0.68;
+        color: var(--color-text);
+    }
+}

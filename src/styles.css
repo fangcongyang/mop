@@ -1,0 +1,140 @@
+@font-face {
+    font-family: "Barlow";
+    font-weight: normal;
+    src: url("@/assets/fonts/Barlow-Regular.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-Regular.ttf") format("truetype");
+    font-display: auto;
+}
+@font-face {
+    font-family: "Barlow";
+    font-weight: medium;
+    src: url("@/assets/fonts/Barlow-Medium.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-Medium.ttf") format("truetype");
+    font-display: auto;
+}
+@font-face {
+    font-family: "Barlow";
+    font-weight: 600;
+    src: url("@/assets/fonts/Barlow-SemiBold.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-SemiBold.ttf") format("truetype");
+    font-display: auto;
+}
+@font-face {
+    font-family: "Barlow";
+    font-weight: bold;
+    src: url("@/assets/fonts/Barlow-Bold.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-Bold.ttf") format("truetype");
+    font-display: auto;
+}
+@font-face {
+    font-family: "Barlow";
+    font-weight: 800;
+    src: url("@/assets/fonts/Barlow-ExtraBold.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-ExtraBold.ttf") format("truetype");
+    font-display: auto;
+}
+@font-face {
+    font-family: "Barlow";
+    font-weight: 900;
+    src: url("@/assets/fonts/Barlow-Black.woff2") format("woff2"),
+        url("@/assets/fonts/Barlow-Black.ttf") format("truetype");
+    font-display: auto;
+}
+
+:root {
+    --color-body-bg: #ffffff;
+    --color-text: #000;
+    --color-error: red;
+    --color-volume-hover: #335eea;
+    --color-secondary: #7a7a7b;
+    --color-secondary-bg: #f5f5f7;
+    --color-navbar-bg: rgba(255, 255, 255, 0.86);
+    --color-primary: #335eea;
+    --color-primary-bg: #eaeffd;
+    --color-primary-bg-for-transparent: rgba(189, 207, 255, 0.28);
+    --color-secondary-bg-for-transparent: rgba(209, 209, 214, 0.28);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+}
+
+[data-theme="dark"] {
+    --color-body-bg: #222222;
+    --color-text: #ffffff;
+    --color-volume-hover: #ffffff;
+    --color-primary: #335eea;
+    --color-primary-bg: #bbcdff;
+    --color-secondary: #7a7a7b;
+    --color-secondary-bg: #323232;
+    --color-navbar-bg: rgba(34, 34, 34, 0.86);
+    --color-primary-bg-for-transparent: rgba(255, 255, 255, 0.12);
+    --color-secondary-bg-for-transparent: rgba(255, 255, 255, 0.08);
+}
+
+.main-body {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+html,
+body {
+    margin: 0;
+    overflow: hidden;
+    background-color: var(--color-body-bg);
+}
+
+button {
+    cursor: pointer;
+    border: 0;
+
+    &:focus-visible {
+        outline: none;
+    }
+}
+
+#root,
+input {
+    font-family: "Barlow", ui-sans-serif, system-ui, -apple-system,
+        BlinkMacSystemFont, Helvetica Neue, PingFang SC, Microsoft YaHei,
+        Source Han Sans SC, Noto Sans CJK SC, WenQuanYi Micro Hei, sans-serif,
+        microsoft uighur;
+}
+
+input:focus {
+    outline: none;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        color: #f6f6f6;
+        background-color: #2f2f2f;
+    }
+
+    a:hover {
+        color: #24c8db;
+    }
+
+    input,
+    button {
+        color: #ffffff;
+        background-color: #0f0f0f98;
+    }
+    button:active {
+        background-color: #0f0f0f69;
+    }
+}
+
+.hidden {
+    display: none !important;
+}

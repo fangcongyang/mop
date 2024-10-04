@@ -1,0 +1,124 @@
+.album-page {
+    margin-top: 32px;
+}
+
+.playlist-info {
+    display: flex;
+    width: 78vw;
+    margin-bottom: 72px;
+
+    .info {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        flex: 1;
+        margin-left: 56px;
+        color: var(--color-text);
+
+        .title {
+            font-size: 56px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-size: 22px;
+            font-weight: 600;
+        }
+
+        .artist {
+            font-size: 18px;
+            opacity: 0.88;
+            margin-top: 24px;
+
+            a {
+                font-weight: 600;
+            }
+        }
+
+        .date-and-count {
+            font-size: 14px;
+            opacity: 0.68;
+            margin-top: 2px;
+        }
+
+        .description {
+            user-select: none;
+            font-size: 14px;
+            opacity: 0.68;
+            margin-top: 24px;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 3;
+            overflow: hidden;
+            cursor: pointer;
+            white-space: pre-line;
+
+            &:hover {
+                transition: opacity 0.3s;
+                opacity: 0.88;
+            }
+        }
+
+        .buttons {
+            margin-top: 32px;
+            display: flex;
+
+            button {
+                margin-right: 16px;
+            }
+        }
+    }
+}
+
+.disc {
+    color: var(--color-text);
+}
+
+.explicit-symbol {
+    opacity: 0.28;
+    color: var(--color-text);
+    margin-right: 4px;
+
+    .svg-icon {
+        margin-bottom: -3px;
+    }
+}
+
+.extra-info {
+    margin-top: 36px;
+    margin-bottom: 36px;
+    font-size: 12px;
+    opacity: 0.48;
+    color: var(--color-text);
+
+    div {
+        margin-bottom: 4px;
+    }
+
+    .album-time {
+        opacity: 0.68;
+    }
+}
+
+.more-by {
+    border-top: 1px solid rgba(128, 128, 128, 0.18);
+
+    padding-top: 22px;
+
+    .section-title {
+        font-size: 22px;
+        font-weight: 600;
+        opacity: 0.88;
+        color: var(--color-text);
+        margin-bottom: 20px;
+    }
+}
+
+.description-fulltext {
+    font-size: 16px;
+    margin-top: 24px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    white-space: pre-line;
+}

@@ -1,0 +1,19 @@
+.artist-mv {
+    h1 {
+        font-size: 42px;
+        color: var(--color-text);
+
+        .avatar {
+            height: 44px;
+            margin-right: 12px;
+            vertical-align: -7px;
+            border-radius: 50%;
+            border: rgba(0, 0, 0, 0.2);
+        }
+    }
+
+    .load-more {
+        display: flex;
+        justify-content: center;
+    }
+}

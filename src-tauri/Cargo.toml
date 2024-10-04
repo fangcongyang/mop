@@ -1,0 +1,66 @@
+[package]
+name = "mop"
+version = "0.0.1"
+description = "mop"
+authors = ["fangcongyang"]
+license = ""
+repository = ""
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "mop_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.0.1", features = [ "config-json5" ] }
+
+[dependencies]
+tauri = { version = "2.0.1", features = [ "config-json5", "protocol-asset", "image-png", "tray-icon" ] }
+tauri-plugin-shell = "2.0.0"
+tauri-plugin-os = "2.0.0"
+tauri-plugin-http = "2.0.0"
+tauri-plugin-fs = { version = "2.0.0", features = ["watch"] }
+tauri-plugin-dialog = "2.0.0"
+tauri-plugin-store = "2.0.0"
+tauri-plugin-process = "2.0.0"
+tauri-plugin-log = "2.0.0"
+tauri-plugin-global-shortcut = "2.0.0"
+serde = { version = "1.0.210", features = ["derive"] }
+serde_json = "1.0.128"
+reqwest = { version = "0.12.8", features = ["json"] }
+lazy_static = "1.5.0"
+lru = "0.12.4"
+tokio = {version ="1.40.0",features = ["full"] }
+cached = {version ="0.53.1",features = ["proc_macro", "async"] }
+once_cell = "1.20.1"
+regex = "1.11.0"
+rand = "0.8.5"
+openssl-sys = "0.9"
+openssl = "0.10"
+base64 = "0.22"
+hex = "0.4" 
+cookie = "0.18"
+anyhow = "1.0.89"
+unm_engine = "0.4.0"
+unm_engine_qq = "0.4.0"
+unm_engine_bilibili = "0.4.0"
+unm_types = "0.4.0"
+log = "0.4.19"
+async-trait = "0.1.83"
+futures = "0.3.28"
+unm_request = "0.4.0"
+unm_selector = "0.4.0"
+concat-string = "1.0.1"
+faster-hex = "0.10.0"
+md5 = "0.7.0"
+souvlaki = { version = "0.7.2", default-features = false, features = ["use_zbus"] }
+
+[target.'cfg(windows)'.dependencies]
+winapi = { version = "0.3", features = ["winuser", "winbase"] }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

@@ -1,0 +1,103 @@
+.cover {
+    position: relative;
+    transition: transform 0.3s;
+}
+
+.coverContainer {
+    position: relative;
+
+    :global {
+        img {
+            border-radius: 0.75em;
+            width: 100%;
+            user-select: none;
+            aspect-ratio: 1 / 1;
+            border: 1px solid rgba(0, 0, 0, 0.04);
+        }
+    }
+}
+
+.coverHover {
+    &:hover {
+        cursor: pointer;
+        /* transform: scale(1.02); */
+    }
+}
+
+.shade {
+    position: absolute;
+    top: 0;
+    height: calc(100% - 3px);
+    width: 100%;
+    background: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.playButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    height: 22%;
+    width: 22%;
+    border-radius: 50%;
+    cursor: default;
+    transition: 0.2s;
+
+    :global {
+        .svg-icon {
+            height: 44%;
+
+            margin: {
+                left: 4px;
+            }
+        }
+    }
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
+
+    &:active {
+        transform: scale(0.94);
+    }
+}
+
+:global {
+
+    .shadow {
+        position: absolute;
+        top: 12px;
+        height: 100%;
+        width: 100%;
+        filter: blur(16px) opacity(0.6);
+        transform: scale(0.92, 0.96);
+        z-index: -1;
+        background-size: cover;
+        border-radius: 0.75em;
+        aspect-ratio: 1 / 1;
+    }
+
+    .fade-enter {
+        opacity: 0;
+    }
+
+    .fade-enter-active{
+        opacity: 1;
+        transition: opacity 200ms;
+    }
+
+    .fade-exit {
+        opacity: 1;
+    }
+
+    .fade-exit-active{
+        opacity: 0;
+        transition: opacity 200ms;
+    }
+}

@@ -1,0 +1,65 @@
+.search-page {
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 32px;
+
+    .artists {
+      flex: 1;
+      margin-right: 8rem;
+    }
+
+    .albums {
+      flex: 1;
+    }
+  }
+}
+
+.section-title {
+  font-weight: 600;
+  font-size: 22px;
+  opacity: 0.88;
+  color: var(--color-text);
+  margin-bottom: 16px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  a {
+    font-size: 13px;
+    font-weight: 600;
+    opacity: 0.68;
+  }
+}
+
+.tracks,
+.music-videos,
+.playlists {
+  margin-top: 46px;
+}
+
+.no-results {
+  position: absolute;
+  top: 64px;
+  right: 0;
+  left: 0;
+  bottom: 64px;
+  font-size: 24px;
+  color: var(--color-text);
+  opacity: 0.38;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  div {
+    display: flex;
+    align-items: center;
+  }
+
+  .svg-icon {
+    height: 24px;
+    width: 24px;
+    margin-right: 16px;
+  }
+}

@@ -1,0 +1,23 @@
+{
+    "identifier": "com.tauri.mop",
+    "bundle": {
+        "resources": ["./resources/yt-dlp.exe", "./initData"],
+        "windows": {
+            "allowDowngrades": true,
+            "certificateThumbprint": null,
+            "digestAlgorithm": null,
+            "nsis": {
+                "displayLanguageSelector": true,
+                "installerIcon": "icons/icon.ico",
+                "installMode": "both",
+                "languages": ["SimpChinese", "TradChinese", "English"]
+            },
+            "timestampUrl": null,
+            "tsp": false,
+            "webviewInstallMode": {
+                "silent": true,
+                "type": "downloadBootstrapper"
+            }
+        }
+    }
+}

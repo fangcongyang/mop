@@ -1,0 +1,11 @@
+.volume-control {
+  margin-left: 4px;
+  display: flex;
+  align-items: center;
+
+  .volume-bar {
+    width: 84px;
+    display: flex;
+    align-items: center;
+  }
+}

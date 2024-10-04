@@ -1,0 +1,102 @@
+.login {
+    display: flex;
+    color: var(--color-text);
+}
+
+.title {
+    font-size: 42px;
+    font-weight: 700;
+    margin-bottom: 48px;
+}
+
+.sestion {
+    margin-top: 18px;
+
+    .name {
+        font-size: 14px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        opacity: 0.78;
+    }
+}
+
+.search-box {
+    .container {
+        display: flex;
+        align-items: center;
+        height: 48px;
+        border-radius: 11px;
+        width: 326px;
+        background: var(--color-primary-bg);
+    }
+
+    .svg-icon {
+        height: 22px;
+        width: 22px;
+        color: var(--color-primary);
+
+        margin: {
+            left: 12px;
+            right: 8px;
+        }
+    }
+
+    input {
+        flex: 1;
+        font-size: 22px;
+        border: none;
+        background: transparent;
+        width: 115%;
+        font-weight: 600;
+        margin-top: -1px;
+        color: var(--color-primary);
+
+        &::placeholder {
+            color: var(--color-primary);
+            opacity: 0.78;
+        }
+    }
+}
+
+.user-list {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 24px;
+    margin-bottom: 24px;
+}
+
+.user {
+    margin-right: 16px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    padding: 12px 12px 12px 16px;
+    border-radius: 8px;
+    width: 256px;
+    transition: 0.2s;
+    user-select: none;
+
+    .head {
+        border-radius: 50%;
+        height: 44px;
+        width: 44px;
+    }
+
+    .nickname {
+        font-size: 18px;
+        margin-left: 12px;
+    }
+
+    &:hover {
+        background: var(--color-secondary-bg);
+    }
+}
+
+.user.active {
+    transition: 0.2s;
+    background: var(--color-primary-bg);
+
+    .nickname {
+        color: var(--color-primary);
+    }
+}

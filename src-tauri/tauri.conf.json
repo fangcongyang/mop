@@ -1,0 +1,62 @@
+{
+    "productName": "mop",
+    "version": "0.0.1",
+    "identifier": "com.tauri.mop",
+    "build": {
+        "beforeDevCommand": "pnpm dev",
+        "beforeBuildCommand": "pnpm build",
+        "devUrl": "http://localhost:1420",
+        "frontendDist": "../dist"
+    },
+    "app": {
+      "security": {
+        "csp": null,
+        "assetProtocol": {
+          "enable": true,
+          "scope": [
+            "**"
+          ]
+        }
+      },
+      "windows": [
+          {
+              "fullscreen": false,
+              "resizable": true,
+              "title": "mop",
+              "width": 1440,
+              "height": 840,
+              "center": true,
+              "decorations": false,
+              "transparent": true
+          }
+      ]
+    },
+    "bundle": {
+        "active": true,
+        "targets": "all",
+        "resources": [
+          "./initData"
+        ],
+        "longDescription": "A music software",
+        "shortDescription": "Music App",
+        "icon": [
+            "icons/32x32.png",
+            "icons/128x128.png",
+            "icons/128x128@2x.png",
+            "icons/icon.icns",
+            "icons/icon.ico"
+        ],
+        "macOS": {
+            "entitlements": null,
+            "exceptionDomain": "",
+            "frameworks": [],
+            "providerShortName": null,
+            "signingIdentity": null
+        }
+    },
+    "plugins": {
+      "shell": {
+        "open": true
+      }
+    }
+}
