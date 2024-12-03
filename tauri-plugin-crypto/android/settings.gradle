@@ -1,0 +1,45 @@
+pluginManagement {
+    repositories {
+        maven {
+            setUrl("https://maven.aliyun.com/repository/google")
+        }
+        maven {
+            setUrl("https://maven.aliyun.com/repository/public")
+        }
+        maven {
+            setUrl("https://maven.aliyun.com/repository/gradle-plugin")
+        }
+
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+    resolutionStrategy {
+        eachPlugin {
+            switch (requested.id.id) {
+                case "com.android.library":
+                    useVersion("8.0.2")
+                    break
+                case "org.jetbrains.kotlin.android":
+                    useVersion("1.8.20")
+                    break
+            }
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+//        // 使用阿里镜像源
+//        maven { url 'https://maven.aliyun.com/repository/google' }
+//        maven { url 'https://maven.aliyun.com/repository/central' }
+
+        google()
+        mavenCentral()
+
+    }
+}
+
+include ':tauri-android'
+project(':tauri-android').projectDir = new File('./.tauri/tauri-api')

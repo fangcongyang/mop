@@ -29,8 +29,6 @@ const excludeSaveKeys = [
     "_playing",
     "_personalFMLoading",
     "_personalFMNextLoading",
-    "_processFps",
-    "_processFpsInterval",
     "_lastProcessFpsDate",
     "_observers",
 ];
@@ -99,16 +97,14 @@ class Player implements PlayerSubject {
      */
     private createdBlobRecords: string[];
     private _howler?: Howl | null;
-    private _processFps: number;
-    private _processFpsInterval: number;
-    private _lastProcessFpsDate?: number | undefined;
+    private _sendTimeInterval?: NodeJS.Timeout;
     private _observers: Set<PlayerObserver>;
 
     constructor() {
         // 播放器状态
         this._playing = false;
         this._progress = 0;
-        this._enabled = false;
+        this._enabled = true;
         this._repeatMode = "off";
         this._shuffle = false;
         this._reversed = false;
@@ -134,9 +130,6 @@ class Player implements PlayerSubject {
         this.createdBlobRecords = [];
 
         this._howler = null;
-        this._processFps = 1;
-        this._processFpsInterval = 1000 / this._processFps;
-        this._lastProcessFpsDate = undefined;
         this._observers = new Set();
         Object.defineProperty(this, "_howler", {
             enumerable: false,
@@ -221,33 +214,19 @@ class Player implements PlayerSubject {
         }
     }
 
-    _step(timestamp: number) {
-        if (this._lastProcessFpsDate == undefined) {
-            this._lastProcessFpsDate = timestamp;
-        }
-        let elapsed = timestamp - this._lastProcessFpsDate!;
-        if (elapsed > this._processFpsInterval) {
-            this._lastProcessFpsDate = timestamp;
+    _step() {
+        if (this._sendTimeInterval) clearInterval(this._sendTimeInterval);
+        this._sendTimeInterval = setInterval(() => {
             if (this._howler?.playing()) {
                 let progress = this._howler!.seek();
                 this._progress = progress;
                 this.notifyObservers("progress");
-                localStorage.setItem(
-                    "playerCurrentTrackTime",
-                    progress.toString()
-                );
+                localStorage.setItem("playerCurrentTrackTime", progress.toString());
             }
-        }
-        requestAnimationFrame(this._step.bind(this));
-        // if (this._sendTimeInterval) clearInterval(this._sendTimeInterval);
-        // this._sendTimeInterval = setInterval(() => {
-        //     if (this._howler === null) return;
-        //     let progress = this._howler!.seek();
-        //     localStorage.setItem("playerCurrentTrackTime", progress.toString());
-        //     // if (isCreateMpris) {
-        //     //   ipcRenderer?.send('playerCurrentTrackTime', this._progress);
-        //     // }
-        // }, 1000);
+            // if (isCreateMpris) {
+            //   ipcRenderer?.send('playerCurrentTrackTime', this._progress);
+            // }
+        }, 1000);
     }
 
     saveSelfToLocalStorage() {
@@ -263,7 +242,7 @@ class Player implements PlayerSubject {
     pause() {
         this._howler?.fade(this.volume, 0, PLAY_PAUSE_FADE_DURATION);
 
-        emit("taryEvent", { taryId: "play", title: "播放" });
+        emit("trayEvent", { trayId: "play", title: "播放" });
 
         this._howler?.once("fade", () => {
             this._howler?.pause();
@@ -275,7 +254,7 @@ class Player implements PlayerSubject {
 
     play() {
         if (this._howler?.playing()) return;
-        emit("taryEvent", { taryId: "play", title: "暂停" });
+        emit("trayEvent", { trayId: "play", title: "暂停" });
         this._howler?.play();
 
         this._howler?.once("play", () => {
@@ -423,7 +402,7 @@ class Player implements PlayerSubject {
         return true;
     }
 
-    playPersionNextTrack() {
+    playPersonNextTrack() {
         if (this.isPersonalFM) {
             this.playNextFMTrack();
         } else {

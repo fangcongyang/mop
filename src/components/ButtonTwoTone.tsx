@@ -15,51 +15,52 @@ interface ButtonTwoToneProps {
     children?: ReactElement | string,
 }
 
-const ButtonTwoTone: FunctionComponent<ButtonTwoToneProps> = (props) => {
+const ButtonTwoTone: FunctionComponent<ButtonTwoToneProps> = ({
+    iconClass= null,
+    iconButton= false,
+    horizontalPadding= 16,
+    color= "blue",
+    className,
+    backgroundColor= '',
+    textColor= '',
+    shape= 'square',
+    onClick,
+    children
+}) => {
 
     const buttonStyle = useMemo(() => {
         let styles: CSSProperties = {
-            borderRadius: props.shape === 'round' ? '50%' : '8px',
-            padding: `8px ${props.horizontalPadding}px`,
+            borderRadius: shape === 'round' ? '50%' : '8px',
+            padding: `8px ${horizontalPadding}px`,
             // height: "38px",
-            width: props.shape === 'round' ? '38px' : 'auto',
+            width: shape === 'round' ? '38px' : 'auto',
         };
-        if (props.backgroundColor !== '')
-            styles.backgroundColor = props.backgroundColor;
-        if (props.textColor !== '') styles.color = props.textColor;
+        if (backgroundColor !== '')
+            styles.backgroundColor = backgroundColor;
+        if (textColor !== '') styles.color = textColor;
         return styles;
-    }, [props])
+    }, [])
 
     const buttonClassName = useMemo(() => {
         let classNames = [];
         classNames.push('buttonTwoTone');
-        if (props.className) classNames.push(props.className);
-        if (props.color) classNames.push(props.color);
+        if (className) classNames.push(className);
+        if (color) classNames.push(color);
         return classNames.join(" ");
-    }, [props.className])
+    }, [className])
 
     return (
         <button
             style={buttonStyle}
             className={buttonClassName}
-            onClick={props.onClick}>
-            {props.iconClass ?
-                <SvgIcon svgName={props.iconClass} svgClass={props.iconClass} svgStyle={{marginRight:  props.iconButton ? '0px' : '8px'}}/>
+            onClick={onClick}>
+            {iconClass ?
+                <SvgIcon svgName={iconClass} svgClass={iconClass} svgStyle={{marginRight: iconButton ? '0px' : '8px'}}/>
                 : ''
             }
-            {props.children}
+            {children}
         </button>
     );
-}
-
-ButtonTwoTone.defaultProps = {
-    iconClass: null,
-    iconButton: false,
-    horizontalPadding: 16,
-    color: "blue",
-    backgroundColor: '',
-    textColor: '',
-    shape: 'square'
 }
 
 export default ButtonTwoTone;

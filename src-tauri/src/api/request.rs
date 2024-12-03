@@ -4,6 +4,7 @@ use log::info;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
+use tauri_plugin_http::reqwest;
 use std::{
     fmt::Debug,
     path::PathBuf,
@@ -185,7 +186,7 @@ pub async fn handle_request(
     let crypto_string = options.crypto.unwrap();
     let crypto = &crypto_string;
 
-    let mut headers = HeaderMap::new();
+    let mut headers: HeaderMap = HeaderMap::new();
     if crypto == &"linuxapi" {
         headers.insert(USER_AGENT, LINUX_USER_AGNET.parse().unwrap());
     } else if crypto == &"weapi" {
@@ -264,7 +265,7 @@ pub async fn handle_request(
     let client_builder = || {
         let client_builder = reqwest::ClientBuilder::new()
         .default_headers(headers);
-        if get_string("proxyProtocol") == "noProxy" {
+        if get_string("proxyProtocol") == "noProxy" || get_string("proxyProtocol") == "" {
             client_builder.no_proxy()
         } else {
             let proxy_url = format!("{}://{}:{}", get_string("proxyProtocol"), get_string("proxyServer"), get_string("proxyPort"));

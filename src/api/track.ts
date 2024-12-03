@@ -14,8 +14,8 @@ import { storeData } from "@/utils";
  * !!!未登录状态返回试听片段(返回字段包含被截取的正常歌曲的开始时间和结束时间)
  * @param {string} id - 音乐的 id，例如 id=405998841,33894312
  */
-export function getMP3(id: string) {
-    const quality = storeData.getBr();
+export async function getMP3(id: string) {
+    const quality = await storeData.getBr();
     return invoke("get_song_url", { data: { id, br: parseInt(quality) } });
 }
 

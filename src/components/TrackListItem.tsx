@@ -73,7 +73,7 @@ const TrackListItem = (props: TrackListItemProps) => {
     }, [props.type])
 
     const showAlbumName = useMemo(() => {
-        return props.type !== 'album' && props.type !== 'tracklist';
+        return props.type !== 'album' && props.type !== 'trackList';
     }, [props.type])
 
     const goToAlbum = () => {
@@ -122,11 +122,11 @@ const TrackListItem = (props: TrackListItemProps) => {
     }, [liked.songs, track])
 
     const showLikeButton = useMemo(() => {
-        return props.type !== 'tracklist' && props.type !== 'cloudDisk';
+        return props.type !== 'trackList' && props.type !== 'cloudDisk';
     }, [props.type])
 
     const showTrackTime = useMemo(() => {
-        return props.type !== 'tracklist';
+        return props.type !== 'trackList';
     }, [props.type])
 
     const imgUrl = () => {

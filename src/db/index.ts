@@ -1,8 +1,8 @@
 import Dexie, { Table } from "dexie";
 import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
-import { storeData } from "@/utils";
 import { decode as base642Buffer } from "@/utils/base64";
+import { store } from "@/utils/store";
 
 class MopDatabase extends Dexie {
     public trackDetail!: Table<any, number>;
@@ -110,7 +110,7 @@ export async function cacheTrackSource(
 }
 
 async function deleteExcessCache() {
-    const cacheLimit = storeData.getCacheLimit();
+    const cacheLimit = await store.get("cacheLimit");
     if (cacheLimit === 0 || tracksCacheBytes < cacheLimit * Math.pow(1024, 2)) {
         return;
     }
@@ -178,11 +178,10 @@ export function cacheLyric(id: number, lyrics: any) {
     });
 }
 
-export function getLyricFromCache(id: number) {
-    return db.lyric.get(Number(id)).then((result) => {
-        if (!result) return undefined;
-        return result.lyrics;
-    });
+export async function getLyricFromCache(id: number) {
+    const result = await db.lyric.get(Number(id));
+    if (!result) return undefined;
+    return result.lyrics;
 }
 
 export async function countDatabaseSize() {

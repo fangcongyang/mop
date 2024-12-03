@@ -9,13 +9,13 @@ use async_trait::async_trait;
 use concat_string::concat_string;
 use futures::FutureExt;
 use log::{debug, info};
-use reqwest::Url;
 use serde::{Deserialize, Serialize};
-use unm_engine::interface::Engine;
-use unm_request::build_client;
-use unm_request::json::{Json, UnableToExtractJson};
-use unm_selector::SimilarSongSelector;
-use unm_types::{
+use interface::Engine;
+use tauri_plugin_http::reqwest::Url;
+use request::build_client;
+use super::{json::{Json, UnableToExtractJson}, models, selector};
+use selector::SimilarSongSelector;
+use models::{
     Album,
     Context,
     RetrievedSongInfo,
@@ -23,6 +23,8 @@ use unm_types::{
     Song,
     SongSearchInformation,
 };
+
+use super::{interface, request};
 
 pub const ENGINE_ID: &str = "kugou";
 

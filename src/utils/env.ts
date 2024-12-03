@@ -1,7 +1,6 @@
 import { type } from "@tauri-apps/plugin-os";
 import { getVersion } from '@tauri-apps/api/app';
 import { initStore } from "./store";
-import { AxiosHttpStrategy, TauriHttpStrategy } from "./httpStrategy";
 import { changeLanguage } from ".";
 
 export let osType = '';
@@ -50,13 +49,10 @@ async function initAppVersion() {
     })
 }
 
-export let httpStrategy: AxiosHttpStrategy | TauriHttpStrategy = new AxiosHttpStrategy();
-
 export function initEnv() {
-    return new Promise<void>((resolve, reject) => {
+    return new Promise<void>((resolve, _reject) => {
         initOsType();
         initAppVersion();
-        httpStrategy = osType.startsWith("web") ? new AxiosHttpStrategy() : new TauriHttpStrategy()
         initStore(osType).then(async (store) => {
             let lang = await store.get("lang");
             changeLanguage(lang || "en");

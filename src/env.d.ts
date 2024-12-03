@@ -1,6 +1,7 @@
 interface ImportMetaEnv {
     readonly VITE_APP_LASTFM_API_KEY: string;
     readonly VITE_APP_LASTFM_API_SHARED_SECRET: string;
+    readonly VITE_MOP_VERSION: string;
 }
 
 interface ImportMeta {

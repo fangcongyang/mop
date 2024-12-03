@@ -1,6 +1,6 @@
 import { authGetSession } from "@/api/lastfm";
 import SvgIcon from "@/components/SvgIcon";
-import _ from "lodash";
+import { debounce } from "lodash";
 import { useEffect, useState } from "react";
 import { useAppDispatch } from "@/store/hooks";
 import { updateLastfm } from "@/store/coreSlice";
@@ -15,7 +15,7 @@ const LastfmCallback = () => {
         initLastfmToken();
     }, [window.location.search]);
 
-    const initLastfmToken = _.debounce(() => {
+    const initLastfmToken = debounce(() => {
         const token = new URLSearchParams(window.location.search).get('token');
         if (!token) {
           setMessage('连接失败，请重试或联系开发者（无Token）');
@@ -38,7 +38,7 @@ const LastfmCallback = () => {
     return (
         <div className={styles.lastfmCallback}>
             <div className="section-1">
-                <img src="/img/logos/yesplaymusic.png" />
+                <img src="/img/logos/mop.png" />
                 <SvgIcon svgName="x" />
                 <img src="/img/logos/lastfm.png" />
             </div>

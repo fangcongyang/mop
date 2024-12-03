@@ -312,8 +312,7 @@ const Library: FunctionComponent<LibraryProps> = (props) => {
                         }
                         tracks={liked.songsWithDetails}
                         columnNumber={3}
-                        type="tracklist"
-                        dbclickTrackFunc="playPlaylistByID"
+                        dbClickTrackFunc="playPlaylistByID"
                     />
                 </div>
             </div>
@@ -469,7 +468,7 @@ const Library: FunctionComponent<LibraryProps> = (props) => {
                             tracks={liked.cloudDisk}
                             type="cloudDisk"
                             columnNumber={3}
-                            dbclickTrackFunc="playCloudDisk"
+                            dbClickTrackFunc="playCloudDisk"
                             extraContextMenuItem={["removeTrackFromCloudDisk"]}
                         />
                     </div>
@@ -501,7 +500,6 @@ const Library: FunctionComponent<LibraryProps> = (props) => {
                         <TrackList
                             tracks={playHistoryList}
                             columnNumber={1}
-                            type="tracklist"
                         />
                     </div>
                 ) : (

@@ -5,12 +5,12 @@
     "build": {
         "beforeDevCommand": "pnpm dev",
         "beforeBuildCommand": "pnpm build",
-        "devUrl": "http://localhost:1420",
+        "devUrl": "http://localhost:2420",
         "frontendDist": "../dist"
     },
     "app": {
       "security": {
-        "csp": null,
+        "csp": "default-src *; script-src *; style-src *; img-src *; connect-src *;",
         "assetProtocol": {
           "enable": true,
           "scope": [

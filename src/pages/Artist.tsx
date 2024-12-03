@@ -323,7 +323,6 @@ const Artist: FunctionComponent<ArtistProps> = (props) => {
                 <div className="section-title">{t("artist.popularSongs")}</div>
                 <TrackList
                     tracks={popularTracks.slice(0, showMorePopTracks ? 24 : 12)}
-                    type="tracklist"
                 />
                 <div id="seeMore" className="show-more">
                     <button

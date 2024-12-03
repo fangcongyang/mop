@@ -1,0 +1,58 @@
+[
+  {
+    "id": "play",
+    "name": "playOrPause",
+    "desc": "播放或暂停",
+    "shortcut": "CmdOrCtrl+space",
+    "globalShortcut": "Alt+CommandOrControl+space",
+    "isPersonalUse": false
+  },
+  {
+    "id": "nextTrack",
+    "name": "nextSong",
+    "desc": "下一首",
+    "shortcut": "CmdOrCtrl+Right",
+    "globalShortcut": "Alt+CommandOrControl+Right",
+    "isPersonalUse": false
+  },
+  {
+    "id": "prevTrack",
+    "name": "prevSong",
+    "desc": "上一首",
+    "shortcut": "CmdOrCtrl+Left",
+    "globalShortcut": "Alt+CommandOrControl+Left",
+    "isPersonalUse": false
+  },
+  {
+    "id": "increaseVolume",
+    "name": "increaseVolume",
+    "desc": "音量+",
+    "shortcut": "CmdOrCtrl+Up",
+    "globalShortcut": "Alt+CommandOrControl+Up",
+    "isPersonalUse": false
+  },
+  {
+    "id": "decreaseVolume",
+    "name": "decreaseVolume",
+    "desc": "音量-",
+    "shortcut": "CmdOrCtrl+Down",
+    "globalShortcut": "Alt+CommandOrControl+Down",
+    "isPersonalUse": false
+  },
+  {
+    "id": "like",
+    "name": "likeOrNotLike",
+    "desc": "收藏/取消收藏",
+    "shortcut": "CmdOrCtrl+L",
+    "globalShortcut": "Alt+CommandOrControl+L",
+    "isPersonalUse": false
+  },
+  {
+    "id": "minimize",
+    "name": "hideOrShowPlayer",
+    "desc": "显示/隐藏播放器",
+    "shortcut": "CmdOrCtrl+M",
+    "globalShortcut": "Alt+CommandOrControl+M",
+    "isPersonalUse": false
+  }
+]

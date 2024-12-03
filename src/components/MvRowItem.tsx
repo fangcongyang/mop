@@ -11,9 +11,12 @@ type MvRowItemProps = {
     subtitle?: string
 };
 
-const MvRowItem: FC<MvRowItemProps> = memo((props) => {
+const MvRowItem: FC<MvRowItemProps> = memo(({
+    mvId,
+    mv= {},
+    subtitle= 'artist',
+}) => {
     const nodeRef = useRef(null);
-    const [mv] = useState<any>(props.mv);
     const [hoverVideo, setHoverVideo] = useState(false);
     const navigate = useNavigate();
 
@@ -23,7 +26,7 @@ const MvRowItem: FC<MvRowItemProps> = memo((props) => {
     }
 
     const getSubtitle = (mv: any) => {
-        if (props.subtitle === 'artist') {
+        if (subtitle === 'artist') {
             let artistName = 'null';
             let artistId = 0;
             if (mv.artistName !== undefined) {
@@ -34,7 +37,7 @@ const MvRowItem: FC<MvRowItemProps> = memo((props) => {
                 artistId = mv.creator[0].userId;
             }
             return `<a href="/#/artist/${artistId}">${artistName}</a>`;
-        } else if (props.subtitle === 'publishTime') {
+        } else if (subtitle === 'publishTime') {
             return mv.publishTime;
         }
     }
@@ -54,7 +57,7 @@ const MvRowItem: FC<MvRowItemProps> = memo((props) => {
             <div className="cover"
                 onMouseOver={() => setHoverVideo(true)}
                 onMouseLeave={() => setHoverVideo(false)}
-                onClick={() => goToMv(props.mvId)}>
+                onClick={() => goToMv(mvId)}>
                 <img src={getUrl(mv)} loading="lazy" />
                 <Transition nodeRef={nodeRef} in={hoverVideo} name="mv-item-fade" timeout={600}>
                     {(state) => (
@@ -66,17 +69,12 @@ const MvRowItem: FC<MvRowItemProps> = memo((props) => {
             </div>
             <div className="info">
                 <div className="title">
-                    <Link to={'/mv/' + props.mvId}>{getTitle(mv)}</Link>
+                    <Link to={'/mv/' + mvId}>{getTitle(mv)}</Link>
                 </div>
                 <div className="artist" dangerouslySetInnerHTML={{ __html: getSubtitle(mv) }}></div>
             </div>
         </div>
     );
 })
-
-MvRowItem.defaultProps = {
-    subtitle: 'artist',
-    mv: {}
-}
 
 export default MvRowItem;

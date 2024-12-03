@@ -34,7 +34,7 @@ export function artistMv(params: any) {
  * 4: 日本
  * @param {number=} type
  */
-export function toplistOfArtists(type = null) {
+export function topListOfArtists(type = null) {
     let params: any = {};
     if (type) {
         params.type = type;
@@ -46,7 +46,7 @@ export function toplistOfArtists(type = null) {
  * 获取收藏的歌手（需要登录）
  * 说明 : 调用此接口可获取到用户收藏的歌手
  */
-export function artistSublist(params: any) {
+export function artistSubList(params: any) {
     params.timestamp = new Date().getTime();
     return invoke('artist_sublist', { data: params });
 }

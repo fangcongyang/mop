@@ -20,6 +20,7 @@ import { getListSourcePath, hasListSource } from "@/utils/playList";
 import { player } from "@/business/player";
 import "./Player.scss";
 import { PlayerObserver } from "@/type/player";
+import { useConfig } from "@/hooks/useConfig";
 
 const Player = () => {
     let location = useLocation();
@@ -42,6 +43,7 @@ const Player = () => {
     const [volume, setVolume] = useState(player.volume);
     const [mute, setMute] = useState(player.mute);
     const playerObserver: PlayerObserver = new PlayerObserver("player");
+    const [nyancatStyle] = useConfig("nyancatStyle", false, { page: "player" });
 
     const registerPlayerObserver = () => {
         playerObserver.on("playing", () => {
@@ -98,10 +100,10 @@ const Player = () => {
 
     const playProgressClass = useMemo(() => {
         let playProgressClass = ["progress-bar"];
-        if (settings.nyancatStyle) playProgressClass.push("nyancat");
+        if (nyancatStyle) playProgressClass.push("nyancat");
         if (!playing) playProgressClass.push("nyancat-stop");
         return playProgressClass.join(" ");
-    }, [playing, settings.nyancatStyle]);
+    }, [playing, nyancatStyle]);
 
     const isCurrentTrackLiked = useMemo(() => {
         return liked.songs.includes(currentTrackId);
@@ -183,7 +185,7 @@ const Player = () => {
     return (
         <div className="player">
             <div className={playProgressClass}>
-                {settings.nyancatStyle ? (
+                {nyancatStyle ? (
                     <Slider
                         aria-label="time-indicator"
                         size="small"

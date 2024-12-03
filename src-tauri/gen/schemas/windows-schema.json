@@ -3475,6 +3475,31 @@
           "const": "core:window:deny-unminimize"
         },
         {
+          "description": "Default permissions for the plugin",
+          "type": "string",
+          "const": "crypto:default"
+        },
+        {
+          "description": "Enables the aes_encrypt,rsa_encrypt,hash_encrypt command without any pre-configured scope.",
+          "type": "string",
+          "const": "crypto:allow-aes-encrypt,rsa-encrypt,hash-encrypt"
+        },
+        {
+          "description": "Enables the ping command without any pre-configured scope.",
+          "type": "string",
+          "const": "crypto:allow-ping"
+        },
+        {
+          "description": "Denies the aes_encrypt,rsa_encrypt,hash_encrypt command without any pre-configured scope.",
+          "type": "string",
+          "const": "crypto:deny-aes-encrypt,rsa-encrypt,hash-encrypt"
+        },
+        {
+          "description": "Denies the ping command without any pre-configured scope.",
+          "type": "string",
+          "const": "crypto:deny-ping"
+        },
+        {
           "description": "This permission set configures the types of dialogs\navailable from the dialog plugin.\n\n#### Granted Permissions\n\nAll dialog types are enabled.\n\n\n",
           "type": "string",
           "const": "dialog:default"

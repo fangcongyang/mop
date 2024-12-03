@@ -22,9 +22,9 @@ import { PlayerObserver } from "@/type/player";
 
 interface TrackListProps {
     tracks: any[],
-    type: "tracklist" | "album" | "playlist" | "cloudDisk",
+    type?: "trackList" | "album" | "playlist" | "cloudDisk",
     id?: number,
-    dbclickTrackFunc?: string
+    dbClickTrackFunc?: string
     albumObject?: any
     extraContextMenuItem?: string[]
     columnNumber?: number,
@@ -33,7 +33,22 @@ interface TrackListProps {
     removeTrack?: Function
 }
 
-const TrackList: FunctionComponent<TrackListProps> = (props) => {
+const TrackList: FunctionComponent<TrackListProps> = ({
+    tracks= [],
+    type= 'trackList',
+    id= 0,
+    dbClickTrackFunc= 'default',
+    albumObject= {
+        artist: {
+            name: '',
+        }
+    },
+    extraContextMenuItem= [],
+    columnNumber= 4,
+    highlightPlayingTrack= true,
+    itemKey= 'id',
+    removeTrack
+}) => {
     const { t } = useTranslation();
     const menu = useRef<ContextMenuHandle>(null);
     const dispatch = useAppDispatch()
@@ -65,11 +80,11 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
     const listStyles = () => {
         let ls: CSSProperties = {
         }
-        if (props.type === 'tracklist') {
+        if (type === 'trackList') {
             ls = {
                 display: 'grid',
                 gap: '4px',
-                gridTemplateColumns: `repeat(${props.columnNumber}, 1fr)`,
+                gridTemplateColumns: `repeat(${columnNumber}, 1fr)`,
             }
         }
         return ls
@@ -77,7 +92,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
 
     const playThisList = (trackId: number) => {
         let trackIds;
-        switch (props.dbclickTrackFunc) {
+        switch (dbClickTrackFunc) {
             case 'default':
                 playThisListDefault(trackId);
                 break;
@@ -85,19 +100,19 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                 player.playTrackOnListById(trackId);
                 break;
             case 'playPlaylistByID':
-                playerEventEmitter.emit('PLAYER:PALY_PLAYLIST', props.id, trackId);
+                playerEventEmitter.emit('PLAYER:PALY_PLAYLIST', id, trackId);
                 break;
             case 'playAList':
-                trackIds = props.tracks.map(t => t.id || t.songId);
-                player.replacePlaylist(trackIds, props.id, 'artist', trackId);
+                trackIds = tracks.map(t => t.id || t.songId);
+                player.replacePlaylist(trackIds, id, 'artist', trackId);
                 break;
             case 'dailyTracks':
-                trackIds = props.tracks.map(t => t.id);
+                trackIds = tracks.map(t => t.id);
                 player.replacePlaylist(trackIds, '/daily/songs', 'url', trackId);
                 break;
             case 'playCloudDisk':
-                trackIds = props.tracks.map(t => t.id || t.songId);
-                player.replacePlaylist(trackIds, props.id, 'cloudDisk', trackId);
+                trackIds = tracks.map(t => t.id || t.songId);
+                player.replacePlaylist(trackIds, id, 'cloudDisk', trackId);
                 break;
             default:
                 break;
@@ -105,13 +120,13 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
     }
 
     const playThisListDefault = (trackId: number) => {
-        if (props.type === 'playlist') {
-            playerEventEmitter.emit('PLAYER:PALY_PLAYLIST', props.id, trackId);
-        } else if (props.type === 'album') {
-            playerEventEmitter.emit('PLAYER:PLAY_ALBUM', props.id, trackId);
-        } else if (props.type === 'tracklist') {
-            let trackIds = props.tracks.map(t => t.id);
-            player.replacePlaylist(trackIds, props.id, 'artist', trackId);
+        if (type === 'playlist') {
+            playerEventEmitter.emit('PLAYER:PALY_PLAYLIST', id, trackId);
+        } else if (type === 'album') {
+            playerEventEmitter.emit('PLAYER:PLAY_ALBUM', id, trackId);
+        } else if (type === 'trackList') {
+            let trackIds = tracks.map(t => t.id);
+            player.replacePlaylist(trackIds, id, 'artist', trackId);
         }
     }
 
@@ -122,7 +137,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
     }
 
     const rightClickedTrackComputed = useMemo(() => {
-        return props.type === 'cloudDisk'
+        return type === 'cloudDisk'
             ? {
                 id: 0,
                 name: '',
@@ -158,7 +173,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
             let trackId = rightClickedTrack.id;
             addOrRemoveTrackFromPlaylist({
                 op: 'del',
-                pid: props.id,
+                pid: id,
                 tracks: trackId,
             }).then((data: any) => {
                 showToast(
@@ -166,9 +181,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                         ? t('toast.removedFromPlaylist')
                         : data.body.message
                 );
-                if (props.removeTrack) {
-                    props.removeTrack(trackId)
-                }
+                removeTrack?.(trackId)
             });
         }
     }
@@ -223,19 +236,19 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
         <div className="track-list">
             <div style={listStyles()}>
                 {
-                    props.tracks.map((track: any, index: number) => {
+                    tracks.map((track: any, index: number) => {
                         return (
                             <TrackListItem
-                                key={props.itemKey === 'id' ? track.id : `${track.id}${index}`}
+                                key={itemKey === 'id' ? track.id : `${track.id}${index}`}
                                 trackProp={track}
                                 trackNo={index + 1}
-                                type={props.type}
-                                highlightPlayingTrack={props.highlightPlayingTrack}
+                                type={type}
+                                highlightPlayingTrack={highlightPlayingTrack}
                                 onDoubleClick={() => playThisList(track.id || track.songId)}
                                 onContextMenu={(e: MouseEvent) => openMenu(e, track, index)}
                                 rightClickedTrack={rightClickedTrack}
                                 playThisList={playThisList}
-                                albumObject={props.albumObject}
+                                albumObject={albumObject}
                                 currentTrackId={currentTrackId}
                             />
                         )
@@ -246,7 +259,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
             <ContextMenu ref={menu} >
                 <div>
                     {
-                        props.type !== 'cloudDisk' ?
+                        type !== 'cloudDisk' ?
                             <div>
                                 <div className="item-info">
                                     <img
@@ -267,7 +280,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                         {t('trackList.addToQueue')}
                     </div>
                     {
-                        props.extraContextMenuItem?.includes('removeTrackFromQueue') ?
+                        extraContextMenuItem?.includes('removeTrackFromQueue') ?
                             <div
                                 className="item"
                                 onClick={removeTrackFromQueue}
@@ -277,7 +290,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                             : ''
                     }
                     {
-                        props.type !== 'cloudDisk' ?
+                        type !== 'cloudDisk' ?
                             <div>
                                 <hr />
                                 {
@@ -296,7 +309,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                             : ''
                     }
                     {
-                        props.extraContextMenuItem?.includes('removeTrackFromPlaylist') ?
+                        extraContextMenuItem?.includes('removeTrackFromPlaylist') ?
                             <div
                                 className="item"
                                 onClick={removeTrackFromPlaylist}
@@ -306,7 +319,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                             : ''
                     }
                     {
-                        props.type !== 'cloudDisk' ?
+                        type !== 'cloudDisk' ?
                             <div>
                                 <div
                                     className="item"
@@ -321,7 +334,7 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
                             : ''
                     }
                     {
-                        props.extraContextMenuItem?.includes('removeTrackFromCloudDisk') ?
+                        extraContextMenuItem?.includes('removeTrackFromCloudDisk') ?
                             <div
                                 className="item"
                                 onClick={removeTrackFromCloudDisk}
@@ -334,22 +347,6 @@ const TrackList: FunctionComponent<TrackListProps> = (props) => {
             </ContextMenu>
         </div>
     )
-}
-
-TrackList.defaultProps = {
-    tracks: [],
-    type: 'tracklist',
-    id: 0,
-    dbclickTrackFunc: 'default',
-    albumObject: {
-        artist: {
-            name: '',
-        }
-    },
-    extraContextMenuItem: [],
-    columnNumber: 4,
-    highlightPlayingTrack: true,
-    itemKey: 'id'
 }
 
 export default TrackList;

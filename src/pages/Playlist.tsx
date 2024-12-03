@@ -448,7 +448,7 @@ const Playlist = () => {
                         {data.user.nickname + t("playlist.favoriteMusic")}
                     </h1>
                     <div
-                        className="searchBoxLikepage"
+                        className="searchBoxLikePage"
                         onClick={searchInPlaylist}
                     >
                         <div

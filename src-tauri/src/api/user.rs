@@ -1,11 +1,14 @@
 use base64::{engine::general_purpose, Engine};
 use cached::proc_macro::cached;
-use openssl::hash::{hash, MessageDigest};
 use regex::Regex;
 use reqwest::header;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tauri::command;
+use tauri_plugin_crypto::{CryptoExt, CryptoResponse, HashEncryptRequest};
+use tauri_plugin_http::reqwest;
+
+use crate::{api::crypto::HashType, APP};
 
 use super::request::{
     request_handler, save_cookie_string, EmptyReq, LocalCookie, Options, Request, CRYPTO_WEAPI,
@@ -220,8 +223,17 @@ pub async fn cloud(mut file: UploadFileArgs) -> serde_json::Value {
     let content = general_purpose::STANDARD
         .decode(file.content.clone().unwrap())
         .unwrap_or("".into());
+
+    let app = APP.get().unwrap();
+    let digest = app
+        .crypto()
+        .hash_encrypt(HashEncryptRequest {
+            data: String::from_utf8(content.clone()).unwrap(),
+            algorithm: HashType::md5.to_string(),
+        })
+        .unwrap_or(CryptoResponse::default());
     if file.md5.is_none() {
-        file.md5 = Some(hex::encode(hash(MessageDigest::md5(), &content).unwrap()));
+        file.md5 = Some(digest.value);
         file.size = Some(content.len());
     }
 
@@ -276,11 +288,11 @@ pub async fn cloud(mut file: UploadFileArgs) -> serde_json::Value {
                                     "Content-Length",
                                     file2.size.unwrap().to_string().parse().unwrap(),
                                 );
-                                let clent = reqwest::Client::builder()
+                                let client = reqwest::Client::builder()
                                     .default_headers(headers)
                                     .build()
                                     .unwrap();
-                                let upload_res = clent
+                                let upload_res = client
                                     .post(format!(
                                         "http://{}/{}/{}?offset=0&complete=true&version=1.0",
                                         lbs["upload"][0], bucket, object_key

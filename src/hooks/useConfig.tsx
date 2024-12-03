@@ -37,10 +37,10 @@ export const useConfig = (key: StoreEventName, defaultValue: any, options: Confi
         }
     }, []);
 
-    const setProperty = useCallback((v: any, forceSync = false) => {
+    const setProperty = useCallback((v: any) => {
         setPropertyState(v);
-        const isSync = forceSync || sync;
-        isSync && syncToStore(v);
+        // const isSync = forceSync || sync;
+        sync && syncToStore(v);
     }, []);
 
     // 初始化

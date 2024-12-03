@@ -15,29 +15,37 @@ interface SettingsSelectProps {
     callback?: Function; // 回调函数
 }
 
-const SettingsSwitch: FC<SettingsSelectProps> = props => {
+const SettingsSwitch: FC<SettingsSelectProps> = ({
+    title= "",
+    titleStyle= {},
+    description= "",
+    initValue= false,
+    fieldKey= "",
+    inputId= "",
+    callback= undefined
+}) => {
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
     
     const switchChange = (switchValue: boolean) => {
         dispatch(updateAppConf({
             confName: "settings",
-            key: props.fieldKey,
+            key: fieldKey,
             value: switchValue
         }));
-        if (props.callback) props.callback(switchValue)
+        callback?.(switchValue)
     }
 
     return (
         <div className="settings-item">
             <div className="left">
-                <div className="title" style={props.titleStyle ? props.titleStyle : {}}> 
-                    { isString(props.title) ? t(props.title) : props.title } 
+                <div className="title" style={titleStyle ? titleStyle : {}}> 
+                    { isString(title) ? t(title) : title } 
                 </div>
                 {
-                    props.description ?
+                    description ?
                     <div className="description">
-                        {t(props.description)}
+                        {t(description)}
                     </div>
                     : ''
                 }
@@ -45,27 +53,17 @@ const SettingsSwitch: FC<SettingsSelectProps> = props => {
             <div className="right">
                 <div className="toggle">
                     <input
-                        id={props.inputId}
+                        id={inputId}
                         type="checkbox"
-                        name={props.inputId}
-                        checked={props.initValue}
+                        name={inputId}
+                        checked={initValue}
                         onChange={(e) => switchChange(e.target.checked)}
                     />
-                    <label htmlFor={props.inputId}></label>
+                    <label htmlFor={inputId}></label>
                 </div>
             </div>
         </div>
     )
-}
-
-SettingsSwitch.defaultProps = {
-    title: "",
-    titleStyle: {},
-    description: "",
-    initValue: false,
-    fieldKey: "",
-    inputId: "",
-    callback: undefined
 }
 
 export default SettingsSwitch;

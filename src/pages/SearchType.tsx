@@ -120,7 +120,7 @@ const SearchType = () => {
                         <TrackList
                             tracks={result}
                             type="playlist"
-                            dbclickTrackFunc="playAList"
+                            dbClickTrackFunc="playAList"
                         />
                     </div>
                     : ''

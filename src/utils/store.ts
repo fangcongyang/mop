@@ -1,37 +1,36 @@
 import { Store, createStore } from "@tauri-apps/plugin-store";
 import { appConfigDir, join } from "@tauri-apps/api/path";
 
-const eventNames = ["lang", "automaticallyCacheSongs", "shortcutList", "excludeR18Classes", "r18ClassFilter", 
-    "downloadSavePath", "proxyProtocol", "proxyServer", "proxyPort"] as const;
+const eventNames = [
+    "lang",
+    "automaticallyCacheSongs",
+    "shortcutList",
+    "musicQuality",
+    "nyancatStyle",
+    "downloadSavePath",
+    "proxyProtocol",
+    "proxyServer",
+    "proxyPort",
+] as const;
 
-export type StoreEventName = typeof eventNames[number];
+export type StoreEventName = (typeof eventNames)[number];
 
 export class StoreObserver {
     private _name: string;
     private _listeners: Record<StoreEventName, Set<Function>>;
 
     constructor(name: string) {
-        this._name = name;
-        this._listeners = {
-            "lang": new Set(),
-            "automaticallyCacheSongs": new Set(),
-            "shortcutList": new Set(),
-            "excludeR18Classes": new Set(),
-            "r18ClassFilter": new Set(),
-            "downloadSavePath": new Set(),
-            "proxyProtocol": new Set(),
-            "proxyServer": new Set(),
-            "proxyPort": new Set(),
-        };
+        this._name = name;        
+        this._listeners = Object.fromEntries(eventNames.map(event => [event, new Set<Function>()])) as Record<StoreEventName, Set<Function>>;
     }
 
     on(eventName: StoreEventName, listener: Function) {
         this._listeners[eventName].add(listener);
     }
 
-    emit(eventName: StoreEventName, ...args: any[]) {
+    emit(eventName: StoreEventName, arg: any) {
         this._listeners[eventName].forEach((listener) => {
-            listener(...args);
+            listener(arg);
         });
     }
 
@@ -47,7 +46,7 @@ export interface StoreSubject {
     // 移除播放器观察者
     removeObserver(observer: StoreObserver): void;
     // 播放器通知观察者
-    notifyObservers(eventName: StoreEventName, ...args: any[]): void;
+    notifyObservers(eventName: StoreEventName, args: any): void;
 }
 
 interface DataStore extends StoreSubject {
@@ -91,14 +90,14 @@ export class TauriDataStore implements DataStore {
     registerObserver(observer: StoreObserver): void {
         this._observers.add(observer);
     }
-    
+
     removeObserver(observer: StoreObserver): void {
         this._observers.delete(observer);
     }
 
-    notifyObservers(eventName: StoreEventName, ...args: any[]): void {
+    notifyObservers(eventName: StoreEventName, arg: any): void {
         this._observers.forEach((observer) => {
-            observer.emit(eventName, args);
+            observer.emit(eventName, arg);
         });
     }
 }
@@ -127,7 +126,7 @@ class LocalDataStore implements DataStore {
             } else {
                 resolve(null);
             }
-        })
+        });
     }
 
     save(): Promise<void> {
@@ -160,5 +159,3 @@ export async function initStore(osType: string) {
     }
     return store;
 }
-
-

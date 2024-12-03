@@ -22,6 +22,7 @@ pub struct StoreWrapper(pub Mutex<Store<Wry>>);
 pub fn init_config(app: &mut tauri::App) {
     let config_path = app.path().resolve("", BaseDirectory::AppConfig).unwrap();
     let config_path = config_path.join("mop.json");
+    let _ = utils::create_dir_if_not_exists(&config_path);
     info!("Load config from: {:?}", config_path);
     let store = StoreBuilder::new(&app.handle().clone(), config_path).build();
 
@@ -70,6 +71,10 @@ pub fn is_first_run() -> bool {
 
 pub fn init_config_value() {
     let init_config_value_str = utils::read_init_data_file("mop.json");
+    if init_config_value_str == "[]" {
+        set("appName", "mop");
+        return;
+    }
     let init_config_value: Value = serde_json::from_str(&init_config_value_str).unwrap();
     init_config_value.as_object().unwrap().iter().for_each(|(k, v)| {
         set(k, v.clone());

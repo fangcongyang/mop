@@ -2,15 +2,16 @@ use base64::{engine::general_purpose, Engine};
 use engine::kugou::{KugouEngine, ENGINE_ID as KUGOU_ENGINE_ID};
 use engine::ytdl::{YtDlEngine, ENGINE_ID as YTDL_ENGINE_ID};
 use reqwest::header::{HeaderMap, REFERER, USER_AGENT};
+use tauri_plugin_http::reqwest;
 use std::{borrow::Cow, sync::Arc};
 use tauri::command;
-use unm_engine::executor::Executor;
-use unm_engine_bilibili::{BilibiliEngine, ENGINE_ID as BILIBILI_ENGINE_ID};
-use unm_engine_qq::{QQEngine, ENGINE_ID as QQ_ENGINE_ID};
-use unm_types::{
-    config::ConfigManagerBuilder, ContextBuilder, RetrievedSongInfo, SearchMode, Song,
+use executor::Executor;
+use config::ConfigManagerBuilder;
+use models::{
+    ContextBuilder, RetrievedSongInfo, SearchMode, Song,
 };
 
+use crate::engine::{config, executor, models};
 use crate::{engine, utils};
 
 #[command]
@@ -26,19 +27,19 @@ pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<Retrieved
         .search_mode(SearchMode::OrderFirst)
         .build().unwrap();
     executor.register(Cow::Borrowed(YTDL_ENGINE_ID), Arc::new(YtDlEngine {}));
-    executor.register(
-        Cow::Borrowed(BILIBILI_ENGINE_ID),
-        Arc::new(BilibiliEngine {}),
-    );
+    // executor.register(
+    //     Cow::Borrowed(BILIBILI_ENGINE_ID),
+    //     Arc::new(BilibiliEngine {}),
+    // );
     executor.register(Cow::Borrowed(KUGOU_ENGINE_ID), Arc::new(KugouEngine {}));
-    executor.register(Cow::Borrowed(QQ_ENGINE_ID), Arc::new(QQEngine {}));
+    // executor.register(Cow::Borrowed(QQ_ENGINE_ID), Arc::new(QQEngine {}));
     let search_result = executor
         .search(
             &[
                 Cow::from(YTDL_ENGINE_ID),
-                Cow::from(BILIBILI_ENGINE_ID),
+                // Cow::from(BILIBILI_ENGINE_ID),
                 Cow::from(KUGOU_ENGINE_ID),
-                Cow::from(QQ_ENGINE_ID),
+                // Cow::from(QQ_ENGINE_ID),
             ],
             &song,
             &context,

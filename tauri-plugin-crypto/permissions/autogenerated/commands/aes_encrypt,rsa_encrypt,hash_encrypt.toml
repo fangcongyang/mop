@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-aes-encrypt,rsa-encrypt,hash-encrypt"
+description = "Enables the aes_encrypt,rsa_encrypt,hash_encrypt command without any pre-configured scope."
+commands.allow = ["aes_encrypt,rsa_encrypt,hash_encrypt"]
+
+[[permission]]
+identifier = "deny-aes-encrypt,rsa-encrypt,hash-encrypt"
+description = "Denies the aes_encrypt,rsa_encrypt,hash_encrypt command without any pre-configured scope."
+commands.deny = ["aes_encrypt,rsa_encrypt,hash_encrypt"]

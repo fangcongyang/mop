@@ -159,7 +159,7 @@ const Search = () => {
                         {t('home.seeMore')}
                     </Link>
                 </div>
-                <TrackList tracks={tracks} type="tracklist" />
+                <TrackList tracks={tracks} />
             </div>
             <div className={musicVideos.length > 0 ? 'music-videos' : 'music-videos hidden'}>
                 <div className="section-title">

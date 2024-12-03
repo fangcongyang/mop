@@ -52,6 +52,7 @@
       margin-top: 24px;
       display: -webkit-box;
       -webkit-box-orient: vertical;
+      line-clamp: 3;
       -webkit-line-clamp: 3;
       overflow: hidden;
       cursor: pointer;
@@ -89,7 +90,7 @@
   }
 }
 
-.searchBoxLikepage {
+.searchBoxLikePage {
   display: flex;
   position: absolute;
   right: 12vw;

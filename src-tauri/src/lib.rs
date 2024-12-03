@@ -3,21 +3,22 @@ mod macros;
 
 extern crate proc_macro;
 
-use app::{hotkey::{register_shortcut, register_shortcut_by_frontend}, menu, mpris::{ self, TrackInfo}};
+use app::hotkey;
 use conf::{get, init_config, init_config_value, is_first_run, set, Shortcut};
 use log::{info, LevelFilter};
 use once_cell::sync::OnceCell;
 use tauri::{Listener, Manager};
 use tauri_plugin_log::{Target, TargetKind};
 
-mod app;
 mod api;
-mod utils;
-mod engine;
+mod app;
 mod conf;
-use api::{album, artist, auth, cloud_engine, mv, other, playlist, request::read_cookie_string, track, user};
-
-use crate::app::menu::Payload;
+mod engine;
+mod utils;
+use api::{
+    album, artist, auth, cloud_engine, mv, other, playlist, request::read_cookie_string, track,
+    user,
+};
 
 pub static APP: OnceCell<tauri::AppHandle> = OnceCell::new();
 
@@ -30,6 +31,7 @@ pub fn run() {
         .plugin(tauri_plugin_os::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(tauri_plugin_crypto::init())
         .plugin(tauri_plugin_store::Builder::default().build())
         .plugin(
             tauri_plugin_log::Builder::default()
@@ -53,51 +55,68 @@ pub fn run() {
                 info!("First Run, opening config window");
                 init_config_value();
             }
-            
+
             read_cookie_string();
-            
+
             #[cfg(target_os = "linux")]
             {
-                let app_name = app.app_handle().config().package.product_name.clone().unwrap_or("".to_owned());
-                mpris::init_mpris(app_name);
+                let app_name = app
+                    .app_handle()
+                    .config()
+                    .product_name
+                    .clone()
+                    .unwrap_or("".to_owned());
+                mpris_linux::init_mpris(app_name);
+
+                app.listen("updateTrackInfo", move |event| {
+                    let track =
+                        serde_json::from_str::<mpris_linux::TrackInfo>(event.payload()).unwrap();
+                    mpris_linux::update_track_info(track);
+                });
             }
 
             #[cfg(desktop)]
-            app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
+            {
+                use app::menu::{self, menu_desktop::Payload};
+                app.handle()
+                    .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
 
-            let mut shortcuts: Vec<Shortcut> = vec![];
-            let enable_global_shortcut = get("enableGlobalShortcut").unwrap().as_bool();
+                let mut shortcuts: Vec<Shortcut> = vec![];
+                let enable_global_shortcut = get("enableGlobalShortcut").unwrap().as_bool();
 
-            // 初始化全局快捷键
-            if Some(true) == enable_global_shortcut {
-                get("shortcutList").unwrap().as_array().unwrap().iter().for_each(|item| {
-                    let shortcut = serde_json::from_value::<Shortcut>(item.clone()).unwrap();
-                    shortcuts.push(register_shortcut(shortcut));
-                });
-                set("shortcutList", shortcuts);
-            }
-
-            menu::tray_menu(&app)?;
-            
-            app.listen("updateTrackInfo", move |event| {
-                let track = serde_json::from_str::<TrackInfo>(event.payload()).unwrap();
-                mpris::update_track_info(track);
-            });
-
-            let app_handle = app.app_handle().clone();
-            app.listen("taryEvent", move |event | {
-                let payload = serde_json::from_str::<Payload>(event.payload()).unwrap();
-                if let Some(menu) = app_handle.menu() {
-                    if let Some(m) = menu.get(&payload.taryId.unwrap()) {
-                        let _ = m.as_menuitem().unwrap().set_text(payload.title.unwrap());
-                    }
+                // 初始化全局快捷键
+                if Some(true) == enable_global_shortcut {
+                    get("shortcutList")
+                        .unwrap()
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .for_each(|item| {
+                            let shortcut =
+                                serde_json::from_value::<Shortcut>(item.clone()).unwrap();
+                            shortcuts.push(hotkey::hotkey_desktop::register_shortcut(shortcut));
+                        });
+                    set("shortcutList", shortcuts);
                 }
-            });
+
+                menu::menu_desktop::tray_menu(&app)?;
+
+                let app_handle = app.app_handle().clone();
+                app.listen("taryEvent", move |event| {
+                    let payload = serde_json::from_str::<Payload>(event.payload()).unwrap();
+                    if let Some(menu) = app_handle.menu() {
+                        if let Some(m) = menu.get(&payload.taryId.unwrap()) {
+                            let _ = m.as_menuitem().unwrap().set_text(payload.title.unwrap());
+                        }
+                    }
+                });
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
             conf::cmd::reload_store,
-            register_shortcut_by_frontend,
+            hotkey::cmd::register_shortcut_by_frontend,
+            hotkey::cmd::unregister_shortcut_by_frontend,
             playlist::get_playlist_detail,
             playlist::playmode_intelligence_list,
             playlist::daily_recommend_playlist,

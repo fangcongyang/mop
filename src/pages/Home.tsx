@@ -11,7 +11,7 @@ import { getRecommendPlayList } from "@/utils/playList";
 import _ from "lodash";
 import DailyTracksCard from "@/components/DailyTracksCard";
 import FMCard from "@/components/FMCard";
-import { toplistOfArtists } from "@/api/artist";
+import { topListOfArtists } from "@/api/artist";
 import { newAlbums } from "@/api/album";
 import { toplists } from "@/api/playlist";
 import { appleMusicData } from "@/static/homeData";
@@ -21,7 +21,7 @@ const Home = () => {
   const { t } = useTranslation();
   const settings = useAppSelector(settingsStore);
   const [recommendPlaylist, setRecommendPlaylist] = useState<any>({ items: [] });
-  const [recommendArtists, setRecommendArtists] = useState<any>({ items: [], indexs: [] });
+  const [recommendArtists, setRecommendArtists] = useState<any>({ items: [], indexList: [] });
   const [newReleasesAlbum, setNewReleasesAlbum] = useState<any>({ items: [] });
   const [topList, setTopList] = useState<any>({ items: [], ids: [19723756, 180106, 60198, 3812895, 60131], })
 
@@ -38,25 +38,25 @@ const Home = () => {
       setRecommendPlaylist({ items: _.uniqBy(items, 'id') });
       NProgress.done();
     });
-    const toplistOfArtistsAreaTable: any = {
+    const topListOfArtistsAreaTable: any = {
       all: null,
       zh: 1,
       ea: 2,
       jp: 4,
       kr: 3,
     };
-    toplistOfArtists(
-      toplistOfArtistsAreaTable[settings.musicLanguage ?? 'all']
+    topListOfArtists(
+      topListOfArtistsAreaTable[settings.musicLanguage ?? 'all']
     ).then((data: any) => {
-      let indexs: any = [];
-      while (indexs.length < 6) {
+      let indexList: any = [];
+      while (indexList.length < 6) {
         let tmp = ~~(Math.random() * 100);
-        if (!indexs.includes(tmp)) indexs.push(tmp);
+        if (!indexList.includes(tmp)) indexList.push(tmp);
       }
       setRecommendArtists({
-        indexs,
+        indexList,
         items: data.list.artists.filter((_l: any, index: number) =>
-          indexs.includes(index)
+          indexList.includes(index)
         )
       })
     });

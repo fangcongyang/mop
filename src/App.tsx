@@ -1,11 +1,20 @@
-import { FunctionComponent, ReactElement, useEffect, useRef } from "react";
+import {
+    FunctionComponent,
+    ReactElement,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
-import { Link, Routes, Route, Navigate } from "react-router-dom";
+import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import {
     getAppConf,
     mainEnableScrollingStore,
     showLyricsStore,
 } from "@/store/coreSlice";
+import Paper from "@mui/material/Paper";
+import BottomNavigation from "@mui/material/BottomNavigation";
+import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import WinTool from "@/components/WinTool";
 import Navbar from "@/components/Navbar";
 import Home from "@/pages/Home";
@@ -34,13 +43,18 @@ import Search from "./pages/Search";
 import SearchType from "./pages/SearchType";
 import ModalAddTrackToPlaylist from "./components/ModalAddTrackToPlaylist";
 import ModalNewPlaylist from "./components/ModalNewPlaylist";
+import { osType } from "@/utils/env";
+import { useTranslation } from "react-i18next";
 
 function App() {
     const dispatch = useAppDispatch();
     const showLyrics = useAppSelector(showLyricsStore);
     const mainEnableScrolling = useAppSelector(mainEnableScrollingStore);
+    let navigate = useNavigate();
+    const { t } = useTranslation();
     const main = useRef<HTMLDivElement>(null);
     const lyricsNodeRef = useRef<HTMLDivElement>(null);
+    const [pageActive, setPageActive] = useState("/");
 
     useEffect(() => {
         dispatch(getAppConf());
@@ -48,14 +62,17 @@ function App() {
 
     return (
         <div className="main-body">
-            <WinTool></WinTool>
+            {osType == "desktop" && <WinTool />}
             <main
                 id="main"
                 ref={main}
                 style={{ overflow: mainEnableScrolling ? "auto" : "hidden" }}
             >
                 <Routes>
-                    <Route path="/" element={<Navbar />}>
+                    <Route
+                        path="/"
+                        element={osType == "desktop" ? <Navbar /> : ""}
+                    >
                         <Route path="/album/:id" element={<Album />} />
                         <Route
                             path="/artist/:id"
@@ -96,7 +113,14 @@ function App() {
                         <Route path="/mv/:id" element={<Mv />} />
                         <Route path="/new-album" element={<NewAlbum />} />
                         <Route path="/next" element={<Next />} />
-                        <Route path="/playlist/:id" element={<Playlist />} />
+                        <Route
+                            path="/playlist/:id"
+                            element={
+                                <RequireAuth>
+                                    <Playlist />
+                                </RequireAuth>
+                            }
+                        />
                         <Route path="/search/:keywords" element={<Search />} />
                         <Route
                             path="/search/:keywords/:type"
@@ -111,7 +135,7 @@ function App() {
                     </Route>
                 </Routes>
             </main>
-            <Player></Player>
+            {osType == "desktop" && <Player />}
             <Toast />
             {auth.isAccountLoggedIn() && <ModalNewPlaylist />}
             {auth.isAccountLoggedIn() && <ModalAddTrackToPlaylist />}
@@ -127,6 +151,46 @@ function App() {
                     )
                 }
             </Transition>
+
+            {osType.toLowerCase().includes("mobile") && (
+                <>
+                    <Paper
+                        sx={{
+                            position: "fixed",
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                        }}
+                        elevation={3}
+                    >
+                        <BottomNavigation
+                            value={pageActive}
+                            onChange={(_event, newValue) => {
+                                navigate(newValue);
+                                setPageActive(newValue);
+                            }}
+                            showLabels
+                        >
+                            <BottomNavigationAction
+                                label={t("nav.home")}
+                                value="/"
+                            />
+                            <BottomNavigationAction
+                                label={t("nav.explore")}
+                                value="/explore"
+                            />
+                            <BottomNavigationAction
+                                label={t("nav.library")}
+                                value="/library"
+                            />
+                            <BottomNavigationAction
+                                label={t("nav.settings")}
+                                value="/settings"
+                            />
+                        </BottomNavigation>
+                    </Paper>
+                </>
+            )}
         </div>
     );
 }

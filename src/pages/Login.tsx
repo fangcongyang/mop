@@ -15,7 +15,7 @@ const Login = () => {
     return (
         <div className={styles.login}>
             <div className={styles.section1}>
-                <img src="/img/logos/yesplaymusic.png" />
+                <img src="/img/logos/mop.png" />
                 <SvgIcon svgName="x"></SvgIcon>
                 <img src="/img/logos/netease-music.png" />
             </div>

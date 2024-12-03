@@ -31,16 +31,9 @@ export default defineConfig(async ({ mode }) => ({
   clearScreen: false,
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
-    port: 1420,
+    port: 2420,
     strictPort: true,
     host: mobile ? "0.0.0.0" : "0.0.0.0",
-    proxy: {
-        "/api": {
-            target: loadEnv(mode, process.cwd()).VITE_VOP_API,
-            changeOrigin: true, // 允许跨域
-            rewrite: (path) => path.replace(/^\/api/, "api"),
-        },
-    },
     hmr: mobile
         ? {
               protocol: "ws",

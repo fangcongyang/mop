@@ -1,0 +1,24 @@
+[package]
+name = "tauri-plugin-crypto"
+version = "0.1.0"
+authors = [ "You" ]
+description = ""
+edition = "2021"
+rust-version = "1.78"
+exclude = ["/examples", "/webview-dist", "/webview-src", "/node_modules"]
+links = "tauri-plugin-crypto"
+
+[dependencies]
+tauri = { version = "2.0.0" }
+serde = "1.0"
+thiserror = "1.0"
+base64 = "0.22"
+hex = "0.4" 
+log = "0.4.19"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+openssl-sys =  { version = "0.9.103", features = [] }
+openssl = { version = "0.10.66", features = [] }
+
+[build-dependencies]
+tauri-plugin = { version = "2.0.0", features = ["build"] }

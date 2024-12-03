@@ -1,5 +1,6 @@
 use anyhow::Result;
 use tauri::{path::BaseDirectory, Manager};
+use tauri_plugin_http::reqwest;
 use std::{
     env,
     fs::{self, read_to_string, File},
@@ -55,6 +56,13 @@ pub async fn download_arraybuffer(url: String) -> anyhow::Result<Vec<u8>, anyhow
     let bytes = response.bytes().await?;
     Ok(bytes.to_vec())
 
+}
+
+pub fn create_dir_if_not_exists(path: &Path) -> Result<()> {
+    if let Some(p) = path.parent() {
+        fs::create_dir_all(p)?
+    }
+    Ok(())
 }
 
 pub fn read_init_data_file(data_name: &str) -> String {

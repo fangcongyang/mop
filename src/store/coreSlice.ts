@@ -13,7 +13,7 @@ import { getTrackDetail, likeTrack } from "@/api/track";
 import { invoke } from "@tauri-apps/api/core";
 import { playlistCategories } from "@/utils/staticData";
 import { albumSublist } from "@/api/album";
-import { artistSublist } from "@/api/artist";
+import { artistSubList } from "@/api/artist";
 import { mvSublist } from "@/api/mv";
 import _ from "lodash";
 import messageEventEmitter from "@/event/messageEventEmitter";
@@ -37,7 +37,6 @@ interface Settings {
     lang: string;
     appearance: string;
     musicLanguage: "all" | "zh" | "ea" | "jp" | "kr";
-    musicQuality: string;
     cacheLimit: number;
     showLyricsTranslation: boolean;
     lyricsBackground: string;
@@ -56,7 +55,6 @@ interface Settings {
     showPlaylistsByAppleMusic: boolean;
     subTitleDefault: boolean;
     enableReversedMode: boolean;
-    nyancatStyle: boolean;
     proxyProtocol: string;
     proxyServer: string;
     proxyPort: number;
@@ -121,7 +119,6 @@ const initialState: CoreState = {
         lang: "zh_ch",
         appearance: "auto",
         musicLanguage: "all",
-        musicQuality: "320000",
         cacheLimit: 8192,
         showLyricsTranslation: true,
         lyricsBackground: "true",
@@ -140,7 +137,6 @@ const initialState: CoreState = {
         showPlaylistsByAppleMusic: true,
         subTitleDefault: false,
         enableReversedMode: false,
-        nyancatStyle: false,
         proxyProtocol: "noProxy",
         proxyServer: "",
         proxyPort: 0,
@@ -253,33 +249,7 @@ export interface ConfUpdate {
 export const updateAppConf = createAsyncThunk(
     "updateAppConf",
     async (confUpdate: ConfUpdate, _) => {
-        invoke("conf_update", { data: confUpdate });
         return confUpdate;
-    }
-);
-
-export const updateShortcut = createAsyncThunk(
-    "updateShortcut",
-    async (data: { id: string; type: string; shortcut: string }, thunkAPI) => {
-        const state: any = thunkAPI.getState();
-        let newShortcut: any = _.cloneDeep(
-            state.core.settings.shortcuts.find((s: any) => s.id === data.id)
-        );
-        newShortcut[data.type] = data.shortcut;
-        let shortcuts = state.core.settings.shortcuts.map((s: any) => {
-            if (s.id !== data.id) return s;
-            return newShortcut;
-        });
-        let s: Shortcut = await invoke(
-            "register_shortcut_by_frontend",
-            { shortcut: newShortcut }
-        );
-        console.log(123, s);
-        newShortcut.isPersonalUse = s.isPersonalUse;
-        invoke("conf_update", {
-            data: { confName: "settings", key: "shortcuts", value: shortcuts },
-        });
-        return shortcuts;
     }
 );
 
@@ -389,7 +359,7 @@ export const fetchLikedArtists = createAsyncThunk(
     "users/fetchLikedArtists",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result = artistSublist({ limit: 200 });
+        let result = artistSubList({ limit: 200 });
         return result;
     }
 );
@@ -622,10 +592,6 @@ export const coreSlice = createSlice({
                 if (result) {
                     state.liked.playHistory = result;
                 }
-            }),
-            builder.addCase(updateShortcut.fulfilled, (state, action) => {
-                const result: any = action.payload;
-                state.settings.shortcuts = result;
             });
     },
 });

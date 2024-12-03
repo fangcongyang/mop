@@ -1,7 +1,10 @@
 use serde::{Serialize, Deserialize};
 use tauri::command;
+use tauri_plugin_crypto::{CryptoExt, CryptoResponse, HashEncryptRequest};
 
-use super::{crypto::{hash_encrypt, HashType}, request::{request_handler, LocalCookie, Options, Request, CRYPTO_WEAPI}};
+use crate::APP;
+
+use super::{crypto::HashType, request::{request_handler, LocalCookie, Options, Request, CRYPTO_WEAPI}};
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -29,8 +32,15 @@ pub async fn login_cellphone(mut data: LoginCellphoneReq) -> serde_json::Value {
         if data.md5_password.is_some() {
             password = data.clone().md5_password;
         } else {
-            let digest = hash_encrypt(&data.password.unwrap_or("".to_string()), HashType::md5, hex::encode);
-            password = Some(digest);
+            let app = APP.get().unwrap();
+            let digest = app
+                .crypto()
+                .hash_encrypt(HashEncryptRequest {
+                    data: data.password.unwrap_or_default(),
+                    algorithm: HashType::md5.to_string(),
+                })
+                .unwrap_or(CryptoResponse::default());
+            password = Some(digest.value);
         }
         data.password = password;
     }
@@ -68,8 +78,15 @@ pub async fn login(mut data: LoginReq) -> serde_json::Value {
     if data.md5_password.is_some() {
         password = data.clone().md5_password;
     } else {
-        let digest = hash_encrypt(&data.password.unwrap_or("".to_string()), HashType::md5, hex::encode);
-        password = Some(digest);
+        let app = APP.get().unwrap();
+        let digest = app
+            .crypto()
+            .hash_encrypt(HashEncryptRequest {
+                data: data.password.unwrap_or_default(),
+                algorithm: HashType::md5.to_string(),
+            })
+            .unwrap_or(CryptoResponse::default());
+        password = Some(digest.value);
     }
     data.password = password;
     data.rememberLogin = Some("true".to_owned());

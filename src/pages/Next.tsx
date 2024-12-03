@@ -80,7 +80,7 @@ const Next = () => {
             <TrackList
                 tracks={[currentTrack]}
                 type="playlist"
-                dbclickTrackFunc="none"
+                dbClickTrackFunc="none"
             />
             {
                 playNextTracks.length > 0 ?
@@ -92,7 +92,7 @@ const Next = () => {
                             tracks={playNextTracks}
                             type="playlist"
                             highlightPlayingTrack={false}
-                            dbclickTrackFunc="playTrackOnListByID"
+                            dbClickTrackFunc="playTrackOnListByID"
                             itemKey="id+index"
                             extraContextMenuItem={['removeTrackFromQueue']}
                         />
@@ -104,7 +104,7 @@ const Next = () => {
                 tracks={playTrackList}
                 type="playlist"
                 highlightPlayingTrack={false}
-                dbclickTrackFunc="playTrackOnListByID"
+                dbClickTrackFunc="playTrackOnListByID"
             />
         </div >
     )

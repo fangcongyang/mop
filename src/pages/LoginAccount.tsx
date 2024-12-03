@@ -314,7 +314,7 @@ const LoginAccount = () => {
                                 className={styles.notice}
                                 dangerouslySetInnerHTML={{
                                     __html: `你的密码会在本地进行 MD5 加密后再传输到网易云 API。<br />
-                                YesPlayMusic 不会传输你的账号数据到任何非网易云音乐官方的服务器。<br />`}}
+                                Mop 不会传输你的账号数据到任何非网易云音乐官方的服务器。<br />`}}
                             >
                             </div>
                             : ''

@@ -45,7 +45,7 @@ const DailyTracks: FunctionComponent<DailyTracksProps> = (props) => {
             <TrackList
                 tracks={dailyTracks}
                 type="playlist"
-                dbclickTrackFunc="dailyTracks"
+                dbClickTrackFunc="dailyTracks"
             />
         </div>
     )

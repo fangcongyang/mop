@@ -24,9 +24,9 @@ use std::borrow::Cow;
 use concat_string::concat_string;
 use log::{debug, info};
 use serde::Deserialize;
-use unm_engine::interface::Engine;
-use unm_types::config::ConfigManager;
-use unm_types::{
+use interface::Engine;
+use super::{config::ConfigManager, models};
+use models::{
     Artist,
     Context,
     RetrievedSongInfo,
@@ -34,6 +34,8 @@ use unm_types::{
     Song,
     SongSearchInformation,
 };
+
+use super::interface;
 
 pub const DEFAULT_EXECUTABLE: &str = "yt-dlp";
 pub const ENGINE_ID: &str = "ytdl";
@@ -200,7 +202,9 @@ impl From<YtDlResponse> for Song {
 
 #[cfg(test)]
 mod tests {
-    use unm_types::config::ConfigManagerBuilder;
+    use config::ConfigManagerBuilder;
+
+    use crate::engine::config;
 
     #[test]
     fn test_decide_ytdl_exe() {
