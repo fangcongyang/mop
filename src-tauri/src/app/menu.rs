@@ -14,22 +14,22 @@ pub mod menu_desktop {
 
     // --- SystemTray Menu
     pub fn tray_menu(app: &App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
-        let play_icon = tauri::image::Image::from_path("./icons/play.png")?;
+        let play_icon = tauri::image::Image::from_path("./assets/play.png")?;
         let play = IconMenuItemBuilder::new("播放")
             .id("play")
             .icon(play_icon)
             .build(app)?;
-        let prev_track_icon = tauri::image::Image::from_path("./icons/play.png")?;
+        let prev_track_icon = tauri::image::Image::from_path("./assets/play.png")?;
         let prev_track = IconMenuItemBuilder::new("播放")
             .id("prevTrack")
             .icon(prev_track_icon)
             .build(app)?;
-        let next_track_icon = tauri::image::Image::from_path("./icons/play.png")?;
+        let next_track_icon = tauri::image::Image::from_path("./assets/play.png")?;
         let next_track = IconMenuItemBuilder::new("下一首")
             .id("nextTrack")
             .icon(next_track_icon)
             .build(app)?;
-        let play_mode_icon = tauri::image::Image::from_path("./icons/play.png")?;
+        let play_mode_icon = tauri::image::Image::from_path("./assets/play.png")?;
         let play_mode = IconMenuItemBuilder::new("循环播放")
             .id("playMode")
             .icon(play_mode_icon)
@@ -37,7 +37,7 @@ pub mod menu_desktop {
 
         let separator = PredefinedMenuItem::separator(app)?;
 
-        let restart_icon = tauri::image::Image::from_path("./icons/play.png")?;
+        let restart_icon = tauri::image::Image::from_path("./assets/play.png")?;
         let restart = IconMenuItemBuilder::new("重启应用")
             .id("restart")
             .icon(restart_icon)
@@ -82,7 +82,7 @@ pub mod menu_desktop {
                 }
             })
             .menu(&menu)
-            .menu_on_left_click(true)
+            .show_menu_on_left_click(true)
             .on_menu_event(|app, event| match event.id.as_ref() {
                 "play" | "prevTrack" | "nextTrack" => {
                     let _ = app.emit(event.id.0.as_str(), "".to_owned());

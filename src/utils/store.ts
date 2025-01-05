@@ -1,4 +1,4 @@
-import { Store, createStore } from "@tauri-apps/plugin-store";
+import { Store } from "@tauri-apps/plugin-store";
 import { appConfigDir, join } from "@tauri-apps/api/path";
 
 const eventNames = [
@@ -71,8 +71,7 @@ export class TauriDataStore implements DataStore {
     async _init() {
         const appConfigDirPath = await appConfigDir();
         const appConfigPath = await join(appConfigDirPath, "mop.json");
-        this._store = await createStore(appConfigPath);
-        await this._store?.load();
+        this._store = await Store.load(appConfigPath);
     }
 
     async set(key: string, value: any) {

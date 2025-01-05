@@ -9,7 +9,6 @@ import {
     Shortcut,
     getAppConf,
     restoreDefaultShortcuts,
-    updateAppConf,
     doLogout,
 } from "@/store/coreSlice";
 import auth from "@/utils/auth";
@@ -351,6 +350,10 @@ const Settings = () => {
         setLang(lang);
     };
 
+    const openDevTools = () => {
+        invoke("open_devtools");
+    };
+
     return (
         <div className={styles.settingsPage} onClick={clickOutside}>
             <div className={styles.container}>
@@ -679,6 +682,18 @@ const Settings = () => {
                         store.notifyObservers("nyancatStyle", value);
                     }}
                 />
+                <div className={styles.item}>
+                    <div className="left">
+                        <div className="title">
+                            打开开发者工具
+                        </div>
+                    </div>
+                    <div className="right">
+                        <button onClick={openDevTools}>
+                            开发者工具
+                        </button>
+                    </div>
+                </div>
 
                 <h3>{t("settings.proxy.text")}</h3>
                 <SettingsSelect

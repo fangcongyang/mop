@@ -3,7 +3,7 @@ mod macros;
 
 extern crate proc_macro;
 
-use app::hotkey;
+use app::{cmds, hotkey};
 use conf::{get, init_config, init_config_value, is_first_run, set, Shortcut};
 use log::{info, LevelFilter};
 use once_cell::sync::OnceCell;
@@ -50,7 +50,8 @@ pub fn run() {
             APP.get_or_init(|| app.handle().clone());
 
             info!("Init Config Store");
-            init_config(app);
+            let mut app_handle = app.handle().clone();
+            init_config(&mut app_handle);
             // Check First Run
             if is_first_run() {
                 // Open Config Window
@@ -177,6 +178,7 @@ pub fn run() {
             mv::mv_sublist,
             cloud_engine::get_audio_source_from_unblock_music,
             utils::cmd::download_music_arraybuffer,
+            cmds::open_devtools,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -188,12 +190,13 @@ fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn s
         tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()));
     #[cfg(not(target_os = "android"))]
     {
-        webview_window = webview_window.title("vop")
+        webview_window = webview_window.title("mop")
             .center()
             .inner_size(1440f64, 840f64)
             .fullscreen(false)
             .resizable(true)
-            .decorations(false);
+            .decorations(false)
+            .transparent(true);
     }
 
     #[allow(unused_assignments)]

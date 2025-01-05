@@ -1,10 +1,10 @@
 use log::{info, warn};
 use serde_json::{json, Value};
-use tauri::{path::BaseDirectory, Manager, Wry};
-use tauri_plugin_store::{Store, StoreBuilder};
-use std::sync::Mutex;
+use std::path::PathBuf;
+use tauri::{path::BaseDirectory, Manager};
 
 use crate::{utils, APP};
+use tauri_plugin_store::StoreExt;
 
 // pub const BUY_COFFEE: &str = "https://www.buymeacoffee.com/lencx";
 
@@ -16,39 +16,37 @@ pub_struct!(Shortcut {
     globalShortcut: String,
     isPersonalUse: bool,
 });
-
-pub struct StoreWrapper(pub Mutex<Store<Wry>>);
-
-pub fn init_config(app: &mut tauri::App) {
+fn get_path(app: &tauri::AppHandle) -> PathBuf {
     let config_path = app.path().resolve("", BaseDirectory::AppConfig).unwrap();
-    let config_path = config_path.join("mop.json");
+    config_path.join("mop.json")
+}
+
+pub fn init_config(app: &mut tauri::AppHandle) {
+    let config_path = get_path(app);
     let _ = utils::create_dir_if_not_exists(&config_path);
     info!("Load config from: {:?}", config_path);
-    let store = StoreBuilder::new(&app.handle().clone(), config_path).build();
 
-    match store.load() {
+    match app.store(config_path) {
         Ok(_) => info!("Config loaded"),
         Err(e) => {
             warn!("Config load error: {:?}", e);
             info!("Config not found, creating new config");
         }
     }
-    app.manage(StoreWrapper(Mutex::new(store)));
 }
 
 #[allow(unused)]
 pub fn get(key: &str) -> Option<Value> {
-  let state = APP.get().unwrap().state::<StoreWrapper>();
-  let store = state.0.lock().unwrap();
-  match store.get(key) {
-      Some(value) => Some(value.clone()),
-      _none => None,
-  }
+    let app = APP.get().unwrap();
+    let store = app.get_store(get_path(app)).unwrap();
+    match store.get(key) {
+        Some(value) => Some(value.clone()),
+        _none => None,
+    }
 }
-
 pub fn get_string(key: &str) -> String {
-    let state = APP.get().unwrap().state::<StoreWrapper>();
-    let store = state.0.lock().unwrap();
+    let app = APP.get().unwrap();
+    let store = app.get_store(get_path(app)).unwrap();
     match store.get(key) {
         Some(value) => {
             // 尝试将值转换为字符串
@@ -60,23 +58,22 @@ pub fn get_string(key: &str) -> String {
                 // 其他类型可以根据需要处理
                 _ => "".to_owned(),
             }
-        },
+        }
         _none => "".to_owned(),
     }
-  }
-
-pub fn set<T: serde::ser::Serialize>(key: &str, value: T) {
-  let state = APP.get().unwrap().state::<StoreWrapper>();
-  let store = state.0.lock().unwrap();
-  store.set(key.to_string(), json!(value));
-  store.save().unwrap();
 }
 
+pub fn set<T: serde::ser::Serialize>(key: &str, value: T) {
+    let app = APP.get().unwrap();
+    let store = app.get_store(get_path(app)).unwrap();
+    store.set(key.to_string(), json!(value));
+    store.save().unwrap();
+}
 
 pub fn is_first_run() -> bool {
-  let state = APP.get().unwrap().state::<StoreWrapper>();
-  let store = state.0.lock().unwrap();
-  store.length() == 0
+    let app = APP.get().unwrap();
+    let store = app.get_store(get_path(app)).unwrap();
+    store.length() == 0
 }
 
 pub fn init_config_value() {
@@ -86,9 +83,13 @@ pub fn init_config_value() {
         return;
     }
     let init_config_value: Value = serde_json::from_str(&init_config_value_str).unwrap();
-    init_config_value.as_object().unwrap().iter().for_each(|(k, v)| {
-        set(k, v.clone());
-    });
+    init_config_value
+        .as_object()
+        .unwrap()
+        .iter()
+        .for_each(|(k, v)| {
+            set(k, v.clone());
+        });
     restore_default_shortcuts();
 }
 
@@ -99,17 +100,17 @@ pub fn restore_default_shortcuts() {
 }
 
 pub mod cmd {
-    use tauri::{ Manager, command };
+    use tauri::command;
+    use tauri_plugin_store::StoreExt;
 
     use crate::APP;
 
-    use super::StoreWrapper;
+    use super::get_path;
 
     #[command]
     pub fn reload_store() {
-        let state = APP.get().unwrap().state::<StoreWrapper>();
-        let store = state.0.lock().unwrap();
-        store.load().unwrap();
+        let app = APP.get().unwrap();
+        let store = app.get_store(get_path(app)).unwrap();
+        store.reload().unwrap();
     }
 }
-

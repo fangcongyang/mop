@@ -10,32 +10,21 @@
     },
     "app": {
       "security": {
-        "csp": "default-src *; script-src *; style-src *; img-src *; connect-src *;",
+        "csp": null,
         "assetProtocol": {
           "enable": true,
           "scope": [
             "**"
           ]
         }
-      },
-      "windows": [
-          {
-              "fullscreen": false,
-              "resizable": true,
-              "title": "mop",
-              "width": 1440,
-              "height": 840,
-              "center": true,
-              "decorations": false,
-              "transparent": true
-          }
-      ]
+      }
     },
     "bundle": {
         "active": true,
         "targets": "all",
         "resources": [
-          "./initData"
+          "./initData",
+          "./assets"
         ],
         "longDescription": "A music software",
         "shortDescription": "Music App",
