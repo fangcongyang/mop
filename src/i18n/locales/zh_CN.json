@@ -273,7 +273,8 @@
     "toast": {
         "needToLogin": "此操作需要登录网易云帐号",
         "copied": "复制成功",
-        "copyFailed": "复制失败"
+        "copyFailed": "复制失败",
+        "savedToPlaylist": "已保存到歌单"
     },
     "playlist": {
         "search": "搜索歌单音乐",

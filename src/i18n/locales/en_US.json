@@ -179,7 +179,7 @@
         }
     },
     "next": {
-        "nowPlaying": "正在播放",
+        "nowPlaying": "Playing",
         "nextUp": "即将播放"
     },
     "explore": {
@@ -273,7 +273,8 @@
     "toast": {
         "needToLogin": "This operation requires logging in to a NetEase Cloud account",
         "copied": "Copied successfully",
-        "copyFailed": "Copy failed"
+        "copyFailed": "Copy failed",
+        "savedToPlaylist": "Saved to playlist"
     },
     "playlist": {
         "search": "Search playlist music",
