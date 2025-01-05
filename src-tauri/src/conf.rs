@@ -50,7 +50,17 @@ pub fn get_string(key: &str) -> String {
     let state = APP.get().unwrap().state::<StoreWrapper>();
     let store = state.0.lock().unwrap();
     match store.get(key) {
-        Some(value) => value.clone().as_str().unwrap_or_default().to_owned(),
+        Some(value) => {
+            // 尝试将值转换为字符串
+            match value {
+                // 如果值是字符串
+                Value::String(s) => s.clone(),
+                // 如果值是数字
+                Value::Number(n) => n.to_string(),
+                // 其他类型可以根据需要处理
+                _ => "".to_owned(),
+            }
+        },
         _none => "".to_owned(),
     }
   }
