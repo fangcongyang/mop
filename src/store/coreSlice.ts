@@ -55,9 +55,6 @@ interface Settings {
     showPlaylistsByAppleMusic: boolean;
     subTitleDefault: boolean;
     enableReversedMode: boolean;
-    proxyProtocol: string;
-    proxyServer: string;
-    proxyPort: number;
     enableGlobalShortcut: boolean;
     shortcuts: Shortcut[];
     enabledPlaylistCategories: string[];
@@ -137,9 +134,6 @@ const initialState: CoreState = {
         showPlaylistsByAppleMusic: true,
         subTitleDefault: false,
         enableReversedMode: false,
-        proxyProtocol: "noProxy",
-        proxyServer: "",
-        proxyPort: 0,
         enableGlobalShortcut: true,
         shortcuts: [
             {

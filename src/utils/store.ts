@@ -8,6 +8,7 @@ const eventNames = [
     "musicQuality",
     "nyancatStyle",
     "downloadSavePath",
+    "unmProxyUri",
     "proxyProtocol",
     "proxyServer",
     "proxyPort",

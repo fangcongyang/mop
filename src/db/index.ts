@@ -35,6 +35,10 @@ export function getTrackSource(id: string) {
     });
 }
 
+export function deleteTrackSource(id: string) {
+    db.trackSources.delete(Number(id));
+}
+
 export async function cacheTrackSource(
     trackInfo: any,
     url: string,
