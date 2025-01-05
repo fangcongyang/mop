@@ -15,12 +15,14 @@ import { formatTrackTime, resizeImage } from "@/utils/data";
 import { clickStop } from "@/utils/common";
 import VolumeControl from "./VolumeControl";
 import PlayControl from "@/components/PlayControl";
+import playerEventEmitter from "@/event/playerEventEmitter";
 import Slider from "@mui/material/Slider";
 import { getListSourcePath, hasListSource } from "@/utils/playList";
 import { player } from "@/business/player";
 import "./Player.scss";
 import { PlayerObserver } from "@/type/player";
 import { useConfig } from "@/hooks/useConfig";
+import { deleteTrackSource } from "@/db";
 
 const Player = () => {
     let location = useLocation();
@@ -180,6 +182,13 @@ const Player = () => {
     const muteChange = () => {
         setMute(!mute);
         player.toggleMute();
+    };
+
+    const onDeleteTrackSource = () => {
+        if (currentTrackId) {
+            deleteTrackSource(currentTrackId);
+            playerEventEmitter.emit("PLAYER:PALY_PLAYLIST", player._getPlaylistSourceId, currentTrackId, false);
+        }
     };
 
     return (
@@ -421,6 +430,9 @@ const Player = () => {
                             onClick={onToggleLyrics}
                         >
                             <SvgIcon svgName="arrow-up" />
+                        </ButtonIcon>
+                        <ButtonIcon title="删除歌曲缓存" onClick={onDeleteTrackSource}>
+                            <SvgIcon svgName="delete" />
                         </ButtonIcon>
                     </div>
                 </div>

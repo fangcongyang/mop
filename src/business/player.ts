@@ -879,6 +879,10 @@ class Player implements PlayerSubject {
         return this._playlistSource;
     }
 
+    _getPlaylistSourceId() {
+        return this._playlistSource.id;
+    }
+
     set currentTrack(track: any) {
         this._currentTrack = track;
         this.notifyObservers("currentTrack");
