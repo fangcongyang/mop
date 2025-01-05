@@ -70,8 +70,16 @@ const Settings = () => {
         length: 0,
     });
     const shortcutInputTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-    const [proxyServer, setProxyServer] = useState(settings.proxyServer);
-    const [proxyPort, setProxyPort] = useState(settings.proxyPort);
+    const [unmProxyUri, setUnmProxyUri] = useConfig("unmProxyUri", "", { page: "settings" });
+    const [proxyProtocol, setProxyProtocol] = useConfig("proxyProtocol", "", {
+        page: "settings",
+    });
+    const [proxyServer, setProxyServer] = useConfig("proxyServer", "", {
+        page: "settings",
+    });
+    const [proxyPort, setProxyPort] = useConfig("proxyPort", "", {
+        page: "settings",
+    });
     const [shortcutList, setShortcutList] = useConfig("shortcutList", [], {
         page: "settings",
     });
@@ -200,28 +208,6 @@ const Settings = () => {
                 clearInterval(lastfmChecker);
             }
         }, 1000);
-    };
-
-    const proxyServerBlur = () => {
-        if (settings.proxyServer === proxyServer) return;
-        dispatch(
-            updateAppConf({
-                confName: "settings",
-                key: "proxyServer",
-                value: proxyServer,
-            })
-        );
-    };
-
-    const proxyPortBlur = () => {
-        if (settings.proxyPort === proxyPort) return;
-        dispatch(
-            updateAppConf({
-                confName: "settings",
-                key: "proxyPort",
-                value: proxyPort,
-            })
-        );
     };
 
     const sendProxyConfig = () => {};
@@ -614,9 +600,12 @@ const Settings = () => {
                                 {t("settings.unm.proxy.desc2")}
                             </div>
                         }
-                        initValue={settings.unmProxyUri}
+                        initValue={unmProxyUri}
                         fieldKey="unmProxyUri"
                         inputPlaceholder="ex. https://192.168.11.45"
+                        callback={(value: string) => {
+                            setUnmProxyUri(value);
+                        }}
                     />
                 </section>
 
@@ -694,23 +683,25 @@ const Settings = () => {
                 <h3>{t("settings.proxy.text")}</h3>
                 <SettingsSelect
                     title="settings.proxy.proxyProtocol"
-                    initValue={settings.proxyProtocol}
+                    initValue={proxyProtocol}
                     fieldKey="proxyProtocol"
                     selectData={proxyProtocolSelectData()}
+                    callback={(proxyProtocol: string) =>
+                        setProxyProtocol(proxyProtocol)
+                    }
                 />
                 <div
                     id="proxy-form"
                     className={
-                        settings.proxyProtocol === "noProxy" ? "disabled" : ""
+                        proxyProtocol === "noProxy" ? "disabled" : ""
                     }
                 >
                     <input
                         value={proxyServer}
                         className="text-input"
                         placeholder={t("settings.proxy.proxyServer")}
-                        disabled={settings.proxyProtocol === "noProxy"}
+                        disabled={proxyProtocol === "noProxy"}
                         onChange={(e) => setProxyServer(e.target.value)}
-                        onBlur={proxyServerBlur}
                     />
                     <input
                         value={proxyPort}
@@ -719,15 +710,12 @@ const Settings = () => {
                         type="number"
                         min={1}
                         max={65535}
-                        disabled={settings.proxyProtocol === "noProxy"}
+                        disabled={proxyProtocol === "noProxy"}
                         onChange={(e) =>
                             setProxyPort(
                                 e.target.valueAsNumber
-                                    ? e.target.valueAsNumber
-                                    : 1
                             )
                         }
-                        onBlur={proxyPortBlur}
                     />
                     <button onClick={sendProxyConfig}>
                         {t("settings.proxy.updateProxy")}
