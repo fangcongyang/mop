@@ -5,16 +5,16 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.media.session.MediaController
-import android.media.session.MediaSession
 import android.os.IBinder
+import android.support.v4.media.session.MediaControllerCompat
+import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.app.NotificationCompat
 import android.os.Binder as AndroidBinder
 
 
 class MopNotificationService: Service() {
-    private var mediaSession: MediaSession? = null
-    private var mediaController: MediaController? = null
+    private var mediaSession: MediaSessionCompat? = null
+    private var mediaController: MediaControllerCompat? = null
     private var mopNotificationManager: MopNotificationManager? = null
 
     // 创建一个 Binder 对象
@@ -62,62 +62,62 @@ class MopNotificationService: Service() {
         stopForeground(true) // 停止前台服务并移除通知
     }
 
-   fun notification(): Notification? {
-       val prevIntent = Intent(this, YourActivity::class.java)
-       prevIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
-       val pendingIntent =
-           PendingIntent.getActivity(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
-
-       val action: Notification.Action = Notification.Action.Builder(
-           R.drawable.play_skip_back,  // 图标
-           "Skip back",  // 文本
-           pendingIntent // 意图
-       ).build()
-
-        val builder = if (isAtLeastAndroid8) {
-            Notification.Builder(applicationContext, NotificationChannelId)
-        } else {
-            Notification.Builder(applicationContext)
-        }
-            .setContentTitle("Playing")
-            .setContentText("Artist Name")
-//            .setSubText(player.playerError?.message)
-//            .setLargeIcon(bitmapProvider.bitmap)
-            .setAutoCancel(false)
-            .setOnlyAlertOnce(true)
-            .setShowWhen(false)
-            .setSmallIcon(R.drawable.add)
-//            .setSmallIcon(player.playerError?.let { R.drawable.alert_circle }
-//                ?: R.drawable.app_icon)
-            .setOngoing(false)
-//            .setContentIntent(activityPendingIntent<MainActivity>(
-//                flags = PendingIntent.FLAG_UPDATE_CURRENT
-//            ) {
-//                putExtra("expandPlayerBottomSheet", true)
-//            })
-//            .setDeleteIntent(broadCastPendingIntent<NotificationDismissReceiver>())
-            .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
-            .setStyle(
-                Notification.MediaStyle()
-                    .setShowActionsInCompactView(0, 1, 2)
-                    .setMediaSession(mediaSession?.sessionToken)
-            )
-            .addAction(R.drawable.play_skip_back, "Skip back", prevIntent)
-            .addAction(
-                if (player.shouldBePlaying) R.drawable.pause else R.drawable.play,
-                if (player.shouldBePlaying) "Pause" else "Play",
-                if (player.shouldBePlaying) pauseIntent else playIntent
-            )
-            .addAction(R.drawable.play_skip_forward, "Skip forward", nextIntent)
-
-//        bitmapProvider.load(mediaMetadata.artworkUri) { bitmap ->
-//            maybeShowSongCoverInLockScreen()
-//            notificationManager?.notify(NotificationId, builder.setLargeIcon(bitmap).build())
+//   fun notification(): Notification? {
+//       val prevIntent = Intent(this, YourActivity::class.java)
+//       prevIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+//       val pendingIntent =
+//           PendingIntent.getActivity(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+//
+//       val action: Notification.Action = Notification.Action.Builder(
+//           R.drawable.play_skip_back,  // 图标
+//           "Skip back",  // 文本
+//           pendingIntent // 意图
+//       ).build()
+//
+//        val builder = if (isAtLeastAndroid8) {
+//            Notification.Builder(applicationContext, NotificationChannelId)
+//        } else {
+//            Notification.Builder(applicationContext)
 //        }
-
-        return builder.build()
-    }
+//            .setContentTitle("Playing")
+//            .setContentText("Artist Name")
+////            .setSubText(player.playerError?.message)
+////            .setLargeIcon(bitmapProvider.bitmap)
+//            .setAutoCancel(false)
+//            .setOnlyAlertOnce(true)
+//            .setShowWhen(false)
+//            .setSmallIcon(R.drawable.add)
+////            .setSmallIcon(player.playerError?.let { R.drawable.alert_circle }
+////                ?: R.drawable.app_icon)
+//            .setOngoing(false)
+////            .setContentIntent(activityPendingIntent<MainActivity>(
+////                flags = PendingIntent.FLAG_UPDATE_CURRENT
+////            ) {
+////                putExtra("expandPlayerBottomSheet", true)
+////            })
+////            .setDeleteIntent(broadCastPendingIntent<NotificationDismissReceiver>())
+//            .setVisibility(Notification.VISIBILITY_PUBLIC)
+//            .setCategory(NotificationCompat.CATEGORY_TRANSPORT)
+//            .setStyle(
+//                Notification.MediaStyle()
+//                    .setShowActionsInCompactView(0, 1, 2)
+//                    .setMediaSession(mediaSession?.sessionToken)
+//            )
+//            .addAction(R.drawable.play_skip_back, "Skip back", prevIntent)
+//            .addAction(
+//                if (player.shouldBePlaying) R.drawable.pause else R.drawable.play,
+//                if (player.shouldBePlaying) "Pause" else "Play",
+//                if (player.shouldBePlaying) pauseIntent else playIntent
+//            )
+//            .addAction(R.drawable.play_skip_forward, "Skip forward", nextIntent)
+//
+////        bitmapProvider.load(mediaMetadata.artworkUri) { bitmap ->
+////            maybeShowSongCoverInLockScreen()
+////            notificationManager?.notify(NotificationId, builder.setLargeIcon(bitmap).build())
+////        }
+//
+//        return builder.build()
+//    }
 
 
     fun updateNotification() {
@@ -131,7 +131,7 @@ class MopNotificationService: Service() {
             )
         val builder: NotificationCompat.Builder =
             NotificationCompat.Builder(this, NotificationChannelId)
-                .setSmallIcon(R.drawable.add)
+                .setSmallIcon(R.drawable.ic_input_add)
                 .setContentTitle("Playing")
                 .setContentText("Artist Name")
                 .setOngoing(true)
@@ -147,7 +147,7 @@ class MopNotificationService: Service() {
 //                    prevPendingIntent
 //                )
 //            )
-                .addAction(NotificationCompat.Action(R.drawable.play, "", actionPlayIntent))
+                .addAction(NotificationCompat.Action(R.drawable.ic_media_play, "", actionPlayIntent))
 //            .addAction(NotificationCompat.Action(R.drawable.ic_next, "Next", nextPendingIntent))
         notification = builder.build()
 //        }

@@ -1,5 +1,4 @@
 use base64::{engine::general_purpose, Engine};
-use log::info;
 use openssl::{
     hash::{hash, MessageDigest},
     rsa::{Padding, Rsa},
@@ -64,7 +63,6 @@ impl<R: Runtime> Crypto<R> {
         let prefix = vec![0u8; 128 - data.len()];
         let data = [&prefix[..], &data.as_bytes()[..]].concat();
         let mut buf = vec![0; rsa.size() as usize];
-        info!("rsa encrypt data: {:?}", rsa.size() as usize);
         rsa.public_encrypt(&data, &mut buf, Padding::NONE).unwrap();
         let value = hex::encode(buf);
         Ok(CryptoResponse { value })
