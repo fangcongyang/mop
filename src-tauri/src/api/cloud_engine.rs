@@ -2,6 +2,7 @@ use base64::{engine::general_purpose, Engine};
 use engine::kugou::{KugouEngine, ENGINE_ID as KUGOU_ENGINE_ID};
 use engine::ytdl::{YtDlEngine, ENGINE_ID as YTDL_ENGINE_ID};
 use reqwest::header::{HeaderMap, REFERER, USER_AGENT};
+use serde_json::Value;
 use tauri_plugin_http::reqwest;
 use std::{borrow::Cow, sync::Arc};
 use tauri::command;
@@ -11,6 +12,9 @@ use models::{
     ContextBuilder, RetrievedSongInfo, SearchMode, Song,
 };
 
+use crate::conf::get;
+use crate::engine::config::ConfigManager;
+use crate::engine::models::Context;
 use crate::engine::{config, executor, models};
 use crate::{engine, utils};
 
@@ -22,10 +26,10 @@ pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<Retrieved
         .set("ytdl:exe", exe_path.into_os_string().into_string().unwrap())
         .build();
 
-    let context = ContextBuilder::default()
-        .config(config)
-        .search_mode(SearchMode::OrderFirst)
-        .build().unwrap();
+    
+    
+    let context = create_context(config);
+
     executor.register(Cow::Borrowed(YTDL_ENGINE_ID), Arc::new(YtDlEngine {}));
     // executor.register(
     //     Cow::Borrowed(BILIBILI_ENGINE_ID),
@@ -56,6 +60,22 @@ pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<Retrieved
         }
     }
     None
+}
+
+fn create_context(config: ConfigManager) -> Context {
+    let mut binding = ContextBuilder::default();
+    let context_builder = binding
+        .config(config)
+        .search_mode(SearchMode::OrderFirst);
+
+    let unm_proxy_uri: Option<Value> = get("unmProxyUri");
+    match unm_proxy_uri {
+        Some(Value::String(proxy_uri)) => {
+            context_builder.proxy_uri(Some(Cow::Owned(proxy_uri)));
+        }
+        _ => {}
+    }
+    context_builder.build().unwrap()
 }
 
 async fn get_bili_video_file(url: String) -> String {

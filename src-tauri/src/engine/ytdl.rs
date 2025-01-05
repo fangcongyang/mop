@@ -163,6 +163,8 @@ async fn fetch_from_youtube(
         cmd.creation_flags(winapi::um::winbase::CREATE_NO_WINDOW);
     }
 
+    log::info!("ytdl cmd params {:?}", cmd);
+
     let child = cmd.kill_on_drop(true).output().await?;
 
     if child.status.success() {
