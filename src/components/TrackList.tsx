@@ -191,16 +191,16 @@ const TrackList: FunctionComponent<TrackListProps> = ({
             showToast(t('toast.needToLogin'));
             return;
         }
-        updateModal({
+        dispatch(updateModal({
             modalName: 'addTrackToPlaylistModal',
             key: 'show',
             value: true,
-        });
-        updateModal({
+        }));
+        dispatch(updateModal({
             modalName: 'addTrackToPlaylistModal',
             key: 'selectedTrackId',
             value: rightClickedTrack.id,
-        });
+        }));
     }
 
     const copyLink = () => {
