@@ -1,7 +1,7 @@
 {
     "identifier": "com.tauri.mop",
     "bundle": {
-        "resources": ["./resources/yt-dlp.exe", "./initData"],
+        "resources": ["./resources", "./initData", "./assets"],
         "windows": {
             "allowDowngrades": true,
             "certificateThumbprint": null,

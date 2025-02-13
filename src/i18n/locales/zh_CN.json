@@ -297,7 +297,9 @@
     "search": {
         "song": "歌曲",
         "noResult": "无结果",
-        "searchFor": "搜索"
+        "searchFor": "搜索",
+        "mv": "MV",
+        "playlist": "歌单"
     },
     "common": {
         "play": "播放",

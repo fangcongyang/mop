@@ -1,6 +1,6 @@
 [
   {
-    "id": "play",
+    "id": "playOrPause",
     "name": "playOrPause",
     "desc": "播放或暂停",
     "shortcut": "CmdOrCtrl+space",

@@ -2,15 +2,12 @@ import { useCallback, useEffect } from 'react';
 import { useGetState } from './useGetState';
 import { store, StoreObserver, StoreEventName } from "../utils/store";
 import { debounce } from 'lodash';
+import { generateUUID } from '@/utils/common';
 
-interface ConfigOptions {
-    page: string; // 可选属性
-    sync?: boolean; // 可选属性
-}
-export const useConfig = (key: StoreEventName, defaultValue: any, options: ConfigOptions) => {
+export const useConfig = (key: StoreEventName, defaultValue: any, options={sync: true}) => {
     const [property, setPropertyState, getProperty] = useGetState(defaultValue);
     const { sync = true } = options;
-    const storeObserver = new StoreObserver(options.page);
+    const storeObserver = new StoreObserver(generateUUID());
 
     // 同步到Store (State -> Store)
     const syncToStore = useCallback(
@@ -26,7 +23,7 @@ export const useConfig = (key: StoreEventName, defaultValue: any, options: Confi
             setPropertyState(v);
         } else {
             store.get(key).then((v) => {
-                if (v === null) {
+                if (v === null || v === undefined) {
                     setPropertyState(defaultValue);
                     store.set(key, defaultValue);
                     store.save();

@@ -8,7 +8,6 @@ import {
     updateLastfm,
     Shortcut,
     getAppConf,
-    restoreDefaultShortcuts,
     doLogout,
 } from "@/store/coreSlice";
 import auth from "@/utils/auth";
@@ -38,6 +37,9 @@ import { osDetailType, appVersion } from "@/utils/env";
 import { useConfig } from "@/hooks/useConfig";
 import { invoke } from "@tauri-apps/api/core";
 import { store } from "@/utils/store";
+import { DownloadFileTask, DownloadInfo } from "@/business/DownloadFileTask";
+import LinearProgressWithLabel from "./components/LinearProgressWithLabel";
+import { YT_DLP } from "@/constant";
 
 const validShortcutCodes = ["=", "-", "~", "[", "]", ";", "'", ",", ".", "/"];
 
@@ -48,15 +50,10 @@ const Settings = () => {
     const data = useAppSelector(dataStore);
     const settings = useAppSelector(settingsStore);
     const lastfm = useAppSelector(lastfmStore);
-    const [lang, setLang] = useConfig("lang", "", {
-        page: "settings",
-    });
+    const [lang, setLang] = useConfig("lang", "");
     const [automaticallyCacheSongs, setAutomaticallyCacheSongs] = useConfig(
         "automaticallyCacheSongs",
-        true,
-        {
-            page: "settings",
-        }
+        true
     );
     const [shortcutInput, setShortcutInput] = useState({
         id: "",
@@ -68,24 +65,19 @@ const Settings = () => {
         size: "0KB",
         length: 0,
     });
+    const [ytdlDownloadProgress, setYtdlDownloadProgress] = useState(0);
+    const [ytdlDownloadSpeed, setYtdlDownloadSpeed] = useState(0.0);
+    const [ytdlDownloadStatus, setYtdlDownloadStatus] = useConfig("ytdlDownloadStatus", "end");
+    const [ytdlVersion, setYtdlVersion] = useConfig("ytdlVersion", "");
+    const [latestVersion, setLatestVersion] = useState("");
     const shortcutInputTimeout = useRef<NodeJS.Timeout | undefined>(undefined);
-    const [unmProxyUri, setUnmProxyUri] = useConfig("unmProxyUri", "", { page: "settings" });
-    const [proxyProtocol, setProxyProtocol] = useConfig("proxyProtocol", "", {
-        page: "settings",
-    });
-    const [proxyServer, setProxyServer] = useConfig("proxyServer", "", {
-        page: "settings",
-    });
-    const [proxyPort, setProxyPort] = useConfig("proxyPort", "", {
-        page: "settings",
-    });
-    const [shortcutList, setShortcutList] = useConfig("shortcutList", [], {
-        page: "settings",
-    });
-    const [musicQuality, setMusicQuality] = useConfig("musicQuality", 320000, {
-        page: "settings",
-    });
-    const [nyancatStyle, setNyancatStyle] = useConfig("nyancatStyle", false, { page: "settings" });
+    const [unmProxyUri, setUnmProxyUri] = useConfig("unmProxyUri", "");
+    const [proxyProtocol, setProxyProtocol] = useConfig("proxyProtocol", "");
+    const [proxyServer, setProxyServer] = useConfig("proxyServer", "");
+    const [proxyPort, setProxyPort] = useConfig("proxyPort", "");
+    const [shortcutList, setShortcutList] = useConfig("shortcutList", []);
+    const [musicQuality, setMusicQuality] = useConfig("musicQuality", 320000);
+    const [nyancatStyle, setNyancatStyle] = useConfig("nyancatStyle", false);
 
     useEffect(() => {
         init();
@@ -93,6 +85,9 @@ const Settings = () => {
 
     const init = _.debounce(() => {
         countDbSize();
+        invoke("github_repos_info_version", { owner: YT_DLP.owner, repo: YT_DLP.repo }).then((latestVersion) => {
+            setLatestVersion(latestVersion as string);
+        });
     }, 500);
 
     const countDbSize = () => {
@@ -328,8 +323,9 @@ const Settings = () => {
         return shortcut.replace("CommandOrControl", "Ctrl");
     };
 
-    const onRestoreDefaultShortcuts = () => {
-        dispatch(restoreDefaultShortcuts());
+    const onRestoreDefaultShortcuts = async () => {
+        await invoke("restore_default_shortcuts", {});
+        window.location.reload();
     };
 
     const changeAppearance = (appearance: string) => {
@@ -352,6 +348,32 @@ const Settings = () => {
 
     const openDevTools = () => {
         invoke("open_devtools");
+    };
+
+    const downloadYtDlp = () => {
+        if (osDetailType in YT_DLP.downloadInfo){
+            const ytDlpInfo = YT_DLP.downloadInfo[osDetailType as keyof typeof YT_DLP.downloadInfo];
+            const ytDlpDownloadTask = new DownloadFileTask({
+                event_id: "yt-dlp",
+                download_url: ytDlpInfo.url,
+                file_path: osDetailType + "/" + ytDlpInfo.path,
+            })
+            ytDlpDownloadTask.on("begin", async (_data: DownloadInfo) => {
+                setYtdlDownloadStatus("begin")
+            })
+            ytDlpDownloadTask.on("progress", async (data: DownloadInfo) => {
+                setYtdlDownloadStatus("progress")
+                setYtdlDownloadProgress(data.progress!)
+                setYtdlDownloadSpeed(data.speed!)
+            })
+            ytDlpDownloadTask.on("end", async (_data: DownloadInfo) => {
+                setYtdlDownloadStatus("end")
+                setYtdlVersion(latestVersion)
+            })
+            ytDlpDownloadTask.startDownload();
+        } else {
+            
+        }
     };
 
     return (
@@ -577,23 +599,25 @@ const Settings = () => {
                         fieldKey="unmQQCookie"
                         inputPlaceholder="uin=..; qm_keyst=.."
                     />
-                    <SettingsInput
-                        title="settings.unm.ytdl"
-                        description={
-                            <div>
-                                <a
-                                    href="https://github.com/UnblockNeteaseMusic/server-rust/tree/main/engines#ytdlexe-設定說明"
-                                    target="_blank"
-                                >
-                                    {t("settings.unm.cookie.desc1")}
-                                </a>
-                                {t("settings.unm.cookie.desc2")}
+                    <div className={styles.item}>
+                        <div className="left">
+                            <div className="title">
+                                {t("settings.unm.ytdl")}
                             </div>
-                        }
-                        initValue={settings.unmYtDlExe}
-                        fieldKey="unmYtDlExe"
-                        inputPlaceholder="ex. youtube-dl"
-                    />
+                            {
+                                ytdlDownloadStatus != 'end' && ytdlDownloadStatus != 'error' ? (
+                                    <LinearProgressWithLabel value={ytdlDownloadProgress} downloadspeed={ytdlDownloadSpeed} />
+                                ) : <div className="description">当前版本：{ytdlVersion}；最新版本：{latestVersion}</div>
+                            }
+                        </div>
+                        <div className="right">
+                            {
+                                latestVersion !== ytdlVersion && (
+                                    <button onClick={downloadYtDlp}>{ytdlVersion ? '更新' : '下载'}</button>
+                                )
+                            }
+                        </div>
+                    </div>
                     <SettingsInput
                         title="settings.unm.proxy.title"
                         description={
@@ -678,20 +702,16 @@ const Settings = () => {
                     initValue={nyancatStyle}
                     fieldKey="nyancatStyle"
                     callback={(value: boolean) => {
-                        setNyancatStyle(value)
+                        setNyancatStyle(value);
                         store.notifyObservers("nyancatStyle", value);
                     }}
                 />
                 <div className={styles.item}>
                     <div className="left">
-                        <div className="title">
-                            打开开发者工具
-                        </div>
+                        <div className="title">打开开发者工具</div>
                     </div>
                     <div className="right">
-                        <button onClick={openDevTools}>
-                            开发者工具
-                        </button>
+                        <button onClick={openDevTools}>开发者工具</button>
                     </div>
                 </div>
 
@@ -707,9 +727,7 @@ const Settings = () => {
                 />
                 <div
                     id="proxy-form"
-                    className={
-                        proxyProtocol === "noProxy" ? "disabled" : ""
-                    }
+                    className={proxyProtocol === "noProxy" ? "disabled" : ""}
                 >
                     <input
                         value={proxyServer}
@@ -726,11 +744,7 @@ const Settings = () => {
                         min={1}
                         max={65535}
                         disabled={proxyProtocol === "noProxy"}
-                        onChange={(e) =>
-                            setProxyPort(
-                                e.target.valueAsNumber
-                            )
-                        }
+                        onChange={(e) => setProxyPort(e.target.valueAsNumber)}
                     />
                     <button onClick={sendProxyConfig}>
                         {t("settings.proxy.updateProxy")}

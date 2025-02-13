@@ -21,7 +21,13 @@ use crate::{engine, utils};
 #[command]
 pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<RetrievedSongInfo> {
     let mut executor = Executor::new();
-    let exe_path = utils::app_install_root().join("resources").join("yt-dlp");
+    let platform = tauri_plugin_os::platform();
+    let mut exe_path = utils::app_install_root().join("resources").join(platform);
+    if platform == "macos" {
+        exe_path = exe_path.join("yt-dlp_macos");
+    } else {
+        exe_path = exe_path.join("yt-dlp");
+    }
     let config = ConfigManagerBuilder::new()
         .set("ytdl:exe", exe_path.into_os_string().into_string().unwrap())
         .build();

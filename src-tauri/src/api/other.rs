@@ -1,6 +1,9 @@
 use cached::proc_macro::cached;
 use serde::{Serialize, Deserialize};
-use tauri::command;
+use serde_json::{Map, Value};
+use tauri::{command, http::{header::USER_AGENT, HeaderMap}};
+
+use crate::utils::{choose_user_agent, create_request_builder};
 
 use super::request::{request_handler, EmptyReq, Options, Request, CRYPTO_WEAPI};
 
@@ -77,4 +80,40 @@ pub async fn fm_trash(data: FmTrashReq) -> serde_json::Value {
     
     let options = Options::new(Some(CRYPTO_WEAPI));
     request_handler(&url, data, options).await
+}
+
+#[command]
+#[cached(time = 86400, option = false)]
+pub async fn github_repos_info_version(owner: String, repo: String) -> Option<String> {
+    let url = format!("https://api.github.com/repos/{}/{}/releases/latest", owner, repo);
+    let mut client_builder = create_request_builder();
+    let mut headers: HeaderMap = HeaderMap::new();
+    headers.insert(
+        USER_AGENT,
+        serde_json::to_value(choose_user_agent("pc"))
+            .unwrap()
+            .as_str()
+            .unwrap()
+            .parse()
+            .unwrap(),
+    );
+    client_builder = client_builder.default_headers(headers);
+    let client = client_builder
+        .build()
+        .unwrap();
+    let response = client.get(url).send().await.unwrap();
+    match response.text().await {
+        Ok(d) => {
+            let data: Map<String, Value> = serde_json::from_str(&d).unwrap();
+            if let Some(v) = data.get("tag_name") {
+                match v {
+                    Value::String(tag_name) => Some(tag_name.to_owned()),
+                    _ => None,
+                }
+            } else {
+                None
+            }
+        }
+        Err(_r) => None,
+    }
 }

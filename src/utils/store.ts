@@ -12,6 +12,8 @@ const eventNames = [
     "proxyProtocol",
     "proxyServer",
     "proxyPort",
+    "ytdlDownloadStatus",
+    "ytdlVersion",
 ] as const;
 
 export type StoreEventName = (typeof eventNames)[number];
