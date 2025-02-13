@@ -73,7 +73,7 @@ export async function cacheTrackSource(
         }
     });
     if (url.startsWith("http")) {
-        invoke("download_music_arraybuffer", { url })
+        invoke("download_music_arraybuffer", { url, from })
             .then((response) => {
                 const sd = new Uint8Array(response as any);
                 db.trackSources.put({

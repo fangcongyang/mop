@@ -103,14 +103,36 @@ pub mod cmd {
     use tauri::command;
     use tauri_plugin_store::StoreExt;
 
-    use crate::APP;
+    use crate::{app::hotkey, APP};
 
-    use super::get_path;
+    use super::{get, get_path, set, Shortcut};
 
     #[command]
     pub fn reload_store() {
         let app = APP.get().unwrap();
         let store = app.get_store(get_path(app)).unwrap();
         store.reload().unwrap();
+    }
+
+    #[command]
+    pub fn restore_default_shortcuts() {
+        super::restore_default_shortcuts();
+        let mut shortcuts: Vec<Shortcut> = vec![];
+        let enable_global_shortcut = get("enableGlobalShortcut").unwrap().as_bool();
+
+        // 初始化全局快捷键
+        if Some(true) == enable_global_shortcut {
+            get("shortcutList")
+                .unwrap()
+                .as_array()
+                .unwrap()
+                .iter()
+                .for_each(|item| {
+                    let shortcut =
+                        serde_json::from_value::<Shortcut>(item.clone()).unwrap();
+                    shortcuts.push(hotkey::hotkey_desktop::register_shortcut(shortcut));
+                });
+            set("shortcutList", shortcuts);
+        }
     }
 }

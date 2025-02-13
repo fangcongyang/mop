@@ -3,7 +3,7 @@ mod macros;
 
 extern crate proc_macro;
 
-use app::{cmds, hotkey};
+use app::{cmds, hotkey, menu::menu_desktop::{update_tray_icon, PlayStatus}};
 use conf::{get, init_config, init_config_value, is_first_run, set, Shortcut};
 use log::{info, LevelFilter};
 use once_cell::sync::OnceCell;
@@ -38,6 +38,8 @@ pub fn run() {
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(LevelFilter::Info)
+                .max_file_size(50_000)
+                .rotation_strategy(tauri_plugin_log::RotationStrategy::KeepAll)
                 .targets([
                     Target::new(TargetKind::Stdout),
                     Target::new(TargetKind::LogDir { file_name: None }),
@@ -88,7 +90,7 @@ pub fn run() {
 
             #[cfg(desktop)]
             {
-                use app::menu::{self, menu_desktop::Payload};
+                use app::menu::{self};
                 app.handle()
                     .plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
 
@@ -111,14 +113,10 @@ pub fn run() {
                 }
 
                 menu::menu_desktop::tray_menu(&app)?;
-
-                let app_handle = app.app_handle().clone();
-                app.listen("taryEvent", move |event| {
-                    let payload = serde_json::from_str::<Payload>(event.payload()).unwrap();
-                    if let Some(menu) = app_handle.menu() {
-                        if let Some(m) = menu.get(&payload.taryId.unwrap()) {
-                            let _ = m.as_menuitem().unwrap().set_text(payload.title.unwrap());
-                        }
+                
+                app.app_handle().clone().listen("play_status", move |event| {
+                    if let Ok(payload) = serde_json::from_str::<PlayStatus>(&event.payload()) {      
+                        let _ = update_tray_icon(payload);
                     }
                 });
             }
@@ -126,6 +124,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             conf::cmd::reload_store,
+            conf::cmd::restore_default_shortcuts,
             hotkey::cmd::register_shortcut_by_frontend,
             hotkey::cmd::unregister_shortcut_by_frontend,
             playlist::get_playlist_detail,
@@ -165,6 +164,7 @@ pub fn run() {
             other::search,
             other::personal_fm,
             other::fm_trash,
+            other::github_repos_info_version,
             artist::toplist_artist,
             artist::artist_sublist,
             artist::artist_sub,
@@ -179,6 +179,7 @@ pub fn run() {
             cloud_engine::get_audio_source_from_unblock_music,
             utils::cmd::download_music_arraybuffer,
             cmds::open_devtools,
+            cmds::download_file_task,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

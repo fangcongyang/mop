@@ -1,4 +1,4 @@
-import { CSSProperties, FC, ReactElement, useState } from "react";
+import { CSSProperties, FC, ReactElement, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch } from "@/store/hooks";
 import { updateAppConf } from "@/store/coreSlice";
@@ -27,6 +27,10 @@ const SettingsInput: FC<SettingsInputProps> = ({
     const dispatch = useAppDispatch();
     const { t } = useTranslation();
     const [inputValue, setInputValue] = useState(initValue);
+
+    useEffect(() => {
+        setInputValue(initValue);
+    }, [initValue]);
 
     const inputBlur = () => {
         if (initValue === inputValue) return;

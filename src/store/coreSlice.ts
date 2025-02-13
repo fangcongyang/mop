@@ -34,7 +34,6 @@ interface Settings {
     showUnavailableSongInGreyStyle: boolean;
     title: string;
     enableDiscordRichPresence: boolean;
-    lang: string;
     appearance: string;
     musicLanguage: "all" | "zh" | "ea" | "jp" | "kr";
     cacheLimit: number;
@@ -49,7 +48,6 @@ interface Settings {
     unmJooxCookie: string;
     unmQQCookie: string;
     unmYtDlExe: string;
-    unmProxyUri: string;
     closeAppOption: string;
     showLibraryDefault: boolean;
     showPlaylistsByAppleMusic: boolean;
@@ -113,7 +111,6 @@ const initialState: CoreState = {
         showUnavailableSongInGreyStyle: false,
         title: "mop",
         enableDiscordRichPresence: false,
-        lang: "zh_ch",
         appearance: "auto",
         musicLanguage: "all",
         cacheLimit: 8192,
@@ -128,7 +125,6 @@ const initialState: CoreState = {
         unmJooxCookie: "",
         unmQQCookie: "",
         unmYtDlExe: "",
-        unmProxyUri: "",
         closeAppOption: "exit",
         showLibraryDefault: false,
         showPlaylistsByAppleMusic: true,
@@ -225,14 +221,6 @@ export const getAppConf = createAsyncThunk("getAppConf", async () => {
     let appConf: any = await invoke("get_app_conf", {});
     return appConf;
 });
-
-export const restoreDefaultShortcuts = createAsyncThunk(
-    "restoreDefaultShortcuts",
-    async () => {
-        let appConf: any = await invoke("restore_default_shortcuts", {});
-        return appConf;
-    }
-);
 
 export interface ConfUpdate {
     confName: string;
@@ -511,13 +499,6 @@ export const coreSlice = createSlice({
                 }
             }
         }),
-            builder.addCase(
-                restoreDefaultShortcuts.fulfilled,
-                (state, action) => {
-                    const appConf: any = action.payload.settings;
-                    state.settings.shortcuts = appConf.shortcuts;
-                }
-            ),
             builder.addCase(updateAppConf.fulfilled, (state, action) => {
                 const confUpdate: ConfUpdate = action.payload;
                 (state as any)[confUpdate.confName][confUpdate.key] =

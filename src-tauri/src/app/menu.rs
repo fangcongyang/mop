@@ -1,9 +1,17 @@
 #[cfg(desktop)]
 pub mod menu_desktop {
+    use std::sync::{Arc, Mutex};
+
+    use lazy_static::lazy_static;
     use tauri::menu::{IconMenuItemBuilder, Menu, PredefinedMenuItem};
-    use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
+    use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
+    use tauri::{App, AppHandle, Manager, Wry};
     use tauri::Emitter;
-    use tauri::{App, Manager, Wry};
+
+    lazy_static! {
+        static ref TRAY_ICON_MAP: Arc<Mutex<Option<TrayIcon>>> = Arc::new(Mutex::new(None));
+        static ref PLAY_STATUS: Arc<Mutex<PlayStatus>> = Arc::new(Mutex::new(PlayStatus{ playing: false, playMode: "1".to_owned() }));
+    }
 
     #[allow(non_snake_case)]
     #[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
@@ -12,53 +20,18 @@ pub mod menu_desktop {
         pub title: Option<String>,
     }
 
+    #[allow(non_snake_case)]
+    #[derive(Clone, serde::Serialize, serde::Deserialize, Debug)]
+    pub struct PlayStatus {
+        pub playing: bool,
+        pub playMode: String,
+    }
+
     // --- SystemTray Menu
     pub fn tray_menu(app: &App<Wry>) -> Result<(), Box<dyn std::error::Error>> {
-        let play_icon = tauri::image::Image::from_path("./assets/play.png")?;
-        let play = IconMenuItemBuilder::new("播放")
-            .id("play")
-            .icon(play_icon)
-            .build(app)?;
-        let prev_track_icon = tauri::image::Image::from_path("./assets/play.png")?;
-        let prev_track = IconMenuItemBuilder::new("播放")
-            .id("prevTrack")
-            .icon(prev_track_icon)
-            .build(app)?;
-        let next_track_icon = tauri::image::Image::from_path("./assets/play.png")?;
-        let next_track = IconMenuItemBuilder::new("下一首")
-            .id("nextTrack")
-            .icon(next_track_icon)
-            .build(app)?;
-        let play_mode_icon = tauri::image::Image::from_path("./assets/play.png")?;
-        let play_mode = IconMenuItemBuilder::new("循环播放")
-            .id("playMode")
-            .icon(play_mode_icon)
-            .build(app)?;
-
-        let separator = PredefinedMenuItem::separator(app)?;
-
-        let restart_icon = tauri::image::Image::from_path("./assets/play.png")?;
-        let restart = IconMenuItemBuilder::new("重启应用")
-            .id("restart")
-            .icon(restart_icon)
-            .build(app)?;
-
-        let quit = PredefinedMenuItem::quit(app, None)?;
-
-        let menu = Menu::with_items(
-            app,
-            &[
-                &play,
-                &prev_track,
-                &next_track,
-                &play_mode,
-                &separator,
-                &restart,
-                &quit,
-            ],
-        )?;
-
-        TrayIconBuilder::new()
+        let play_status = PLAY_STATUS.lock().unwrap().clone();
+        let menu = create_tray_icon(&app.handle().clone(), play_status).unwrap();
+        let tray = TrayIconBuilder::new()
             .icon(app.default_window_icon().unwrap().clone())
             .on_tray_icon_event(|tray, event| match event {
                 TrayIconEvent::Click {
@@ -84,7 +57,17 @@ pub mod menu_desktop {
             .menu(&menu)
             .show_menu_on_left_click(true)
             .on_menu_event(|app, event| match event.id.as_ref() {
-                "play" | "prevTrack" | "nextTrack" => {
+                "playOrPause" => {
+                    let mut play_status = PLAY_STATUS.lock().unwrap();
+                    play_status.playing = !play_status.playing;
+                    let menu = create_tray_icon(app, play_status.clone()).unwrap();
+                    if let Some(tray) = TRAY_ICON_MAP.lock().unwrap().as_mut() {
+                        tray.set_menu(Some(menu)).unwrap();
+                    }
+
+                    let _ = app.emit(event.id.0.as_str(), "".to_owned());
+                }
+                "prevTrack" | "nextTrack" => {
                     let _ = app.emit(event.id.0.as_str(), "".to_owned());
                 }
                 "restart" => tauri::process::restart(&app.env()),
@@ -96,45 +79,82 @@ pub mod menu_desktop {
                 }
             })
             .build(app)?;
+        let mut tray_icon = TRAY_ICON_MAP.lock().unwrap();
+        *tray_icon = Some(tray);
+        Ok(())
+    }
+
+    fn create_tray_icon(
+        app: &AppHandle,
+        play_status: PlayStatus,
+    ) -> Result<Menu<Wry>, Box<dyn std::error::Error>> {
+        let play_icon = if play_status.playing {
+            tauri::image::Image::from_path("./assets/pause.png")?
+        } else {
+            tauri::image::Image::from_path("./assets/play.png")?
+        };
+        let play = if play_status.playing {
+            IconMenuItemBuilder::new("暂停")
+                .id("playOrPause")
+                .icon(play_icon)
+                .build(app)?
+        } else {
+            IconMenuItemBuilder::new("播放")
+                .id("playOrPause")
+                .icon(play_icon)
+                .build(app)?
+        };
+        let prev_track_icon = tauri::image::Image::from_path("./assets/previous.png")?;
+        let prev_track = IconMenuItemBuilder::new("上一首")
+            .id("prevTrack")
+            .icon(prev_track_icon)
+            .build(app)?;
+        let next_track_icon = tauri::image::Image::from_path("./assets/next.png")?;
+        let next_track = IconMenuItemBuilder::new("下一首")
+            .id("nextTrack")
+            .icon(next_track_icon)
+            .build(app)?;
+        let play_mode_icon = tauri::image::Image::from_path("./assets/repeat.png")?;
+        let play_mode = IconMenuItemBuilder::new("循环播放")
+            .id("playMode")
+            .icon(play_mode_icon)
+            .build(app)?;
+
+        let separator = PredefinedMenuItem::separator(app)?;
+
+        let restart_icon = tauri::image::Image::from_path("./assets/restart.png")?;
+        let restart = IconMenuItemBuilder::new("重启应用")
+            .id("restart")
+            .icon(restart_icon)
+            .build(app)?;
+
+        let quit = PredefinedMenuItem::quit(app, None)?;
+
+        let menu = Menu::with_items(
+            app,
+            &[
+                &play,
+                &prev_track,
+                &next_track,
+                &play_mode,
+                &separator,
+                &restart,
+                &quit,
+            ],
+        )?;
+        return Ok(menu);
+    }
+
+    pub fn update_tray_icon(
+        payload: PlayStatus,
+    ) -> Result<(), Box<dyn std::error::Error>> {      
+        let mut play_status = PLAY_STATUS.lock().unwrap();
+        play_status.playing = payload.playing;
+        play_status.playMode = payload.playMode.clone();
+        if let Some(tray) = TRAY_ICON_MAP.lock().unwrap().as_mut() {
+            let menu = create_tray_icon(tray.app_handle(), play_status.clone())?;
+            tray.set_menu(Some(menu))?;
+        }
         Ok(())
     }
 }
-
-// pub mod cmd {
-//   use tauri::{command, AppHandle, Manager};
-//   use crate::conf::AppConf;
-
-//   #[command]
-//   pub fn exist_app(app: AppHandle) {
-//     let main = app.get_focused_window().unwrap();
-//     let app_conf = AppConf::read();
-//     let save_window_state = app_conf.systemConf.saveWindowState;
-//     if app_conf.isinit {
-//       tauri::api::dialog::ask(
-//         Some(&app.get_focused_window().unwrap()),
-//         "退出",
-//         "你确定退出程序吗？按[x]进行退出",
-//         move |is_ok| {
-//             app_conf
-//             .amend(serde_json::json!({ "isinit" : false, "main_close": is_ok }))
-//             .write();
-//             if is_ok {
-//               if save_window_state {
-//                 app.save_window_state(StateFlags::all()).expect("保存窗口状态失败");
-//               }
-//               std::process::exit(0);
-//             } else {
-//               main.minimize().unwrap();
-//             }
-//         },
-//       );
-//     } else if app_conf.main_close {
-//       if save_window_state {
-//         app.save_window_state(StateFlags::all()).expect("保存窗口状态失败");
-//       }
-//       std::process::exit(0);
-//     } else {
-//       main.minimize().unwrap();
-//     }
-//   }
-// }

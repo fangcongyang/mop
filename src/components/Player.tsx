@@ -23,6 +23,7 @@ import "./Player.scss";
 import { PlayerObserver } from "@/type/player";
 import { useConfig } from "@/hooks/useConfig";
 import { deleteTrackSource } from "@/db";
+import { emit } from "@tauri-apps/api/event";
 
 const Player = () => {
     let location = useLocation();
@@ -50,6 +51,7 @@ const Player = () => {
     const registerPlayerObserver = () => {
         playerObserver.on("playing", () => {
             setPlaying(player.playing);
+            emit("play_status", { playing: player.playing, playMode: repeatMode });
         });
 
         playerObserver.on("currentTrack", () => {

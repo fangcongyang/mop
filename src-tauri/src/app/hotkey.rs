@@ -28,6 +28,7 @@ pub mod hotkey_desktop {
                             "Registered global shortcut: {} for {}",
                             hotkey, shortcut_name
                         );
+                        shortcut_conf.isPersonalUse = false;
                     }
                     Err(e) => {
                         shortcut_conf.isPersonalUse = true;
