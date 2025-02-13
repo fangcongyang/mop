@@ -4,7 +4,7 @@ import { debounce } from 'lodash';
 
 export async function initTaryEvent() {
     let volume;
-    await listen<string>('play', debounce((_event: any) => {
+    await listen<string>('playOrPause', debounce((_event: any) => {
         player.playOrPause();
     }, 300))
 
