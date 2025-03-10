@@ -65,6 +65,8 @@ class Player implements PlayerSubject {
     private _mute: boolean;
     // 0 to 1
     private _volume: number;
+    // 是否正在加载歌曲
+    private _loading: boolean;
     //是否正在私人FM中加载新的track
     private _personalFMLoading: boolean;
     // 是否正在缓存私人FM的下一首歌曲
@@ -110,6 +112,7 @@ class Player implements PlayerSubject {
         this._reversed = false;
         this._mute = false;
         this._volume = 1;
+        this._loading = false;
         this._personalFMLoading = false;
         this._personalFMNextLoading = false;
 
@@ -430,8 +433,16 @@ class Player implements PlayerSubject {
     }
 
     playPrevTrack() {
+        if (this._loading) {
+            messageEventEmitter.emit("MESSAGE:INFO", "正在加载中，请稍后再试");
+            return false;
+        }
+        this._setLoading(true);
         const [trackId, index] = this._getPrevTrack();
-        if (trackId === undefined) return false;
+        if (trackId === undefined) {
+            this._setLoading(false);
+            return false;
+        }
         this._current = index;
         this._replaceCurrentTrack(
             trackId,
@@ -442,11 +453,17 @@ class Player implements PlayerSubject {
     }
 
     playNextTrack() {
-        // TODO: 切换歌曲时增加加载中的状态
+        if (this._loading) {
+            messageEventEmitter.emit("MESSAGE:INFO", "正在加载中，请稍后再试");
+            return false;
+        }
+        // 设置加载中状态
+        this._setLoading(true);
         const [trackID, index] = this._getNextTrack();
         if (trackID === undefined) {
             this._howler?.stop();
             this._setPlaying(false);
+            this._setLoading(false);
             return false;
         }
         let next = index;
@@ -578,6 +595,7 @@ class Player implements PlayerSubject {
                 }
                 return replaced;
             } else {
+                this._setLoading(false);
                 messageEventEmitter.emit(
                     "MESSAGE:INFO",
                     `无法播放${track.id} ${track.name}`
@@ -611,6 +629,8 @@ class Player implements PlayerSubject {
             format: ["mp3", "flac", "aac", "m4a"],
             onplay: () => {
                 requestAnimationFrame(this._step.bind(this));
+                // 音频开始播放时，取消加载状态
+                this._setLoading(false);
             },
             onend: () => {
                 this._nextTrackCallback();
@@ -689,6 +709,10 @@ class Player implements PlayerSubject {
     }
 
     _playNextTrack(isPersonal = false) {
+        if (this._loading) {
+            messageEventEmitter.emit("MESSAGE:INFO", "正在加载中，请稍后再试");
+            return false;
+        }
         if (isPersonal) {
             this.playNextFMTrack();
         } else {
@@ -861,6 +885,11 @@ class Player implements PlayerSubject {
         // ipcRenderer?.send('updateTrayPlayState', this._playing);
     }
 
+    _setLoading(isLoading: boolean) {
+        this._loading = isLoading;
+        this.notifyObservers("loading");
+    }
+
     removeTrackFromQueue(index: number) {
         this._playNextList.splice(index, 1);
     }
@@ -1007,6 +1036,10 @@ class Player implements PlayerSubject {
 
     get currentAudioSource() {
         return this._currentAudioSource;
+    }
+
+    get loading() {
+        return this._loading;
     }
 
     toggleMute() {

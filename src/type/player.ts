@@ -25,6 +25,7 @@ const eventNames = [
     "progressForceRefresh",
     "volumeChange",
     "muteChange",
+    "loading",
 ] as const;
 
 export type PlayerEventName = (typeof eventNames)[number];
@@ -48,6 +49,7 @@ export class PlayerObserver {
             "progressForceRefresh": new Set(),
             "volumeChange": new Set(),
             "muteChange": new Set(),
+            "loading": new Set(),
         };
     }
 

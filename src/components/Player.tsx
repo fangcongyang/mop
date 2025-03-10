@@ -45,8 +45,9 @@ const Player = () => {
     const [reversed, setReversed] = useState(player.reversed);
     const [volume, setVolume] = useState(player.volume);
     const [mute, setMute] = useState(player.mute);
+    const [loading, setLoading] = useState(player.loading);
     const playerObserver: PlayerObserver = new PlayerObserver("player");
-    const [nyancatStyle] = useConfig("nyancatStyle", false, { page: "player" });
+    const [nyancatStyle] = useConfig("nyancatStyle", false);
 
     const registerPlayerObserver = () => {
         playerObserver.on("playing", () => {
@@ -89,6 +90,10 @@ const Player = () => {
 
         playerObserver.on("muteChange", () => {
             setMute(player.mute);
+        });
+
+        playerObserver.on("loading", () => {
+            setLoading(player.loading);
         });
 
         player.registerObserver(playerObserver);
@@ -194,7 +199,7 @@ const Player = () => {
     };
 
     return (
-        <div className="player">
+        <div className={`player ${loading ? 'loading' : ''}`}>
             <div className={playProgressClass}>
                 {nyancatStyle ? (
                     <Slider
