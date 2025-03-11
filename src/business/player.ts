@@ -31,6 +31,7 @@ const excludeSaveKeys = [
     "_personalFMNextLoading",
     "_lastProcessFpsDate",
     "_observers",
+    "_loading"
 ];
 
 export const delay = (ms: number) =>
@@ -312,6 +313,8 @@ class Player implements PlayerSubject {
         if (!this._enabled) this._enabled = true;
         this._list = trackIds;
         this._current = 0;
+        // 重置加载中状态
+        this._setLoading(false);
         this._playlistSource = {
             type: playlistSourceType,
             id: playlistSourceId,
@@ -521,6 +524,7 @@ class Player implements PlayerSubject {
         }
         const data = await getTrackDetail(id);
         if (data.songs.length == 0) {
+            this._setLoading(false);
             return;
         }
         const track_1 = data.songs[0];
