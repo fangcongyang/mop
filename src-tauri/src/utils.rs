@@ -1,4 +1,5 @@
 use anyhow::Result;
+use rand::Rng;
 use tauri::{path::BaseDirectory, Manager};
 use tauri_plugin_http::reqwest::{self, ClientBuilder};
 use std::{
@@ -100,12 +101,14 @@ pub fn create_request_builder() -> ClientBuilder {
 }
 
 pub fn choose_user_agent(ua: &str) -> &str {
+    let mut rng = rand::rng();
+    let i: usize = rng.random_range(0..usize::MAX);
     let index = if ua == "mobile" {
-        rand::random::<usize>() % 7
+        i % 7
     } else if ua == "pc" {
-        rand::random::<usize>() % 5 + 8
+        i % 5 + 8
     } else if ua.is_empty() {
-        rand::random::<usize>() % USER_AGENT_LIST.len()
+        i % USER_AGENT_LIST.len()
     } else {
         return ua;
     };

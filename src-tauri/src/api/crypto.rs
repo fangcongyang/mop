@@ -3,7 +3,7 @@ use std::fmt;
 use crate::APP;
 use base64::alphabet::Alphabet;
 use lazy_static::lazy_static;
-use rand::{rngs::OsRng, RngCore};
+use rand::{rngs::OsRng, TryRngCore};
 use serde::{Deserialize, Serialize};
 use tauri_plugin_crypto::{
     AesCryptoRequest, CryptoExt, CryptoResponse, HashEncryptRequest, RsaCryptoRequest,
@@ -96,7 +96,7 @@ impl Crypto {
 
     pub fn weapi(text: &str) -> CryptoRequest {
         let mut secret_key = [0u8; 16];
-        OsRng.fill_bytes(&mut secret_key);
+        let _ = OsRng.try_fill_bytes(&mut secret_key);
         let key: Vec<u8> = secret_key
             .iter()
             .map(|i| BASE62[(i % 62) as usize])

@@ -4,7 +4,7 @@ use log::info;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use tauri_plugin_http::reqwest::{self};
+use tauri_plugin_http::reqwest::{self, Error};
 use std::{
     fmt::Debug,
     path::PathBuf,
@@ -165,7 +165,7 @@ pub async fn handle_request(
     method: &str,
     query_params: impl Request,
     options: Options<'_>
-) -> reqwest::Response {
+) -> Result<reqwest::Response, Error> {
     let crypto_string = options.crypto.unwrap();
     let crypto = &crypto_string;
 
@@ -256,13 +256,17 @@ pub async fn handle_request(
     } else {
         rq = rq.form(&body);
     }
-    let response = rq.send().await.unwrap();
+    let response = rq.send().await;
     response
 }
 
-async fn handle_response(response: reqwest::Response) -> serde_json::Value {
+async fn handle_response(response: Result<reqwest::Response, Error>) -> serde_json::Value {
+    if response.is_err() {
+        return serde_json::from_str("").unwrap();
+    }
+    let rs = response.unwrap();
     {
-        let headers = response.headers();
+        let headers = rs.headers();
         let set_cookies = headers.get_all("set-cookie");
         let mut cookie_jar = COOKIE_JAR.lock().unwrap();
         for val in set_cookies {
@@ -270,7 +274,7 @@ async fn handle_response(response: reqwest::Response) -> serde_json::Value {
             cookie_jar.add_original(cookie);
         }
     }
-    match response.text().await {
+    match rs.text().await {
         Ok(d) => {
             let mut data: Map<String, Value> = serde_json::from_str(&d).unwrap();
             data.insert(

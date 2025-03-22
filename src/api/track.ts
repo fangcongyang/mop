@@ -26,17 +26,21 @@ export async function getMP3(id: string) {
  */
 export async function getTrackDetail(ids: string | number) {
     const fetchLatest = async () => {
-        const data: any = await invoke("get_song_detail", {
-            data: { ids: ids.toString() },
-        });
-        data.songs.map((song: any) => {
-            const privileges = data.privileges.find(
-                (t: any) => t.id === song.id
-            );
-            cacheTrackDetail(song, privileges);
-        });
-        data.songs = auth.mapTrackPlayableStatus(data.songs, data.privileges);
-        return data;
+        try {
+            const data: any = await invoke("get_song_detail", {
+                data: { ids: ids.toString() },
+            });
+            data.songs.map((song: any) => {
+                const privileges = data.privileges.find(
+                    (t: any) => t.id === song.id
+                );
+                cacheTrackDetail(song, privileges);
+            });
+            data.songs = auth.mapTrackPlayableStatus(data.songs, data.privileges);
+            return data;
+        } catch (e) {
+            return null;
+        }
     };
 
     let idsInArray = [String(ids)];
