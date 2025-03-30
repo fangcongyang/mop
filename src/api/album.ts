@@ -33,7 +33,16 @@ export async function getAlbum(id: number) {
  * @param {string} params.area
  */
 export function newAlbums(params: any) {
-  return invoke('album_new', { data: params });
+  return new Promise((resolve, reject) => {
+      invoke('album_new', { data: params })
+      .then((data: any) => {
+          data = data.code === 200 ? data.data : {}
+          resolve(data)
+      })
+      .catch((e) => {
+          reject(e)
+      })
+  })
 }
 
 /**
@@ -47,7 +56,16 @@ export function newAlbums(params: any) {
  */
 export function albumSublist(params: any) {
   params["timestamp"] = new Date().getTime();
-  return invoke("album_sublist", { data: params });
+  return new Promise((resolve, reject) => {
+      invoke('album_sublist', { data: params })
+      .then((data: any) => {
+          data = data.code === 200 ? data.data : {}
+          resolve(data)
+      })
+      .catch((e) => {
+          reject(e)
+      })
+  })
 }
 
 /**
@@ -61,7 +79,16 @@ export function albumSublist(params: any) {
  */
 export function likeAAlbum(params: any) {
   params.t =  params.t == 1 ? 'sub' : 'unsub'
-  return invoke("album_sub", { data: params });
+  return new Promise((resolve, reject) => {
+      invoke('album_sub', { data: params })
+      .then((data: any) => {
+          data = data.code === 200 ? data.data : {}
+          resolve(data)
+      })
+      .catch((e) => {
+          reject(e)
+      })
+  })
 }
 
 /**
@@ -76,7 +103,16 @@ export function likeAAlbum(params: any) {
  * @param {number=} params.offset
  */
 export function getArtistAlbum(params: any) {
-  return invoke("artist_albums", { data: params });
+  return new Promise((resolve, reject) => {
+      invoke('artist_albums', { data: params })
+      .then((data: any) => {
+          data = data.code === 200 ? data.data : {}
+          resolve(data)
+      })
+      .catch((e) => {
+          reject(e)
+      })
+  })
 }
 
 /**
@@ -86,5 +122,14 @@ export function getArtistAlbum(params: any) {
  * @param {number} id
  */
 export function albumDynamicDetail(id: number) {
-  return invoke("album_detail_dynamic", { data: {id} });
+  return new Promise((resolve, reject) => {
+      invoke('album_detail_dynamic', { data: {id} })
+      .then((data: any) => {
+          data = data.code === 200 ? data.data : {}
+          resolve(data)
+      })
+      .catch((e) => {
+          reject(e)
+      })
+  })
 }

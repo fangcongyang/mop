@@ -7,7 +7,8 @@ import { invoke } from "@tauri-apps/api/core";
  * @param {number} id - 歌手 id, 可由搜索接口获得
  */
 export async function getArtist(id: string) {
-    const data: any = await invoke('artists', { data: { id, timestamp: new Date().getTime() } });
+    let data: any = await invoke('artists', { data: { id, timestamp: new Date().getTime() } });
+    data = data.code === 200 ? data.data : {}
     data.hotSongs = auth.mapTrackPlayableStatus(data.hotSongs);
     return data;
 }
@@ -21,7 +22,16 @@ export async function getArtist(id: string) {
  */
 export function artistMv(params: any) {
     params.artistId = params.id;
-    return invoke('artist_mv', { data: params });
+    return new Promise((resolve, reject) => {
+        invoke('artist_mv', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -39,7 +49,16 @@ export function topListOfArtists(type = null) {
     if (type) {
         params.type = type;
     }
-    return invoke('toplist_artist', { data: params });
+    return new Promise((resolve, reject) => {
+        invoke('toplist_artist', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -48,7 +67,16 @@ export function topListOfArtists(type = null) {
  */
 export function artistSubList(params: any) {
     params.timestamp = new Date().getTime();
-    return invoke('artist_sublist', { data: params });
+    return new Promise((resolve, reject) => {
+        invoke('artist_sublist', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -63,7 +91,16 @@ export function artistSubList(params: any) {
 export function followAArtist(params: any) {
     params.t = params.t == 1 ? 'sub' : 'unsub';
     params.artistId = params.id;
-    return invoke('artist_sub', { data: params });
+    return new Promise((resolve, reject) => {
+        invoke('artist_sub', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -73,5 +110,14 @@ export function followAArtist(params: any) {
  * @param {number} id
  */
 export function similarArtistList(id: number) {
-    return invoke('simi_artist', { data: { artistid: id } });
+    return new Promise((resolve, reject) => {
+        invoke('simi_artist', { data: { artistid: id } })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
