@@ -42,7 +42,7 @@ async function replaceRecommendResult(recommend: any) {
     for (let r of recommend) {
         if (specialPlaylist.indexOf(r.id) > -1) {
             const data: any = await getPlaylistDetail(r.id, true);
-            const playlist = data.playlist;
+            const playlist = data?.playlist;
             if (playlist) {
                 r.name = playlist.name;
                 r.picUrl = playlist.coverImgUrl;

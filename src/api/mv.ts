@@ -8,12 +8,19 @@ import { invoke } from "@tauri-apps/api/core";
  * @param {number} id mv 的 id
  */
 export function mvDetail(id: string) {
-    return invoke('mv_detail', {
-        data: {
+    return new Promise((resolve, reject) => {
+        invoke('mv_detail', { data: {
             id,
             timestamp: new Date().getTime()
-        }
-    });
+        } })
+       .then((data: any) => {
+          data = data.code === 200 ? data.data : null
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
@@ -27,7 +34,16 @@ export function mvDetail(id: string) {
  * @param {number=} params.r
  */
 export function mvUrl(params: any) {
-    return invoke('mv_url', { data: params });
+    return new Promise((resolve, reject) => {
+        invoke('mv_url', { data: params })
+       .then((data: any) => {
+          data = data.code === 200 ? data.data : null
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
@@ -36,7 +52,16 @@ export function mvUrl(params: any) {
  * @param {number} mvid
  */
 export function simiMv(mvid: string) {
-    return invoke('simi_mv', { data: {mvid} });
+    return new Promise((resolve, reject) => {
+        invoke('simi_mv', { data: {mvid} })
+       .then((data: any) => {
+          data = data.code === 200 ? data.data : null
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
