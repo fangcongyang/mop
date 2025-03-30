@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { do_invoke } from "./fetch";
 
 /**
  * 获取 mv 数据
@@ -52,16 +53,7 @@ export function mvUrl(params: any) {
  * @param {number} mvid
  */
 export function simiMv(mvid: string) {
-    return new Promise((resolve, reject) => {
-        invoke('simi_mv', { data: {mvid} })
-       .then((data: any) => {
-          data = data.code === 200 ? data.data : null
-          resolve(data)
-       })
-       .catch((e) => {
-        reject(e)
-       })
-    }) 
+    return do_invoke('simi_mv', { data: {mvid} });
 }
 
 /**
@@ -70,7 +62,7 @@ export function simiMv(mvid: string) {
  */
 export function mvSublist(params: any) {
     params.timestamp = new Date().getTime();
-    return invoke('mv_sublist', { data: params });
+    return do_invoke('mv_sublist', { data: params });
 }
 
 /**
@@ -87,5 +79,5 @@ export function likeAMv(params: any) {
     params.timestamp = new Date().getTime();
     params.mvId = params.mvid;
     params.t = params.t == 1 ? 'sub' : 'unsub';
-    return invoke('mv_sub', { data: params });
+    return do_invoke('mv_sub', { data: params });
 }

@@ -1,11 +1,22 @@
+import { getLocalLikeTrackIds } from "@/db";
 import { invoke } from "@tauri-apps/api/core";
+import { do_invoke } from "./fetch";
 
 export function userAccount() {
-    return invoke("user_account", { data: {} });
+    return do_invoke("user_account", { data: {} });
 }
 
 export function userPlaylist(data: any) {
-    return invoke("user_playlist", { data });
+    return new Promise((resolve, reject) => {
+        invoke("user_playlist", { data })
+       .then((data: any) => {
+          data = data.code === 200 ? data.data : null
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
@@ -14,8 +25,21 @@ export function userPlaylist(data: any) {
  * - uid: 用户 id
  * @param {number} uid
  */
-export function userLikedSongsIds(uid: number) {
-    return invoke("user_like_songs_ids", { data: { uid, timestamp: new Date().getTime() } });
+export function userLikedSongsIds(uid: number, playListId: number) {
+    return new Promise((resolve, reject) => {
+        do_invoke("user_like_songs_ids", { data: { uid, timestamp: new Date().getTime() } })
+       .then(async (data: any) => {
+          const lids = await getLocalLikeTrackIds(playListId)
+          if (lids) {
+            data.ids = [...data.ids, ...lids]
+          }
+
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
@@ -23,7 +47,7 @@ export function userLikedSongsIds(uid: number) {
  * @param {Array} id
  */
 export function cloudDiskTrackDelete(id: string) {
-    return invoke("cloud_del", { data: { id, timestamp: new Date().getTime() } });
+    return do_invoke("cloud_del", { data: { id, timestamp: new Date().getTime() } });
 }
 
 /**
@@ -37,7 +61,7 @@ export function cloudDiskTrackDelete(id: string) {
  */
 export function cloudDisk(params: any) {
     params.timestamp = new Date().getTime();
-    return invoke("user_cloud", { data: params });
+    return do_invoke("user_cloud", { data: params });
 }
 
 /**
@@ -50,14 +74,14 @@ export function cloudDisk(params: any) {
  * @param {number} params.type
  */
 export function userPlayHistory(params: any) {
-    return invoke("user_record", { data: params });
+    return do_invoke("user_record", { data: params });
 }
 
 /**
  * 上传歌曲到云盘（需要登录）
  */
 export function uploadSong(params: any) {
-    return invoke("cloud", { data: params });
+    return do_invoke("cloud", { data: params });
     // let formData = new FormData();
     // formData.append('songFile', file);
     // return request({

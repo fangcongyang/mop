@@ -13,7 +13,16 @@ import { invoke } from "@tauri-apps/api/core";
  * @param {string=} params.md5_password
  */
 export function loginWithPhone(params: any) {
-    return invoke("login_cellphone", { data: params })
+    return new Promise((resolve, reject) => {
+        invoke('login_cellphone', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -28,11 +37,29 @@ export function loginWithPhone(params: any) {
  */
 export function loginWithEmail(params: any) {
     params.username = params.email;
-    return invoke("login", { data: params })
+    return new Promise((resolve, reject) => {
+        invoke('login', { data: params })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 export function loginQrCodeKey() {
-    return invoke("login_qr_codekey", { data: {} })
+    return new Promise((resolve, reject) => {
+        invoke('login_qr_codekey', { data: {} })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }
 
 /**
@@ -41,5 +68,14 @@ export function loginQrCodeKey() {
  * @param {string} key
  */
 export function loginQrCodeCheck(key: string) {
-    return invoke("login_qr_check", { data: { key } })
+    return new Promise((resolve, reject) => {
+        invoke('login_qr_check', { data: { key } })
+        .then((data: any) => {
+            data = data.code === 200 ? data.data : {}
+            resolve(data)
+        })
+        .catch((e) => {
+            reject(e)
+        })
+    })
 }

@@ -7,6 +7,7 @@ import {
     getTrackDetailFromCache,
 } from "@/db";
 import { storeData } from "@/utils";
+import { do_invoke } from "./fetch";
 
 /**
  * 获取音乐 url
@@ -16,7 +17,16 @@ import { storeData } from "@/utils";
  */
 export async function getMP3(id: string) {
     const quality = await storeData.getBr();
-    return invoke("get_song_url", { data: { id, br: parseInt(quality) } });
+    return new Promise((resolve, reject) => {
+       invoke('get_song_url', { data: { id, br: parseInt(quality) } })
+       .then((data: any) => {
+          data = data.code === 200 ? data.data : null
+          resolve(data)
+       })
+       .catch((e) => {
+        reject(e)
+       })
+    }) 
 }
 
 /**
@@ -27,7 +37,7 @@ export async function getMP3(id: string) {
 export async function getTrackDetail(ids: string | number) {
     const fetchLatest = async () => {
         try {
-            const data: any = await invoke("get_song_detail", {
+            let data: any = await do_invoke("get_song_detail", {
                 data: { ids: ids.toString() },
             });
             data.songs.map((song: any) => {
@@ -65,7 +75,7 @@ export async function getTrackDetail(ids: string | number) {
  */
 export async function getLyric(id: number) {
     const fetchLatest = async () => {
-        let result = await invoke("get_lyric", { data: { id } });
+        let result = await do_invoke("get_lyric", { data: { id } });
         cacheLyric(id, result);
         return result;
     };
@@ -88,7 +98,7 @@ export async function getLyric(id: number) {
  */
 export function scrobble(params: any) {
     params.timestamp = new Date().getTime();
-    return invoke("scrobble", { data: params });
+    return do_invoke("scrobble", { data: params });
 }
 
 /**

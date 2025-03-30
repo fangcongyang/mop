@@ -104,8 +104,10 @@ const Explore = (props: ExploreProps) => {
             cat: getActiveCategory(),
             offset: playlistsRef.current.length,
         }).then((data: any) => {
-            updatePlaylist(data.playlists);
-            setHasMore(data.more);
+            const playlists = data.code == 200 ? data.data.playlists : [];
+            const hasMore = data.code == 200? data.data.more : false;
+            updatePlaylist(playlists);
+            setHasMore(hasMore);
         });
     };
 
@@ -116,8 +118,9 @@ const Explore = (props: ExploreProps) => {
                       .updateTime
                 : 0;
         highQualityPlaylist({ limit: 50, lasttime }).then((data: any) => {
-            updatePlaylist(data.playlists);
-            setHasMore(data.more);
+            if (data.code!== 200) return;
+            updatePlaylist(data.data.playlists);
+            setHasMore(data.data.more);
         });
     };
 
@@ -125,7 +128,8 @@ const Explore = (props: ExploreProps) => {
         toplists().then((data: any) => {
             playlistsRef.current = [];
             setHasMore(false);
-            updatePlaylist(data.list);
+            if (data.code!== 200) return;
+            updatePlaylist(data.data.list);
         });
     };
 

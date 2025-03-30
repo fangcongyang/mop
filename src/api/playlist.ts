@@ -1,5 +1,6 @@
 import auth from '@/utils/auth';
 import { invoke } from "@tauri-apps/api/core";
+import { do_invoke } from './fetch';
 
 /**
  * 获取歌单详情
@@ -16,7 +17,7 @@ export function getPlaylistDetail(id: any, noCache: boolean | undefined = false)
   return new Promise((resolve, _) => {
     let params: any = { id };
     if (noCache) params.timestamp = new Date().getTime();
-    invoke('get_playlist_detail', { data: params }).then((data: any) => {
+    do_invoke('get_playlist_detail', { data: params }).then((data: any) => {
       if (data.playlist) {
         data.playlist.tracks = auth.mapTrackPlayableStatus(
           data.playlist.tracks,
@@ -36,7 +37,16 @@ export function getPlaylistDetail(id: any, noCache: boolean | undefined = false)
  * @param {string} params.pid
  */
 export function dailyRecommendTracks(params = {}) {
-  return invoke('recommend_songs', { data: params });
+  return new Promise((resolve, reject) => {
+     invoke('recommend_songs', { data: params })
+     .then((data: any) => {
+        data = data.code === 200 ? data.data : null
+        resolve(data)
+     })
+     .catch((e) => {
+      reject(e)
+     })
+  }) 
 }
 
 /**
@@ -53,7 +63,7 @@ export function intelligencePlaylist(params: any) {
   params.songId = params.id;
   params.playlistId = params.pid;
   params.startMusicId = params.sid || params.id;
-  return invoke('playmode_intelligence_list', { data: params });
+  return do_invoke('playmode_intelligence_list', { data: params });
 }
 
 /**
@@ -63,7 +73,16 @@ export function intelligencePlaylist(params: any) {
  * @param {number=} params.limit
  */
 export function dailyRecommendPlaylist(params = {}) {
-  return invoke('daily_recommend_playlist', { data: params });
+  return new Promise((resolve, reject) => {
+     invoke('daily_recommend_playlist', { data: params })
+     .then((data: any) => {
+        data = data.code === 200 ? data.data : null
+        resolve(data)
+     })
+     .catch((e) => {
+      reject(e)
+     })
+  }) 
 }
 
 /**
@@ -75,7 +94,16 @@ export function dailyRecommendPlaylist(params = {}) {
  * @param {number=} params.limit
  */
 export function recommendPlaylist(params: any) {
-  return invoke('recommend_playlist', { data: params });
+  return new Promise((resolve, reject) => {
+     invoke('recommend_playlist', { data: params })
+     .then((data: any) => {
+        data = data.code === 200 ? data.data : null
+        resolve(data)
+     })
+     .catch((e) => {
+      reject(e)
+     })
+  }) 
 }
 
 /**
@@ -90,7 +118,7 @@ export function recommendPlaylist(params: any) {
  * @param {number=} params.limit
  */
 export function topPlaylist(params: any) {
-  return invoke('top_playlist', { data: params });
+  return do_invoke('top_playlist', { data: params });
 }
 
 /**
@@ -105,7 +133,7 @@ export function topPlaylist(params: any) {
  * @param {number} params.before
  */
 export function highQualityPlaylist(params: any) {
-  return invoke('top_playlist_high_quality', { data: params });
+  return do_invoke('top_playlist_high_quality', { data: params });
 }
 
 /**
@@ -113,7 +141,16 @@ export function highQualityPlaylist(params: any) {
  * 说明 : 调用此接口,可获取所有榜单 接口地址 : /toplist
  */
 export function toplists(params = {}) {
-  return invoke('top_list', { data: params });
+  return new Promise((resolve, reject) => {
+     invoke('top_list', { data: params })
+     .then((data: any) => {
+        data = data.code === 200 ? data.data : null
+        resolve(data)
+     })
+     .catch((e) => {
+      reject(e)
+     })
+  }) 
 }
 
 /**
@@ -128,7 +165,7 @@ export function toplists(params = {}) {
 export function subscribePlaylist(params: any) {
   params.t = params.t === 1 ? 'subscribe' : 'unsubscribe';
   params.timestamp = new Date().getTime();
-  return invoke('playlist_subscribe', { data: params });
+  return do_invoke('playlist_subscribe', { data: params });
 }
 
 /**
@@ -142,7 +179,7 @@ export function subscribePlaylist(params: any) {
  */
 export function addOrRemoveTrackFromPlaylist(params: any) {
   params.timestamp = new Date().getTime();
-  return invoke('playlist_tracks', { data: params });
+  return do_invoke('playlist_tracks', { data: params });
 }
 
 /**
@@ -152,7 +189,7 @@ export function addOrRemoveTrackFromPlaylist(params: any) {
  *  * @param {number} id
  */
 export function deletePlaylist(id: string) {
-  return invoke('playlist_remove', { data: {id} });
+  return do_invoke('playlist_remove', { data: {id} });
 }
 
 /**
@@ -168,5 +205,5 @@ export function deletePlaylist(id: string) {
  */
 export function createPlaylist(params: any) {
   params.timestamp = new Date().getTime();
-  return invoke('playlist_create', { data: params });
+  return do_invoke('playlist_create', { data: params });
 }

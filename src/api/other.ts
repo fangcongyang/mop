@@ -1,5 +1,6 @@
 import auth from "@/utils/auth";
 import { invoke } from "@tauri-apps/api/core";
+import { do_invoke } from "./fetch";
 
 /**
  * 搜索
@@ -17,16 +18,18 @@ import { invoke } from "@tauri-apps/api/core";
  * @param {number=} params.type
  */
 export async function search(params: any) {
-    const data: any = await invoke('search', { data: params });
+    let data: any = await invoke('search', { data: params });
+    if (data.code !== 200) return data;
+    data = data.data;
     if (data.result?.song !== undefined)
         data.result.song.songs = auth.mapTrackPlayableStatus(data.result.song.songs);
     return data;
 }
 
 export function personalFM(params = {}) {
-    return invoke('personal_fm', { data: params });
+    return do_invoke('personal_fm', { data: params });
 }
 
 export function fmTrash(id: number) {
-    return invoke('personal_fm', { data: { id } });
+    return do_invoke('personal_fm', { data: { id } });
 }
