@@ -1,13 +1,13 @@
+use crate::{conf::get_string, APP};
 use anyhow::Result;
 use rand::Rng;
-use tauri::{path::BaseDirectory, Manager};
-use tauri_plugin_http::reqwest::{self, ClientBuilder};
 use std::{
     env,
     fs::{self, read_to_string, File},
     path::{Path, PathBuf},
 };
-use crate::{conf::get_string, APP};
+use tauri::{path::BaseDirectory, Manager};
+use tauri_plugin_http::reqwest::{self, ClientBuilder};
 
 const USER_AGENT_LIST: [&str; 14] = [
     "Mozilla/5.0 (iPhone; CPU iPhone OS 9_1 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13B143 Safari/601.1",
@@ -28,7 +28,10 @@ const USER_AGENT_LIST: [&str; 14] = [
 
 pub fn app_root() -> PathBuf {
     let app_handle = APP.get().unwrap();
-    let path = app_handle.path().resolve("", BaseDirectory::AppConfig).unwrap();
+    let path = app_handle
+        .path()
+        .resolve("", BaseDirectory::AppConfig)
+        .unwrap();
     path
 }
 
@@ -54,22 +57,24 @@ pub fn get_proxy_client(from: String) -> anyhow::Result<reqwest::ClientBuilder, 
     let unm_proxy_uri = get_string("unmProxyUri");
     if from == "unm:ytdl" && !unm_proxy_uri.is_empty() {
         let proxy = reqwest::Proxy::all(unm_proxy_uri)?;
-       
-       client_builder = client_builder.proxy(proxy);
+
+        client_builder = client_builder.proxy(proxy);
     }
 
     Ok(client_builder)
 }
 
-pub async fn download_arraybuffer(url: String, from: String) -> anyhow::Result<Vec<u8>, anyhow::Error> {
+pub async fn download_arraybuffer(
+    url: String,
+    from: String,
+) -> anyhow::Result<Vec<u8>, anyhow::Error> {
     let client_builder = get_proxy_client(from)?;
     let client = client_builder.build()?;
 
     let response = client.get(url).send().await?;
-    
+
     let bytes = response.bytes().await?;
     Ok(bytes.to_vec())
-
 }
 
 pub fn create_dir_if_not_exists(path: &Path) -> Result<()> {
@@ -85,8 +90,7 @@ pub fn read_init_data_file(data_name: &str) -> String {
     if !exists(&path) {
         return "[]".to_string();
     }
-    let contents = read_to_string(path)
-    .expect("Should have been able to read the file");
+    let contents = read_to_string(path).expect("Should have been able to read the file");
     contents
 }
 
@@ -95,7 +99,12 @@ pub fn create_request_builder() -> ClientBuilder {
     if get_string("proxyProtocol") == "noProxy" || get_string("proxyProtocol") == "" {
         client_builder.no_proxy()
     } else {
-        let proxy_url = format!("{}://{}:{}", get_string("proxyProtocol"), get_string("proxyServer"), get_string("proxyPort"));
+        let proxy_url = format!(
+            "{}://{}:{}",
+            get_string("proxyProtocol"),
+            get_string("proxyServer"),
+            get_string("proxyPort")
+        );
         client_builder.proxy(reqwest::Proxy::http(proxy_url).unwrap())
     }
 }

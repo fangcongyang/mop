@@ -4,17 +4,18 @@ use log::info;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use tauri_plugin_http::reqwest::{self, Error};
 use std::{
     fmt::Debug,
     path::PathBuf,
     sync::{Arc, Mutex},
 };
+use tauri_plugin_http::reqwest::{self, Error};
 
 use reqwest::header::{HeaderMap, HeaderValue, CONTENT_TYPE, COOKIE, REFERER, USER_AGENT};
 
 use crate::{
-    api::crypto::Crypto, utils::{app_root, choose_user_agent, create_file, create_request_builder, exists}
+    api::crypto::Crypto,
+    utils::{app_root, choose_user_agent, create_file, create_request_builder, exists},
 };
 
 lazy_static! {
@@ -95,15 +96,13 @@ fn get_cookie_string(cookie: Option<LocalCookie>) -> String {
             cookie_jar.add_original(("appver", "8.20.21"));
         }
     }
-    cookie_jar
-        .iter()
-        .fold(String::from(""), |acc, val| {
-            if acc == "" {
-                val.to_string()
-            } else {
-                val.to_string() + "; " + &acc
-            }
-        })
+    cookie_jar.iter().fold(String::from(""), |acc, val| {
+        if acc == "" {
+            val.to_string()
+        } else {
+            val.to_string() + "; " + &acc
+        }
+    })
 }
 
 fn get_save_cookie_string() -> String {
@@ -135,7 +134,7 @@ pub fn read_cookie_string() {
             let mut cookie_jar = COOKIE_JAR.lock().unwrap();
             for ele in v_arr.clone() {
                 let ele_string = ele.to_string();
-                if ele_string == ""{
+                if ele_string == "" {
                     continue;
                 }
                 let arr: Vec<&str> = ele_string.split(";").collect();
@@ -152,7 +151,7 @@ pub fn read_cookie_string() {
 pub async fn request_handler(
     url: &str,
     query_params: impl Request,
-    mut options: Options<'_>
+    mut options: Options<'_>,
 ) -> serde_json::Value {
     if options.realIP.is_none() {
         options.realIP = Some("211.161.244.70".to_owned());
@@ -164,7 +163,7 @@ pub async fn handle_request(
     mut url: String,
     method: &str,
     query_params: impl Request,
-    options: Options<'_>
+    options: Options<'_>,
 ) -> Result<reqwest::Response, Error> {
     let crypto_string = options.crypto.unwrap();
     let crypto = &crypto_string;
@@ -177,12 +176,14 @@ pub async fn handle_request(
     } else {
         headers.insert(
             USER_AGENT,
-            serde_json::to_value(choose_user_agent(&(options.ua.clone()).unwrap_or("".to_owned())))
-                .unwrap()
-                .as_str()
-                .unwrap()
-                .parse()
-                .unwrap(),
+            serde_json::to_value(choose_user_agent(
+                &(options.ua.clone()).unwrap_or("".to_owned()),
+            ))
+            .unwrap()
+            .as_str()
+            .unwrap()
+            .parse()
+            .unwrap(),
         );
     }
     if method.to_uppercase() == "POST" {
@@ -200,10 +201,13 @@ pub async fn handle_request(
             headers.insert("X-Real-IP", new_ip.clone());
             headers.insert("X-Forwarded-For", new_ip);
         }
-        None => {}
+        _none => {}
     };
 
-    headers.insert(COOKIE, get_cookie_string(options.cookie.clone()).parse().unwrap()); 
+    headers.insert(
+        COOKIE,
+        get_cookie_string(options.cookie.clone()).parse().unwrap(),
+    );
 
     let empty_cookie = HeaderValue::from_static("");
     let cookie = headers
@@ -247,9 +251,7 @@ pub async fn handle_request(
     info!("请求地址:{}", url);
     let mut client_builder = create_request_builder();
     client_builder = client_builder.default_headers(headers);
-    let client = client_builder
-        .build()
-        .unwrap();
+    let client = client_builder.build().unwrap();
     let mut rq = client.post(url);
     if body.is_none() {
         rq = rq.form(&query_params);
@@ -260,9 +262,38 @@ pub async fn handle_request(
     response
 }
 
+#[derive(serde::Serialize)]
+struct Response<T> {
+    code: i32,
+    message: String,
+    data: T,
+}
+
+impl<T> Response<T> {
+    fn ok(data: T) -> Self {
+        return Self {
+            code: 200,
+            message: "".to_string(),
+            data,
+        };
+    }
+
+    fn error(message: String, data: T) -> Self {
+        return Self {
+            code: 500,
+            message,
+            data,
+        };
+    }
+}
+
 async fn handle_response(response: Result<reqwest::Response, Error>) -> serde_json::Value {
     if response.is_err() {
-        return serde_json::from_str("").unwrap();
+        return serde_json::to_value(&Response::error(
+            response.unwrap_err().to_string(),
+            "".to_owned(),
+        ))
+        .unwrap();
     }
     let rs = response.unwrap();
     {
@@ -281,8 +312,8 @@ async fn handle_response(response: Result<reqwest::Response, Error>) -> serde_js
                 "cookie".to_owned(),
                 serde_json::Value::String(get_cookie_string(None)),
             );
-            serde_json::Value::Object(data)
+            serde_json::to_value(&Response::ok(data)).unwrap()
         }
-        Err(_r) => serde_json::from_str("").unwrap(),
+        Err(r) => serde_json::to_value(&Response::error(r.to_string(), "".to_owned())).unwrap(),
     }
 }

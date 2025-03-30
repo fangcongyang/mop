@@ -40,7 +40,7 @@ impl Executor {
     }
 
     /// Deregister the `engine_id` from [`Executor`].
-    
+
     #[allow(unused)]
     pub fn deregister(&mut self, engine_id: EngineId) {
         debug!("DeRegistering engine: {engine_id}");

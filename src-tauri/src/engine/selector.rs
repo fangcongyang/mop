@@ -67,9 +67,9 @@ impl SimilarSongSelector {
 
 #[cfg(test)]
 mod tests {
+    use models::Song;
     use once_cell::sync::Lazy;
     use serde_json::json;
-    use models::Song;
 
     use crate::engine::{models, selector::SimilarSongSelector};
 

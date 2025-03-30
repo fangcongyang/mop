@@ -3,7 +3,10 @@ mod macros;
 
 extern crate proc_macro;
 
-use app::{cmds, hotkey, menu::menu_desktop::{update_tray_icon, PlayStatus}};
+use app::{
+    cmds, hotkey,
+    menu::menu_desktop::{update_tray_icon, PlayStatus},
+};
 use conf::{get, init_config, init_config_value, is_first_run, set, Shortcut};
 use log::{info, LevelFilter};
 use once_cell::sync::OnceCell;
@@ -113,12 +116,14 @@ pub fn run() {
                 }
 
                 menu::menu_desktop::tray_menu(&app)?;
-                
-                app.app_handle().clone().listen("play_status", move |event| {
-                    if let Ok(payload) = serde_json::from_str::<PlayStatus>(&event.payload()) {      
-                        let _ = update_tray_icon(payload);
-                    }
-                });
+
+                app.app_handle()
+                    .clone()
+                    .listen("play_status", move |event| {
+                        if let Ok(payload) = serde_json::from_str::<PlayStatus>(&event.payload()) {
+                            let _ = update_tray_icon(payload);
+                        }
+                    });
             }
             Ok(())
         })
@@ -185,13 +190,13 @@ pub fn run() {
         .expect("error while running tauri application");
 }
 
-
 fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn std::error::Error>> {
     let mut webview_window =
         tauri::WebviewWindowBuilder::new(app, "main", tauri::WebviewUrl::App("index.html".into()));
     #[cfg(not(target_os = "android"))]
     {
-        webview_window = webview_window.title("mop")
+        webview_window = webview_window
+            .title("mop")
             .center()
             .inner_size(1440f64, 840f64)
             .fullscreen(false)
@@ -204,7 +209,7 @@ fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn s
     let mut proxy_protocol: Option<Value> = None;
     #[cfg(not(any(target_os = "android", target_os = "macos")))]
     {
-        proxy_protocol = get("proxyProtocol"); 
+        proxy_protocol = get("proxyProtocol");
     }
     match proxy_protocol {
         Some(proxy_protocol) => {
@@ -214,8 +219,10 @@ fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn s
                 let proxy_server_str = proxy_server.as_str().unwrap();
                 let proxy_port = get("proxyPort").unwrap_or(json!(7897));
                 let proxy_port_num = proxy_port.as_u64().unwrap();
-                webview_window = webview_window
-                .proxy_url(Url::parse(&format!("{}://{}:{}", pp, proxy_server_str, proxy_port_num)).unwrap());
+                webview_window = webview_window.proxy_url(
+                    Url::parse(&format!("{}://{}:{}", pp, proxy_server_str, proxy_port_num))
+                        .unwrap(),
+                );
             }
             return Ok(webview_window.build()?);
         }
@@ -224,4 +231,3 @@ fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn s
         }
     }
 }
-

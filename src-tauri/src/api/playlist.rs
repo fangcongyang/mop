@@ -3,7 +3,9 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use tauri::command;
 
-use super::request::{request_handler, EmptyReq, LocalCookie, Options, Request, CRYPTO_API, CRYPTO_WEAPI};
+use super::request::{
+    request_handler, EmptyReq, LocalCookie, Options, Request, CRYPTO_API, CRYPTO_WEAPI,
+};
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -31,7 +33,7 @@ pub async fn get_playlist_detail(mut data: PlaylistDetailReq) -> serde_json::Val
     }
 
     let options = Options::new(Some(CRYPTO_API));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -54,7 +56,9 @@ impl Request for PlaymodeIntelligenceListReq {
 
 #[command]
 #[cached(time = 120, option = false)]
-pub async fn playmode_intelligence_list(mut data: PlaymodeIntelligenceListReq) -> serde_json::Value {
+pub async fn playmode_intelligence_list(
+    mut data: PlaymodeIntelligenceListReq,
+) -> serde_json::Value {
     let url = "https://music.163.com/weapi/playmode/intelligence/list";
     if data.r#type.is_none() {
         data.r#type = Some("fromPlayOne".to_owned());
@@ -64,7 +68,7 @@ pub async fn playmode_intelligence_list(mut data: PlaymodeIntelligenceListReq) -
     }
 
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -73,7 +77,7 @@ pub async fn playmode_intelligence_list(mut data: PlaymodeIntelligenceListReq) -
 pub async fn daily_recommend_playlist(data: EmptyReq) -> serde_json::Value {
     let url = "https://music.163.com/weapi/v1/discovery/recommend/resource";
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -106,7 +110,7 @@ pub async fn recommend_playlist(mut data: RecommendPlaylistReq) -> serde_json::V
         data.n = Some(1000);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -148,7 +152,7 @@ pub async fn top_playlist(mut data: TopPlaylistReq) -> serde_json::Value {
     }
 
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     let response = serde_json::to_string(&request_handler(url, data, options).await).unwrap();
     let r = Regex::new(r"avatarImgId_str").unwrap();
     let new_response = r.replace(&response, "avatarImgIdStr");
@@ -187,9 +191,9 @@ pub async fn top_playlist_high_quality(mut data: TopPlaylistHighQualityReq) -> s
     if data.total.is_none() {
         data.total = Some(true);
     }
-    
+
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -210,7 +214,7 @@ impl Request for ToplistReq {
 pub async fn top_list(data: ToplistReq) -> serde_json::Value {
     let url = "https://music.163.com/api/toplist";
     let options = Options::new(Some(CRYPTO_API));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -231,7 +235,7 @@ impl Request for RecommendSongsReq {
 pub async fn recommend_songs(data: RecommendSongsReq) -> serde_json::Value {
     let url = "https://music.163.com/api/v3/discovery/recommend/songs";
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -296,8 +300,8 @@ pub async fn playlist_tracks(mut data: PlaylistTracksReq) -> serde_json::Value {
             } else {
                 serde_json::Value::Object(result_data)
             }
-        },
-        _ => result
+        }
+        _ => result,
     }
 }
 
@@ -321,7 +325,10 @@ pub async fn playlist_remove(mut data: PlaylistRemoveReq) -> serde_json::Value {
     data.ids = Some(format!("[{}]", data.id));
 
     let mut options = Options::new(Some(CRYPTO_WEAPI));
-    options.cookie = Some(LocalCookie{ os: Some("pc".to_owned()), appver: None });
+    options.cookie = Some(LocalCookie {
+        os: Some("pc".to_owned()),
+        appver: None,
+    });
     request_handler(&url, data.clone(), options.clone()).await
 }
 
@@ -348,6 +355,9 @@ pub async fn playlist_create(mut data: PlaylistCreateReq) -> serde_json::Value {
     }
 
     let mut options = Options::new(Some(CRYPTO_WEAPI));
-    options.cookie = Some(LocalCookie{ os: Some("pc".to_owned()), appver: None });
+    options.cookie = Some(LocalCookie {
+        os: Some("pc".to_owned()),
+        appver: None,
+    });
     request_handler(&url, data.clone(), options.clone()).await
 }

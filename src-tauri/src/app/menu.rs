@@ -5,12 +5,15 @@ pub mod menu_desktop {
     use lazy_static::lazy_static;
     use tauri::menu::{IconMenuItemBuilder, Menu, PredefinedMenuItem};
     use tauri::tray::{MouseButton, MouseButtonState, TrayIcon, TrayIconBuilder, TrayIconEvent};
-    use tauri::{App, AppHandle, Manager, Wry};
     use tauri::Emitter;
+    use tauri::{App, AppHandle, Manager, Wry};
 
     lazy_static! {
         static ref TRAY_ICON_MAP: Arc<Mutex<Option<TrayIcon>>> = Arc::new(Mutex::new(None));
-        static ref PLAY_STATUS: Arc<Mutex<PlayStatus>> = Arc::new(Mutex::new(PlayStatus{ playing: false, playMode: "1".to_owned() }));
+        static ref PLAY_STATUS: Arc<Mutex<PlayStatus>> = Arc::new(Mutex::new(PlayStatus {
+            playing: false,
+            playMode: "1".to_owned()
+        }));
     }
 
     #[allow(non_snake_case)]
@@ -145,9 +148,7 @@ pub mod menu_desktop {
         return Ok(menu);
     }
 
-    pub fn update_tray_icon(
-        payload: PlayStatus,
-    ) -> Result<(), Box<dyn std::error::Error>> {      
+    pub fn update_tray_icon(payload: PlayStatus) -> Result<(), Box<dyn std::error::Error>> {
         let mut play_status = PLAY_STATUS.lock().unwrap();
         play_status.playing = payload.playing;
         play_status.playMode = payload.playMode.clone();

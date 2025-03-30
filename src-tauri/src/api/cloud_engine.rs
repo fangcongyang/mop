@@ -1,16 +1,14 @@
 use base64::{engine::general_purpose, Engine};
+use config::ConfigManagerBuilder;
 use engine::kugou::{KugouEngine, ENGINE_ID as KUGOU_ENGINE_ID};
 use engine::ytdl::{YtDlEngine, ENGINE_ID as YTDL_ENGINE_ID};
+use executor::Executor;
+use models::{ContextBuilder, RetrievedSongInfo, SearchMode, Song};
 use reqwest::header::{HeaderMap, REFERER, USER_AGENT};
 use serde_json::Value;
-use tauri_plugin_http::reqwest;
 use std::{borrow::Cow, sync::Arc};
 use tauri::command;
-use executor::Executor;
-use config::ConfigManagerBuilder;
-use models::{
-    ContextBuilder, RetrievedSongInfo, SearchMode, Song,
-};
+use tauri_plugin_http::reqwest;
 
 use crate::conf::get;
 use crate::engine::config::ConfigManager;
@@ -32,8 +30,6 @@ pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<Retrieved
         .set("ytdl:exe", exe_path.into_os_string().into_string().unwrap())
         .build();
 
-    
-    
     let context = create_context(config);
 
     executor.register(Cow::Borrowed(YTDL_ENGINE_ID), Arc::new(YtDlEngine {}));
@@ -70,9 +66,7 @@ pub async fn get_audio_source_from_unblock_music(song: Song) -> Option<Retrieved
 
 fn create_context(config: ConfigManager) -> Context {
     let mut binding = ContextBuilder::default();
-    let context_builder = binding
-        .config(config)
-        .search_mode(SearchMode::OrderFirst);
+    let context_builder = binding.config(config).search_mode(SearchMode::OrderFirst);
 
     let unm_proxy_uri: Option<Value> = get("unmProxyUri");
     match unm_proxy_uri {

@@ -3,7 +3,7 @@ use std::time::Duration;
 
 use cached::proc_macro::cached;
 use tauri::http::{self, HeaderMap, HeaderValue};
-use tauri_plugin_http::reqwest::{ self, Client, ClientBuilder, Proxy };
+use tauri_plugin_http::reqwest::{self, Client, ClientBuilder, Proxy};
 use thiserror::Error;
 use url::Url;
 

@@ -1,7 +1,10 @@
 use cached::proc_macro::cached;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};
-use tauri::{command, http::{header::USER_AGENT, HeaderMap}};
+use tauri::{
+    command,
+    http::{header::USER_AGENT, HeaderMap},
+};
 
 use crate::utils::{choose_user_agent, create_request_builder};
 
@@ -18,7 +21,7 @@ pub struct SearchReq {
     scene: Option<String>,
     limit: Option<i16>,
     offset: Option<i16>,
-    pub csrf_token: Option<String>
+    pub csrf_token: Option<String>,
 }
 
 impl Request for SearchReq {
@@ -64,7 +67,7 @@ pub async fn personal_fm(data: EmptyReq) -> serde_json::Value {
 pub struct FmTrashReq {
     pub id: i32,
     pub time: Option<i8>,
-    pub csrf_token: Option<String>
+    pub csrf_token: Option<String>,
 }
 
 impl Request for FmTrashReq {
@@ -76,8 +79,12 @@ impl Request for FmTrashReq {
 #[command]
 #[cached(option = false)]
 pub async fn fm_trash(data: FmTrashReq) -> serde_json::Value {
-    let url = format!("https://music.163.com/weapi/radio/trash/add?alg=RT&songId={}&time={}", data.id, data.time.unwrap_or(25));
-    
+    let url = format!(
+        "https://music.163.com/weapi/radio/trash/add?alg=RT&songId={}&time={}",
+        data.id,
+        data.time.unwrap_or(25)
+    );
+
     let options = Options::new(Some(CRYPTO_WEAPI));
     request_handler(&url, data, options).await
 }
@@ -85,7 +92,10 @@ pub async fn fm_trash(data: FmTrashReq) -> serde_json::Value {
 #[command]
 #[cached(time = 86400, option = false)]
 pub async fn github_repos_info_version(owner: String, repo: String) -> Option<String> {
-    let url = format!("https://api.github.com/repos/{}/{}/releases/latest", owner, repo);
+    let url = format!(
+        "https://api.github.com/repos/{}/{}/releases/latest",
+        owner, repo
+    );
     let mut client_builder = create_request_builder();
     let mut headers: HeaderMap = HeaderMap::new();
     headers.insert(
@@ -98,9 +108,7 @@ pub async fn github_repos_info_version(owner: String, repo: String) -> Option<St
             .unwrap(),
     );
     client_builder = client_builder.default_headers(headers);
-    let client = client_builder
-        .build()
-        .unwrap();
+    let client = client_builder.build().unwrap();
     let response = client.get(url).send().await.unwrap();
     match response.text().await {
         Ok(d) => {

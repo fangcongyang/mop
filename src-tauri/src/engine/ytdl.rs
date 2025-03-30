@@ -21,19 +21,14 @@
 
 use std::borrow::Cow;
 
-use concat_string::concat_string;
-use log::{debug, info};
-use serde::Deserialize;
-use interface::Engine;
 use super::{config::ConfigManager, models};
+use concat_string::concat_string;
+use interface::Engine;
+use log::{debug, info};
 use models::{
-    Artist,
-    Context,
-    RetrievedSongInfo,
-    SerializedIdentifier,
-    Song,
-    SongSearchInformation,
+    Artist, Context, RetrievedSongInfo, SerializedIdentifier, Song, SongSearchInformation,
 };
+use serde::Deserialize;
 
 use super::interface;
 
@@ -151,10 +146,7 @@ async fn fetch_from_youtube(
     }
 
     // search query
-    cmd.arg(concat_string!(
-        "ytsearch:",
-        keyword
-    ));
+    cmd.arg(concat_string!("ytsearch:", keyword));
 
     // (Windows only) Don't show the `yt-dlp` window
     #[cfg(target_os = "windows")]

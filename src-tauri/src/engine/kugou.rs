@@ -5,24 +5,22 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use super::{
+    json::{Json, UnableToExtractJson},
+    models, selector,
+};
 use async_trait::async_trait;
 use concat_string::concat_string;
 use futures::FutureExt;
-use log::{debug, info};
-use serde::{Deserialize, Serialize};
 use interface::Engine;
-use tauri_plugin_http::reqwest::Url;
-use request::build_client;
-use super::{json::{Json, UnableToExtractJson}, models, selector};
-use selector::SimilarSongSelector;
+use log::{debug, info};
 use models::{
-    Album,
-    Context,
-    RetrievedSongInfo,
-    SerializedIdentifier,
-    Song,
-    SongSearchInformation,
+    Album, Context, RetrievedSongInfo, SerializedIdentifier, Song, SongSearchInformation,
 };
+use request::build_client;
+use selector::SimilarSongSelector;
+use serde::{Deserialize, Serialize};
+use tauri_plugin_http::reqwest::Url;
 
 use super::{interface, request};
 
@@ -228,7 +226,7 @@ pub async fn single(
     debug!("Retriving the audio file in the format “{format}” from “{song}”…");
 
     let hash = extract_hash_id(song, format)?;
-    
+
     let key = faster_hex::hex_string(md5::compute(concat_string!(song.id, "kgcloudv2")).as_slice());
 
     let album_id = song

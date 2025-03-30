@@ -50,9 +50,9 @@ pub mod cmd {
     #[cfg(desktop)]
     use tauri_plugin_global_shortcut::GlobalShortcutExt;
 
-    use crate::conf::Shortcut;
     #[cfg(desktop)]
     use super::hotkey_desktop::register_shortcut;
+    use crate::conf::Shortcut;
 
     #[command]
     pub fn register_shortcut_by_frontend(shortcut: Shortcut) -> Result<Shortcut, String> {

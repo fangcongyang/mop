@@ -128,8 +128,7 @@ pub mod cmd {
                 .unwrap()
                 .iter()
                 .for_each(|item| {
-                    let shortcut =
-                        serde_json::from_value::<Shortcut>(item.clone()).unwrap();
+                    let shortcut = serde_json::from_value::<Shortcut>(item.clone()).unwrap();
                     shortcuts.push(hotkey::hotkey_desktop::register_shortcut(shortcut));
                 });
             set("shortcutList", shortcuts);

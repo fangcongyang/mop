@@ -1,7 +1,9 @@
 use serde::{Deserialize, Serialize};
 use tauri::command;
 
-use super::request::{request_handler, LocalCookie, Options, Request, CRYPTO_API, CRYPTO_EAPI, CRYPTO_WEAPI};
+use super::request::{
+    request_handler, LocalCookie, Options, Request, CRYPTO_API, CRYPTO_EAPI, CRYPTO_WEAPI,
+};
 
 #[allow(non_snake_case)]
 #[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -56,7 +58,7 @@ pub async fn get_song_url(mut data: SongUrlReq) -> serde_json::Value {
     if data.br.is_none() {
         data.br = Some(999000)
     }
-    
+
     let mut options = Options::new(Some(CRYPTO_EAPI));
     options.url = Some("/api/song/enhance/player/url".to_owned());
     request_handler(url, data, options).await
@@ -192,7 +194,7 @@ pub async fn like(mut data: LikeReq) -> serde_json::Value {
     let mut options = Options::new(Some(CRYPTO_WEAPI));
     options.cookie = Some(LocalCookie {
         os: Some("pc".into()),
-        appver: Some("2.9.7".into())
+        appver: Some("2.9.7".into()),
     });
     request_handler(url, data, options).await
 }

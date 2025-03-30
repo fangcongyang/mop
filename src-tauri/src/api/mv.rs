@@ -27,7 +27,7 @@ pub async fn mv_sub(mut data: MVSubReq) -> serde_json::Value {
         data.mvIds = Some(format!("[{}]", data.mvId))
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(&url, data, options).await
 }
 
@@ -48,7 +48,7 @@ impl Request for MVDetailReq {
 pub async fn mv_detail(data: MVDetailReq) -> serde_json::Value {
     let url = "https://music.163.com/api/v1/mv/detail";
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -74,7 +74,7 @@ pub async fn mv_url(mut data: MVUrlReq) -> serde_json::Value {
         data.r = Some(1080);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -96,7 +96,7 @@ impl Request for SimiMVReq {
 pub async fn simi_mv(data: SimiMVReq) -> serde_json::Value {
     let url = "https://music.163.com/weapi/discovery/simiMV";
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -128,6 +128,6 @@ pub async fn mv_sublist(mut data: MVSublistReq) -> serde_json::Value {
         data.total = Some(true);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }

@@ -37,7 +37,7 @@ pub async fn toplist_artist(mut data: ToplistArtistReq) -> serde_json::Value {
         data.total = Some(true);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -69,7 +69,7 @@ pub async fn artist_sublist(mut data: ArtistSublistReq) -> serde_json::Value {
         data.total = Some(true);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -79,7 +79,7 @@ pub struct ArtistSubReq {
     pub artistId: String,
     pub artistIds: Option<String>,
     pub t: String,
-    pub csrf_token: Option<String>
+    pub csrf_token: Option<String>,
 }
 
 impl Request for ArtistSubReq {
@@ -104,7 +104,7 @@ pub async fn artist_sub(mut data: ArtistSubReq) -> serde_json::Value {
 #[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct ArtistsReq {
     pub id: String,
-    pub csrf_token: Option<String>
+    pub csrf_token: Option<String>,
 }
 
 impl Request for ArtistsReq {
@@ -152,7 +152,7 @@ pub async fn artist_mv(mut data: ArtistMvReq) -> serde_json::Value {
         data.total = Some(true);
     }
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }
 
@@ -174,6 +174,6 @@ impl Request for SimiArtistReq {
 pub async fn simi_artist(data: SimiArtistReq) -> serde_json::Value {
     let url = "https://music.163.com/weapi/discovery/simiArtist";
     let options = Options::new(Some(CRYPTO_WEAPI));
-    
+
     request_handler(url, data, options).await
 }

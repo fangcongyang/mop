@@ -19,7 +19,8 @@ const EAPIKEY: &str = "e82ckenh8dichen8";
 const RSA_PUBLIC_KEY: &str = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7clFSs6sXqHauqKWqdtLkF2KexO40H1YTX8z2lSgBBOAxLsvaklV8k4cBFK9snQXE9/DDaFt6Rr7iVZMldczhC0JNgTz+SHXT6CBHuX3e9SdB1Ua44oncaTWz7OBGLbCiK45wIDAQAB\n-----END PUBLIC KEY-----";
 
 lazy_static! {
-    static ref CUSTOM: Alphabet = Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/").unwrap();
+    static ref CUSTOM: Alphabet =
+        Alphabet::new("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/").unwrap();
 }
 
 #[allow(non_camel_case_types)]
@@ -96,7 +97,7 @@ impl Crypto {
 
     pub fn weapi(text: &str) -> CryptoRequest {
         let mut secret_key = [0u8; 16];
-        let _ = OsRng.try_fill_bytes(&mut secret_key);
+        OsRng.try_fill_bytes(&mut secret_key).unwrap();
         let key: Vec<u8> = secret_key
             .iter()
             .map(|i| BASE62[(i % 62) as usize])
@@ -130,13 +131,12 @@ impl Crypto {
             .crypto()
             .rsa_encrypt(RsaCryptoRequest {
                 data: std::str::from_utf8(&key.iter().rev().map(|n| *n).collect::<Vec<u8>>())
-                    .unwrap().to_owned(),
+                    .unwrap()
+                    .to_owned(),
                 key: RSA_PUBLIC_KEY.to_owned(),
             })
             .unwrap_or_default();
 
-            
-        // info!("待加密的数据:{}，rsa加密后的数据:{}", text, enc_sec_key.value);
         CryptoRequest {
             params: Some(params.value),
             encSecKey: Some(enc_sec_key.value),
