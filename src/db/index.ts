@@ -3,12 +3,16 @@ import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
 import { decode as base642Buffer } from "@/utils/base64";
 import { store } from "@/utils/store";
+import { t } from "i18next";
 
 class MopDatabase extends Dexie {
     public trackDetail!: Table<any, number>;
     public trackSources!: Table<any, number>;
     public lyric!: Table<any, number>;
     public album!: Table<any, number>;
+    public userPlaylist!: Table<any, number>;
+    public playlistDetail!: Table<any, number>;
+    public localStarTrackId!: Table<any, number>;
 
     public constructor() {
         super("MopDatabase");
@@ -18,6 +22,11 @@ class MopDatabase extends Dexie {
             lyric: "&id, updateTime",
             album: "&id, updateTime",
         });
+        this.version(2).stores({
+            userPlaylist: "&id, userId, updateTime",
+            playlistDetail: "&id, updateTime",
+            localStarTrackId: "id++, trackId, playListId, updateTime",
+        });
     }
 }
 
@@ -25,18 +34,85 @@ const db = new MopDatabase();
 
 let tracksCacheBytes = 0;
 
-export function getTrackSource(id: string) {
-    return db.trackSources.get(Number(id)).then((track) => {
-        if (!track || !track.source || track.source?.length == 0) return null;
-        console.debug(
-            `[debug][db.js] get track from cache 👉 ${track.name} by ${track.artist}`
-        );
-        return track;
-    });
+export async function getTrackSource(id: string) {
+    const track = await db.trackSources.get(Number(id));
+    if (!track || !track.source || track.source?.length == 0) return null;
+    console.debug(
+        `[debug][db.js] get track from cache 👉 ${track.name} by ${track.artist}`
+    );
+    return track;
 }
 
 export function deleteTrackSource(id: string) {
     db.trackSources.delete(Number(id));
+}
+
+export async function cacheUserPlaylist(playlists: any) {
+    playlists.map(async (playlist: any) => {
+        playlist.updateTime = new Date().getTime();
+    });
+    await db.userPlaylist.bulkPut(playlists); 
+}
+
+export async function getUserPlaylist(userId: string) {
+    const playlists = await db.userPlaylist
+       .where("userId")
+       .equals(Number(userId))
+       .toArray();
+    if (playlists.length === 0) return undefined;
+    return {playlist: playlists};
+}
+
+export async function cachePlaylistDetail(id: number, playlistDetail: any) {
+    playlistDetail.updateTime = new Date().getTime();
+    playlistDetail.id = Number(id);
+    await db.playlistDetail.put(playlistDetail);
+}
+
+export async function selectPlaylistDetail(id: number) {
+    const playlistDetail = await db.playlistDetail.get(Number(id));
+    if (!playlistDetail) return undefined;
+    const tracks = await db.localStarTrackId.where("playListId").equals(Number(id)).toArray();
+    tracks.map((track: any) => {
+        playlistDetail.playlist.trackIds.push(track.trackInfo);
+        playlistDetail.privileges.push(track.privileges);
+    });
+    playlistDetail.playlist.trackIds.sort((a: any, b: any) => {
+        return b.at - a.at;
+    });
+    return playlistDetail; 
+}
+
+export async function localLikeTrack(uid: number, playListId: number, trackDetail: any, like: boolean){
+    const song = trackDetail.songs![0] || undefined;
+    if (!song) return;
+    if (like) {
+        let lst = {
+            alg: null,
+            at: new Date().getTime(),
+            dpr: null,
+            f: null,
+            id: song.id,
+            rcmdReason: "",
+            rcmdReasonTitle: "编辑推荐",
+            sc: null,
+            sr: null,
+            t: song.t,
+            uid: uid,
+            v: song.v,
+        }
+        await db.localStarTrackId.add({trackId: song.id, playListId, trackInfo: lst, privileges: trackDetail.privileges![0]});
+    } else {
+        await db.localStarTrackId.where("trackId").equals(Number(song.id)).and((item) => item.playListId == playListId).delete();
+    }
+}
+
+export async function getLocalLikeTrackIds(playListId: number){
+    const tracks = await db.localStarTrackId.where("playListId").equals(Number(playListId)).toArray();
+    if (tracks.length === 0) return undefined;
+    return tracks.map((track: any) => {
+        return track.trackId;
+    });
 }
 
 export async function cacheTrackSource(

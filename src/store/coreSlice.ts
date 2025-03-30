@@ -17,6 +17,7 @@ import { artistSubList } from "@/api/artist";
 import { mvSublist } from "@/api/mv";
 import _ from "lodash";
 import messageEventEmitter from "@/event/messageEventEmitter";
+import { cachePlaylistDetail, cacheUserPlaylist, getUserPlaylist, localLikeTrack, selectPlaylistDetail } from "@/db";
 
 const enabledPlaylistCategories = playlistCategories
     .filter((c) => c.enable)
@@ -36,7 +37,6 @@ interface Settings {
     enableDiscordRichPresence: boolean;
     appearance: string;
     musicLanguage: "all" | "zh" | "ea" | "jp" | "kr";
-    cacheLimit: number;
     showLyricsTranslation: boolean;
     lyricsBackground: string;
     showLyricsTime: boolean;
@@ -54,7 +54,6 @@ interface Settings {
     subTitleDefault: boolean;
     enableReversedMode: boolean;
     enableGlobalShortcut: boolean;
-    shortcuts: Shortcut[];
     enabledPlaylistCategories: string[];
 }
 
@@ -113,7 +112,6 @@ const initialState: CoreState = {
         enableDiscordRichPresence: false,
         appearance: "auto",
         musicLanguage: "all",
-        cacheLimit: 8192,
         showLyricsTranslation: true,
         lyricsBackground: "true",
         showLyricsTime: true,
@@ -131,57 +129,6 @@ const initialState: CoreState = {
         subTitleDefault: false,
         enableReversedMode: false,
         enableGlobalShortcut: true,
-        shortcuts: [
-            {
-                id: "play",
-                name: "播放/暂停",
-                shortcut: "CmdOrCtrl+1",
-                globalShortcut: "Alt+CommandOrControl+1",
-                isPersonalUse: false,
-            },
-            {
-                id: "next",
-                name: "下一首",
-                shortcut: "CmdOrCtrl+Right",
-                globalShortcut: "Alt+CommandOrControl+Right",
-                isPersonalUse: false,
-            },
-            {
-                id: "previous",
-                name: "上一首",
-                shortcut: "CmdOrCtrl+Left",
-                globalShortcut: "Alt+CommandOrControl+Left",
-                isPersonalUse: false,
-            },
-            {
-                id: "increaseVolume",
-                name: "增加音量",
-                shortcut: "CmdOrCtrl+Up",
-                globalShortcut: "Alt+CommandOrControl+Up",
-                isPersonalUse: false,
-            },
-            {
-                id: "decreaseVolume",
-                name: "减少音量",
-                shortcut: "CmdOrCtrl+Down",
-                globalShortcut: "Alt+CommandOrControl+Down",
-                isPersonalUse: false,
-            },
-            {
-                id: "like",
-                name: "喜欢歌曲",
-                shortcut: "CmdOrCtrl+L",
-                globalShortcut: "Alt+CommandOrControl+L",
-                isPersonalUse: false,
-            },
-            {
-                id: "minimize",
-                name: "隐藏/显示播放器",
-                shortcut: "CmdOrCtrl+M",
-                globalShortcut: "Alt+CommandOrControl+M",
-                isPersonalUse: false,
-            },
-        ],
         enabledPlaylistCategories: enabledPlaylistCategories,
     },
     data: JSON.parse(localStorage.getItem("data") || "{}"),
@@ -217,11 +164,6 @@ const initialState: CoreState = {
     },
 };
 
-export const getAppConf = createAsyncThunk("getAppConf", async () => {
-    let appConf: any = await invoke("get_app_conf", {});
-    return appConf;
-});
-
 export interface ConfUpdate {
     confName: string;
     key: string;
@@ -249,11 +191,16 @@ export const fetchLikedPlaylist = createAsyncThunk(
         const state: any = thunkAPI.getState();
         if (!auth.isLooseLoggedIn()) return;
         if (auth.isAccountLoggedIn()) {
-            return await userPlaylist({
-                uid: state.core.data.user?.userId,
-                limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
-                timestamp: new Date().getTime(),
-            });
+            let data: any = await getUserPlaylist(state.core.data.user?.userId);
+            if (!data) {
+                data = await userPlaylist({
+                    uid: state.core.data.user?.userId,
+                    limit: 2000, // 最多只加载2000个歌单（等有用户反馈问题再修）
+                    timestamp: new Date().getTime(),
+                });
+                await cacheUserPlaylist(data.playlist);
+            }
+            return data;
         } else {
             // TODO:搜索ID登录的用户
         }
@@ -266,7 +213,7 @@ export const fetchLikedSongs = createAsyncThunk(
         const state: any = thunkAPI.getState();
         if (!auth.isLooseLoggedIn()) return;
         if (auth.isAccountLoggedIn()) {
-            return await userLikedSongsIds(state.core.data.user?.userId);
+            return await userLikedSongsIds(state.core.data.user?.userId, state.core.data.likedSongPlaylistID);
         } else {
             // TODO:搜索ID登录的用户
         }
@@ -277,10 +224,14 @@ export const fetchLikedSongsWithDetails = createAsyncThunk(
     "users/fetchLikedSongsWithDetails",
     async (_, thunkAPI) => {
         const state: any = thunkAPI.getState();
-        let result: any = await getPlaylistDetail(
-            state.core.data.likedSongPlaylistID,
-            true
-        );
+        let result: any = await selectPlaylistDetail(state.core.data.likedSongPlaylistID);
+        if (!result) {
+            result = await getPlaylistDetail(
+                state.core.data.likedSongPlaylistID,
+                true
+            );
+            await cachePlaylistDetail(state.core.data.likedSongPlaylistID, { playlist: result.playlist, privileges: result.privileges });
+        }
 
         if (result.playlist?.trackIds?.length === 0) {
             return {};
@@ -291,6 +242,7 @@ export const fetchLikedSongsWithDetails = createAsyncThunk(
                     .map((t: any) => t.id)
                     .join(",")
             );
+            
             result.name = "songsWithDetails";
             return result;
         }
@@ -310,7 +262,15 @@ export const likeATrack = createAsyncThunk(
         const state: any = thunkAPI.getState();
         let like = true;
         if (state.core.liked.songs.includes(id)) like = false;
-        await likeTrack({ trackId: id, like }).catch((_e) => {
+        await likeTrack({ trackId: id, like })
+        .then((data: any) => {
+            if (data.code === 200 && data.data.code !== 200 || !like) {
+                getTrackDetail(id)
+                .then((data: any) => {
+                    localLikeTrack(state.core.data.user?.userId, state.core.data.likedSongPlaylistID, data, like)
+                });
+            }
+        }).catch((_e) => {
             messageEventEmitter.emit(
                 "MESSAGE:INFO",
                 "操作失败，专辑下架或版权锁定"
@@ -332,8 +292,8 @@ export const fetchLikedAlbums = createAsyncThunk(
     "users/fetchLikedAlbums",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result = albumSublist({ limit: 200 });
-        return result;
+        let result: any = await albumSublist({ limit: 200 });
+        return result.code === 200? result.data : {};
     }
 );
 
@@ -341,8 +301,8 @@ export const fetchLikedArtists = createAsyncThunk(
     "users/fetchLikedArtists",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result = artistSubList({ limit: 200 });
-        return result;
+        let result: any = await artistSubList({ limit: 200 });
+        return result.code === 200? result.data : {};
     }
 );
 
@@ -350,8 +310,8 @@ export const fetchLikedMVs = createAsyncThunk(
     "users/fetchLikedMVs",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result = mvSublist({ limit: 200 });
-        return result;
+        let result: any = await mvSublist({ limit: 200 });
+        return result.code === 200? result.data : {};
     }
 );
 
@@ -359,7 +319,8 @@ export const fetchCloudDisk = createAsyncThunk(
     "users/fetchCloudDisk",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        return cloudDisk({ limit: 200 });
+        let result: any = await cloudDisk({ limit: 200 });
+        return result.code === 200? result.data : {};
     }
 );
 
@@ -375,9 +336,9 @@ export const fetchPlayHistory = createAsyncThunk(
         ]).then((result: any) => {
             const data: any = {};
             const dataType: any = { 0: "allData", 1: "weekData" };
-            if (result[0] && result[1]) {
+            if (result[0].code == 200 && result[1].code == 200) {
                 for (let i = 0; i < result.length; i++) {
-                    const songData = result[i][dataType[i]].map((item: any) => {
+                    const songData = result[i].data[dataType[i]].map((item: any) => {
                         const song = item.song;
                         song.playCount = item.playCount;
                         return song;
@@ -491,14 +452,6 @@ export const coreSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
-        builder.addCase(getAppConf.fulfilled, (state, action) => {
-            const appConf: any = action.payload.settings;
-            for (let key in state.settings) {
-                if (appConf[key]) {
-                    (state.settings as any)[key] = appConf[key];
-                }
-            }
-        }),
             builder.addCase(updateAppConf.fulfilled, (state, action) => {
                 const confUpdate: ConfUpdate = action.payload;
                 (state as any)[confUpdate.confName][confUpdate.key] =
