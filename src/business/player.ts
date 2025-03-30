@@ -1,7 +1,7 @@
 import { Howl, Howler } from "howler";
 import shuffle from "lodash/shuffle";
 import { getMP3, getTrackDetail, scrobble } from "@/api/track";
-import { getTrackSource } from "@/db";
+import { getTrackSource, deleteTrackSource } from "@/db";
 import auth from "@/utils/auth";
 import { invoke } from "@tauri-apps/api/core";
 import { decode as base642Buffer } from "@/utils/base64";
@@ -31,7 +31,7 @@ const excludeSaveKeys = [
     "_personalFMNextLoading",
     "_lastProcessFpsDate",
     "_observers",
-    "_loading"
+    "_loading",
 ];
 
 export const delay = (ms: number) =>
@@ -100,6 +100,8 @@ class Player implements PlayerSubject {
      */
     private createdBlobRecords: string[];
     private _howler?: Howl | null;
+    private _curr_error_track_id: string;
+    private _retryTrackPlayCount: number;
     private _sendTimeInterval?: NodeJS.Timeout;
     private _observers: Set<PlayerObserver>;
 
@@ -134,6 +136,8 @@ class Player implements PlayerSubject {
         this.createdBlobRecords = [];
 
         this._howler = null;
+        this._curr_error_track_id = "";
+        this._retryTrackPlayCount = 0;
         this._observers = new Set();
         Object.defineProperty(this, "_howler", {
             enumerable: false,
@@ -142,7 +146,6 @@ class Player implements PlayerSubject {
 
     _init() {
         this._loadSelfFromLocalStorage();
-
         if (this._enabled) {
             // 恢复当前播放歌曲
             this._replaceCurrentTrack(this.currentTrackId, false).then(() => {
@@ -163,8 +166,8 @@ class Player implements PlayerSubject {
             this._personalFMTrack.id === this._personalFMNextTrack.id
         ) {
             personalFM().then((result: any) => {
-                this._personalFMTrack = result.data[0];
-                this._personalFMNextTrack = result.data[1];
+                this._personalFMTrack = result[0];
+                this._personalFMNextTrack = result[1];
                 return this._personalFMTrack;
             });
         }
@@ -523,7 +526,7 @@ class Player implements PlayerSubject {
             this._scrobble(this.currentTrack, this._howler?.seek());
         }
         const data = await getTrackDetail(id);
-        if (data.songs.length == 0) {
+        if (data == null || data.songs.length == 0) {
             this._setLoading(false);
             return;
         }
@@ -645,30 +648,60 @@ class Player implements PlayerSubject {
             // https://developer.mozilla.org/en-US/docs/Web/API/MediaError/code
             // code 3: MEDIA_ERR_DECODE
             if (errCode === 3) {
-                this._playNextTrack(this._isPersonalFM);
+                this._setLoading(false);
+                setTimeout(() => {
+                    this._playNextTrack(this._isPersonalFM);
+                }, 5000)
             } else if (errCode === 4) {
+                const trackId = this._currentTrack.id;
                 messageEventEmitter.emit(
                     "MESSAGE:INFO",
-                    `无法播放: 不支持的音频格式${this._currentTrack.id} ${this._currentTrack.name}`
+                    `无法播放: 不支持的音频格式${trackId} ${this._currentTrack.name}`
                 );
                 console.warn(
-                    `无法播放: 不支持的音频格式${this._currentTrack.id} ${this._currentTrack.name}`
+                    `无法播放: 不支持的音频格式${trackId} ${this._currentTrack.name}`
                 );
-                this._playNextTrack(this._isPersonalFM);
+                this._setLoading(false);
+                // 播放失败，证明歌曲缓存错误。1、歌曲缓存不完整 2、yt-dlp版本更新导致搜索结果不是音乐
+                getTrackSource(trackId).then(trackSource => {
+                    if (trackSource) {
+                        deleteTrackSource(trackId)
+                        this._replaceCurrentTrack(this.currentTrackId, true)
+                    } else {
+                        setTimeout(() => {
+                            this._playNextTrack(this._isPersonalFM);
+                        }, 5000)
+                    }
+                })
             } else {
                 const t = this.progress;
-                this._replaceCurrentTrackAudio(
-                    this.currentTrack,
-                    false,
-                    false
-                ).then((replaced) => {
-                    // 如果 replaced 为 false，代表当前的 track 已经不是这里想要替换的track
-                    // 此时则不修改当前的歌曲进度
-                    if (replaced) {
-                        this._howler?.seek(t);
-                        this.play();
-                    }
-                });
+                if (!this._curr_error_track_id || this._curr_error_track_id !== this._currentTrack.id) {
+                    this._curr_error_track_id = this._currentTrack.id
+                    this._retryTrackPlayCount = 0
+                } else {
+                    this._retryTrackPlayCount += 1
+                }
+                if (this._retryTrackPlayCount >= 3) {
+                    this._setLoading(false);
+                    this._retryTrackPlayCount = 0
+                    this.playPersonNextTrack();
+                    return
+                }
+
+                setTimeout(() => {
+                    this._replaceCurrentTrackAudio(
+                        this.currentTrack,
+                        false,
+                        false
+                    ).then((replaced) => {
+                        // 如果 replaced 为 false，代表当前的 track 已经不是这里想要替换的track
+                        // 此时则不修改当前的歌曲进度
+                        if (replaced) {
+                            this._howler?.seek(t);
+                            this.play();
+                        }
+                    });
+                }, 5000)
             }
         });
         if (autoplay) {
@@ -816,16 +849,19 @@ class Player implements PlayerSubject {
     async _getAudioSourceFromNetease(track: any) {
         let source;
         if (auth.isAccountLoggedIn()) {
-            const result_1: any = await getMP3(track.id.toString());
-            if (!result_1.data[0]) return null;
-            if (!result_1.data[0].url) return null;
-            if (result_1.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
-            source = result_1.data[0].url.replace(/^http:/, "https:");
-            playerEventEmitter.emit("PLAYER:TRACK_GET_COMPLETE", {
-                track,
-                source,
-                br: result_1.data[0].br,
-            });
+            getMP3(track.id.toString()).then((result_1: any) => {
+                if (!result_1.data[0]) return null;
+                if (!result_1.data[0].url) return null;
+                if (result_1.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
+                source = result_1.data[0].url.replace(/^http:/, "https:");
+                playerEventEmitter.emit("PLAYER:TRACK_GET_COMPLETE", {
+                    track,
+                    source,
+                    br: result_1.data[0].br,
+                });
+            }).catch(() => {
+                return null
+            })
         } else {
             source = `https://music.163.com/song/media/outer/url?id=${track.id}`;
         }
