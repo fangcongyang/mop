@@ -7,7 +7,6 @@ import {
     lastfmStore,
     updateLastfm,
     Shortcut,
-    getAppConf,
     doLogout,
 } from "@/store/coreSlice";
 import auth from "@/utils/auth";
@@ -78,6 +77,8 @@ const Settings = () => {
     const [shortcutList, setShortcutList] = useConfig("shortcutList", []);
     const [musicQuality, setMusicQuality] = useConfig("musicQuality", 320000);
     const [nyancatStyle, setNyancatStyle] = useConfig("nyancatStyle", false);
+    const [enableReversedMode, setEnableReversedMode] = useConfig("enableReversedMode", false);
+    const [cacheLimit, setCacheLimit] = useConfig("cacheLimit", "8192")
 
     useEffect(() => {
         init();
@@ -174,7 +175,6 @@ const Settings = () => {
         if (shortcutInput.recording === false) return;
         setShortcutInput({ id: "", type: "", recording: false });
         recordedShortcut.current = [];
-        dispatch(getAppConf());
     };
 
     const logout = () => {
@@ -462,9 +462,10 @@ const Settings = () => {
                 />
                 <SettingsSelect
                     title="settings.cacheLimit.text"
-                    initValue={settings.cacheLimit}
+                    initValue={cacheLimit}
                     fieldKey="cacheLimit"
                     selectData={cacheLimitSelectData()}
+                    callback={(value: any) => setCacheLimit(value)}
                 />
                 <div className={styles.item}>
                     <div className="left">
@@ -692,8 +693,12 @@ const Settings = () => {
                 <SettingsSwitch
                     inputId="enable-reversed-mode"
                     title="settings.enableReversedMode"
-                    initValue={settings.enableReversedMode}
+                    initValue={enableReversedMode}
                     fieldKey="enableReversedMode"
+                    callback={(value: boolean) => {
+                        setEnableReversedMode(value);
+                        store.notifyObservers("enableReversedMode", value);
+                    }}
                 />
                 <SettingsSwitch
                     inputId="nyancat-style"

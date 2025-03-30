@@ -38,7 +38,7 @@ const DailyTracksCard = () => {
 
     const coverUrl = useMemo(() => {
         return `${
-            dailyTracks[0]?.al.picUrl || sample(defaultCovers)
+            dailyTracks && dailyTracks[0]?.al.picUrl || sample(defaultCovers)
         }?param=1024y1024`;
     }, [dailyTracks]);
 

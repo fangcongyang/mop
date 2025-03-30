@@ -14,6 +14,8 @@ const eventNames = [
     "proxyPort",
     "ytdlDownloadStatus",
     "ytdlVersion",
+    "enableReversedMode",
+    "cacheLimit"
 ] as const;
 
 export type StoreEventName = (typeof eventNames)[number];
