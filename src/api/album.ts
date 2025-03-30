@@ -9,7 +9,9 @@ import { invoke } from "@tauri-apps/api/core";
  */
 export async function getAlbum(id: number) {
   const fetchLatest = async () => {
-    const data: any = await invoke('get_album', { data: { id } });
+    let data: any = await invoke('get_album', { data: { id } });
+    if (data.code !== 200) return null
+    data = data.data
     cacheAlbum(id, data);
     data.songs = auth.mapTrackPlayableStatus(data.songs);
     return data;

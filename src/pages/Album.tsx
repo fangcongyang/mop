@@ -31,6 +31,7 @@ const Album = () => {
     const dispatch = useAppDispatch();
     const { id } = useParams();
     const [album, setAlbum] = useState<any>({
+        id: "",
         artist: { id: "" },
         name: "",
         publishTime: new Date().getTime(),
@@ -121,6 +122,7 @@ const Album = () => {
     const loadData = _.debounce((id) => {
         NProgress.start();
         getAlbum(id).then((data) => {
+            if (!data) return
             const album = data.album;
             setAlbum(album);
             formatTitle();
