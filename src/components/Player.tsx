@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import {
-    settingsStore,
     toggleLyrics,
     likedStore,
     likeATrack,
@@ -24,12 +23,12 @@ import { PlayerObserver } from "@/type/player";
 import { useConfig } from "@/hooks/useConfig";
 import { deleteTrackSource } from "@/db";
 import { emit } from "@tauri-apps/api/event";
+import { osType } from "@/utils/env";
 
 const Player = () => {
     let location = useLocation();
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
-    const settings = useAppSelector(settingsStore);
     const liked = useAppSelector(likedStore);
     const data = useAppSelector(dataStore);
     const [playing, setPlaying] = useState(player.playing);
@@ -47,6 +46,7 @@ const Player = () => {
     const [mute, setMute] = useState(player.mute);
     const [loading, setLoading] = useState(player.loading);
     const playerObserver: PlayerObserver = new PlayerObserver("player");
+    const [enableReversedMode] = useConfig("enableReversedMode", false);
     const [nyancatStyle] = useConfig("nyancatStyle", false);
 
     const registerPlayerObserver = () => {
@@ -194,9 +194,13 @@ const Player = () => {
     const onDeleteTrackSource = () => {
         if (currentTrackId) {
             deleteTrackSource(currentTrackId);
-            playerEventEmitter.emit("PLAYER:PALY_PLAYLIST", player._getPlaylistSourceId, currentTrackId, false);
+            playerEventEmitter.emit("PLAYER:PALY_PLAYLIST", player._getPlaylistSourceId(), currentTrackId, false);
         }
     };
+
+    if (osType !== "desktop") {
+        return <></>
+    }
 
     return (
         <div className={`player ${loading ? 'loading' : ''}`}>
@@ -407,7 +411,7 @@ const Player = () => {
                         >
                             <SvgIcon svgName="shuffle" />
                         </ButtonIcon>
-                        {settings.enableReversedMode ? (
+                        {enableReversedMode ? (
                             <ButtonIcon
                                 className={
                                     reversed

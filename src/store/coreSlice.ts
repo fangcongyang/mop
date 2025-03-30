@@ -10,7 +10,6 @@ import {
 } from "@/api/user";
 import { getPlaylistDetail } from "@/api/playlist";
 import { getTrackDetail, likeTrack } from "@/api/track";
-import { invoke } from "@tauri-apps/api/core";
 import { playlistCategories } from "@/utils/staticData";
 import { albumSublist } from "@/api/album";
 import { artistSubList } from "@/api/artist";

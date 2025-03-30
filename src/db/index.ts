@@ -3,7 +3,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { fetch } from "@tauri-apps/plugin-http";
 import { decode as base642Buffer } from "@/utils/base64";
 import { store } from "@/utils/store";
-import { t } from "i18next";
 
 class MopDatabase extends Dexie {
     public trackDetail!: Table<any, number>;

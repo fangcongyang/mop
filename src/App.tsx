@@ -4,7 +4,7 @@ import {
     useRef,
     useState,
 } from "react";
-import { useAppSelector, useAppDispatch } from "@/store/hooks";
+import { useAppSelector } from "@/store/hooks";
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import {
     mainEnableScrollingStore,
