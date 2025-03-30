@@ -1,14 +1,12 @@
 import {
     FunctionComponent,
     ReactElement,
-    useEffect,
     useRef,
     useState,
 } from "react";
 import { useAppSelector, useAppDispatch } from "@/store/hooks";
 import { Link, Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import {
-    getAppConf,
     mainEnableScrollingStore,
     showLyricsStore,
 } from "@/store/coreSlice";
@@ -47,7 +45,6 @@ import { osType } from "@/utils/env";
 import { useTranslation } from "react-i18next";
 
 function App() {
-    const dispatch = useAppDispatch();
     const showLyrics = useAppSelector(showLyricsStore);
     const mainEnableScrolling = useAppSelector(mainEnableScrollingStore);
     let navigate = useNavigate();
@@ -55,10 +52,6 @@ function App() {
     const main = useRef<HTMLDivElement>(null);
     const lyricsNodeRef = useRef<HTMLDivElement>(null);
     const [pageActive, setPageActive] = useState("/");
-
-    useEffect(() => {
-        dispatch(getAppConf());
-    });
 
     return (
         <div className="main-body">
@@ -135,7 +128,7 @@ function App() {
                     </Route>
                 </Routes>
             </main>
-            {osType == "desktop" && <Player />}
+            <Player />
             <Toast />
             {auth.isAccountLoggedIn() && <ModalNewPlaylist />}
             {auth.isAccountLoggedIn() && <ModalAddTrackToPlaylist />}
