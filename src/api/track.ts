@@ -40,6 +40,10 @@ export async function getTrackDetail(ids: string | number) {
             let data: any = await do_invoke("get_song_detail", {
                 data: { ids: ids.toString() },
             });
+            if (!data) {
+                return data;
+            }
+            data.songs = data!.songs || [];
             data.songs.map((song: any) => {
                 const privileges = data.privileges.find(
                     (t: any) => t.id === song.id
@@ -49,6 +53,7 @@ export async function getTrackDetail(ids: string | number) {
             data.songs = auth.mapTrackPlayableStatus(data.songs, data.privileges);
             return data;
         } catch (e) {
+            console.log(123, e)
             return null;
         }
     };
@@ -65,7 +70,7 @@ export async function getTrackDetail(ids: string | number) {
             result_1.privileges
         );
     }
-    return result_1 ?? fetchLatest();
+    return fetchLatest();
 }
 
 /**

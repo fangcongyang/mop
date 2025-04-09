@@ -606,7 +606,7 @@ const Settings = () => {
                             {
                                 ytdlDownloadStatus != 'end' && ytdlDownloadStatus != 'error' ? (
                                     <LinearProgressWithLabel value={ytdlDownloadProgress} downloadspeed={ytdlDownloadSpeed} />
-                                ) : <div className="description">当前版本：{ytdlVersion}；最新版本：{latestVersion}</div>
+                                ) : <div className="description">当前版本：{ytdlVersion}；最新版本：{latestVersion}, 版本不是最新的会导致搜索错误</div>
                             }
                         </div>
                         <div className="right">

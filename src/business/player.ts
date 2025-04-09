@@ -662,6 +662,9 @@ class Player implements PlayerSubject {
                     `无法播放: 不支持的音频格式${trackId} ${this._currentTrack.name}`
                 );
                 this._setLoading(false);
+                if (this._shouldSkipCurrentTrack()) {
+                    return;
+                }
                 // 播放失败，证明歌曲缓存错误。1、歌曲缓存不完整 2、yt-dlp版本更新导致搜索结果不是音乐
                 getTrackSource(trackId).then(trackSource => {
                     if (trackSource) {
@@ -669,25 +672,15 @@ class Player implements PlayerSubject {
                         this._replaceCurrentTrack(this.currentTrackId, true)
                     } else {
                         setTimeout(() => {
-                            this._playNextTrack(this._isPersonalFM);
+                            this.playPersonNextTrack();
                         }, 5000)
                     }
                 })
             } else {
                 const t = this.progress;
-                if (!this._curr_error_track_id || this._curr_error_track_id !== this._currentTrack.id) {
-                    this._curr_error_track_id = this._currentTrack.id
-                    this._retryTrackPlayCount = 0
-                } else {
-                    this._retryTrackPlayCount += 1
+                if (this._shouldSkipCurrentTrack()) {
+                    return;
                 }
-                if (this._retryTrackPlayCount >= 3) {
-                    this._setLoading(false);
-                    this._retryTrackPlayCount = 0
-                    this.playPersonNextTrack();
-                    return
-                }
-
                 setTimeout(() => {
                     this._replaceCurrentTrackAudio(
                         this.currentTrack,
@@ -711,6 +704,22 @@ class Player implements PlayerSubject {
             }
             // setTrayLikeState(store.getState().core.liked.songs.includes(this.currentTrack.id));
         }
+    }
+
+    _shouldSkipCurrentTrack() {
+        if (!this._curr_error_track_id || this._curr_error_track_id !== this._currentTrack.id) {
+            this._curr_error_track_id = this._currentTrack.id
+            this._retryTrackPlayCount = 0
+        } else {
+            this._retryTrackPlayCount += 1
+        }
+        if (this._retryTrackPlayCount >= 3) {
+            this._setLoading(false);
+            this._retryTrackPlayCount = 0
+            this.playPersonNextTrack();
+            return true
+        }
+        return false
     }
 
     _nextTrackCallback() {

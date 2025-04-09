@@ -1,6 +1,7 @@
 import auth from "./auth";
 import { dailyRecommendPlaylist, getPlaylistDetail, recommendPlaylist } from "@/api/playlist";
 import { player } from "@/business/player";
+import { uniqBy } from "lodash";
 
 const specialPlaylist = [3136952023, 2829883282, 2829816518, 2829896389];
 
@@ -31,7 +32,8 @@ export async function getRecommendPlayList(limit: number, removePrivateRecommand
             if (removePrivateRecommand) recommend = recommend.slice(1);
             await replaceRecommendResult(recommend);
         }
-        return recommend.concat(playlists[1]?.result ?? []).slice(0, limit);
+        let result = recommend.concat(playlists[1]?.result ?? []);
+        return uniqBy(result, 'id').slice(0, limit)
     } else {
         const response: any = await recommendPlaylist({ limit });
         return response?.result;

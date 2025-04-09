@@ -37,7 +37,7 @@ const Home = () => {
   const loadData = _.debounce(() => {
     NProgress.start();
     getRecommendPlayList(10, false).then((items: any) => {
-      items && setRecommendPlaylist({ items: _.uniqBy(items, 'id') });
+      items && setRecommendPlaylist({ items });
       NProgress.done();
     });
     const topListOfArtistsAreaTable: any = {
