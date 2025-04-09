@@ -35,6 +35,7 @@ import styles from "./index.module.scss";
 import { osDetailType, appVersion } from "@/utils/env";
 import { useConfig } from "@/hooks/useConfig";
 import { invoke } from "@tauri-apps/api/core";
+import { relaunch } from "@tauri-apps/plugin-process";
 import { store } from "@/utils/store";
 import { DownloadFileTask, DownloadInfo } from "@/business/DownloadFileTask";
 import LinearProgressWithLabel from "./components/LinearProgressWithLabel";
@@ -50,6 +51,8 @@ const Settings = () => {
     const settings = useAppSelector(settingsStore);
     const lastfm = useAppSelector(lastfmStore);
     const [lang, setLang] = useConfig("lang", "");
+    const [appearance, setAppearance] = useConfig("appearance", "auto");
+    const [musicLanguage, setMusicLanguage] = useConfig("musicLanguage", "ALL");
     const [automaticallyCacheSongs, setAutomaticallyCacheSongs] = useConfig(
         "automaticallyCacheSongs",
         true
@@ -74,6 +77,7 @@ const Settings = () => {
     const [proxyProtocol, setProxyProtocol] = useConfig("proxyProtocol", "");
     const [proxyServer, setProxyServer] = useConfig("proxyServer", "");
     const [proxyPort, setProxyPort] = useConfig("proxyPort", "");
+    const [enableGlobalShortcut, setEnableGlobalShortcut] = useConfig("enableGlobalShortcut", true);
     const [shortcutList, setShortcutList] = useConfig("shortcutList", []);
     const [musicQuality, setMusicQuality] = useConfig("musicQuality", 320000);
     const [nyancatStyle, setNyancatStyle] = useConfig("nyancatStyle", false);
@@ -204,7 +208,9 @@ const Settings = () => {
         }, 1000);
     };
 
-    const sendProxyConfig = () => {};
+    const sendProxyConfig = () => {
+        relaunch();
+    };
 
     const handleShortcutKeydown = (e: KeyboardEvent) => {
         if (shortcutInput.recording === false) return;
@@ -292,7 +298,7 @@ const Settings = () => {
     const readyToRecordShortcut = (id: string, type: string) => {
         if (
             type === "globalShortcut" &&
-            settings.enableGlobalShortcut === false
+            enableGlobalShortcut === false
         ) {
             return;
         }
@@ -329,16 +335,8 @@ const Settings = () => {
     };
 
     const changeAppearance = (appearance: string) => {
-        if (appearance === "auto" || appearance === undefined) {
-            appearance = window.matchMedia("(prefers-color-scheme: dark)")
-                .matches
-                ? "dark"
-                : "light";
-        }
-        document.body.setAttribute("data-theme", appearance);
-        document
-            .querySelector('meta[name="theme-color"]')
-            ?.setAttribute("content", appearance === "dark" ? "#222" : "#fff");
+        setAppearance(appearance);
+        store.notifyObservers("appearance", appearance);
     };
 
     const onChangeLanguage = (lang: string) => {
@@ -431,23 +429,24 @@ const Settings = () => {
                 />
                 <SettingsSelect
                     title="settings.appearance.text"
-                    initValue={settings.appearance}
-                    fieldKey="appearance"
+                    initValue={appearance}
                     selectData={appearanceSelectData()}
                     callback={changeAppearance}
                 />
                 <SettingsSelect
                     title="settings.musicGenrePreference.text"
-                    initValue={settings.musicLanguage}
-                    fieldKey="musicLanguage"
+                    initValue={musicLanguage}
                     selectData={musicLanguageSelectData()}
+                    callback={(value: string) => {
+                        setMusicLanguage(value)
+                        store.notifyObservers("musicLanguage", value);
+                    }}
                 />
 
                 <h3>{t("settings.musicQuality.text")}</h3>
                 <SettingsSelect
                     title="settings.musicQuality.text"
                     initValue={musicQuality}
-                    fieldKey="musicQuality"
                     selectData={musicQualitySelectData()}
                     callback={setMusicQuality}
                 />
@@ -457,7 +456,6 @@ const Settings = () => {
                     inputId="automatically-cache-songs"
                     title="settings.automaticallyCacheSongs"
                     initValue={automaticallyCacheSongs}
-                    fieldKey="automaticallyCacheSongs"
                     callback={setAutomaticallyCacheSongs}
                 />
                 <SettingsSelect
@@ -746,7 +744,7 @@ const Settings = () => {
                         className="text-input"
                         placeholder={t("settings.proxy.proxyPort")}
                         type="number"
-                        min={1}
+                        min={0}
                         max={65535}
                         disabled={proxyProtocol === "noProxy"}
                         onChange={(e) => setProxyPort(e.target.valueAsNumber)}
@@ -760,13 +758,15 @@ const Settings = () => {
                 <SettingsSwitch
                     inputId="enable-enable-global-shortcut"
                     title="settings.shortcut.enableGlobalShortcut"
-                    initValue={settings.enableGlobalShortcut}
-                    fieldKey="enableGlobalShortcut"
+                    initValue={enableGlobalShortcut}
+                    callback={(value: boolean) =>
+                        setEnableGlobalShortcut(value)
+                    }
                 />
                 <div
                     id="shortcut-table"
                     className={
-                        !settings.enableGlobalShortcut ? "global-disabled" : ""
+                        !enableGlobalShortcut ? "global-disabled" : ""
                     }
                     tabIndex={0}
                     onKeyDown={handleShortcutKeydown}

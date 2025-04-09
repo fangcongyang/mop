@@ -10,7 +10,7 @@ interface SettingsSelectProps {
     titleStyle?: CSSProperties,
     description?: string;
     initValue: boolean;
-    fieldKey: string;
+    fieldKey?: string;
     inputId: string;
     callback?: Function; // 回调函数
 }

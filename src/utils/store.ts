@@ -15,7 +15,10 @@ const eventNames = [
     "ytdlDownloadStatus",
     "ytdlVersion",
     "enableReversedMode",
-    "cacheLimit"
+    "cacheLimit",
+    "enableGlobalShortcut",
+    "appearance",
+    "musicLanguage"
 ] as const;
 
 export type StoreEventName = (typeof eventNames)[number];

@@ -13,7 +13,7 @@ interface SelectData {
 interface SettingsSelectProps {
     title: string; // 标题
     initValue: string | number;
-    fieldKey: string;
+    fieldKey?: string;
     selectData: SelectData[];
     converNumber?: boolean;
     callback?: Function; // 回调函数

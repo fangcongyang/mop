@@ -34,8 +34,6 @@ interface Settings {
     showUnavailableSongInGreyStyle: boolean;
     title: string;
     enableDiscordRichPresence: boolean;
-    appearance: string;
-    musicLanguage: "all" | "zh" | "ea" | "jp" | "kr";
     showLyricsTranslation: boolean;
     lyricsBackground: string;
     showLyricsTime: boolean;
@@ -46,13 +44,10 @@ interface Settings {
     unmSearchMode: string;
     unmJooxCookie: string;
     unmQQCookie: string;
-    unmYtDlExe: string;
     closeAppOption: string;
     showLibraryDefault: boolean;
     showPlaylistsByAppleMusic: boolean;
     subTitleDefault: boolean;
-    enableReversedMode: boolean;
-    enableGlobalShortcut: boolean;
     enabledPlaylistCategories: string[];
 }
 
@@ -109,8 +104,6 @@ const initialState: CoreState = {
         showUnavailableSongInGreyStyle: false,
         title: "mop",
         enableDiscordRichPresence: false,
-        appearance: "auto",
-        musicLanguage: "all",
         showLyricsTranslation: true,
         lyricsBackground: "true",
         showLyricsTime: true,
@@ -121,13 +114,10 @@ const initialState: CoreState = {
         unmSearchMode: "fast-first",
         unmJooxCookie: "",
         unmQQCookie: "",
-        unmYtDlExe: "",
         closeAppOption: "exit",
         showLibraryDefault: false,
         showPlaylistsByAppleMusic: true,
         subTitleDefault: false,
-        enableReversedMode: false,
-        enableGlobalShortcut: true,
         enabledPlaylistCategories: enabledPlaylistCategories,
     },
     data: JSON.parse(localStorage.getItem("data") || "{}"),
@@ -291,8 +281,7 @@ export const fetchLikedAlbums = createAsyncThunk(
     "users/fetchLikedAlbums",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result: any = await albumSublist({ limit: 200 });
-        return result.code === 200? result.data : {};
+        return await albumSublist({ limit: 200 });
     }
 );
 
@@ -300,8 +289,7 @@ export const fetchLikedArtists = createAsyncThunk(
     "users/fetchLikedArtists",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result: any = await artistSubList({ limit: 200 });
-        return result.code === 200? result.data : {};
+        return await artistSubList({ limit: 200 });
     }
 );
 
@@ -309,8 +297,7 @@ export const fetchLikedMVs = createAsyncThunk(
     "users/fetchLikedMVs",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result: any = await mvSublist({ limit: 200 });
-        return result.code === 200? result.data : {};
+        return await mvSublist({ limit: 200 });
     }
 );
 
@@ -318,8 +305,7 @@ export const fetchCloudDisk = createAsyncThunk(
     "users/fetchCloudDisk",
     async (_) => {
         if (!auth.isAccountLoggedIn()) return;
-        let result: any = await cloudDisk({ limit: 200 });
-        return result.code === 200? result.data : {};
+        return await cloudDisk({ limit: 200 });
     }
 );
 
