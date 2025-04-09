@@ -8,6 +8,7 @@ main {
   padding: 104px 10vw 96px 10vw;
   box-sizing: border-box;
   scrollbar-width: none;
+  background-color: var(--color-body-bg);
 }
 
 @media screen and (max-width: 1336px) {

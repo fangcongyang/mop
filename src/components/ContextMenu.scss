@@ -9,7 +9,7 @@
   min-width: 136px;
   max-width: 240px;
   list-style: none;
-  background: rgba(255, 255, 255, 0.88);
+  background: var(--color-navbar-bg);
   box-shadow: 0 6px 12px -4px rgba(0, 0, 0, 0.08);
   border: 1px solid rgba(0, 0, 0, 0.06);
   backdrop-filter: blur(12px);

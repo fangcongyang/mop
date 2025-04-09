@@ -1,6 +1,7 @@
 import {
     FunctionComponent,
     ReactElement,
+    useEffect,
     useRef,
     useState,
 } from "react";
@@ -43,6 +44,7 @@ import ModalAddTrackToPlaylist from "./components/ModalAddTrackToPlaylist";
 import ModalNewPlaylist from "./components/ModalNewPlaylist";
 import { osType } from "@/utils/env";
 import { useTranslation } from "react-i18next";
+import { useConfig } from "./hooks/useConfig";
 
 function App() {
     const showLyrics = useAppSelector(showLyricsStore);
@@ -52,6 +54,21 @@ function App() {
     const main = useRef<HTMLDivElement>(null);
     const lyricsNodeRef = useRef<HTMLDivElement>(null);
     const [pageActive, setPageActive] = useState("/");
+    const [appearance] = useConfig("appearance", "auto");
+
+    useEffect(() => {
+        let ae = appearance
+        if (appearance === "auto" || appearance === undefined) {
+            ae = window.matchMedia("(prefers-color-scheme: dark)")
+                .matches
+                ? "dark"
+                : "light";
+        }
+        document.body.setAttribute("data-theme", ae);
+        document
+            .querySelector('meta[name="theme-color"]')
+            ?.setAttribute("content", ae === "dark" ? "#222" : "#fff");
+    }, [appearance])
 
     return (
         <div className="main-body">
