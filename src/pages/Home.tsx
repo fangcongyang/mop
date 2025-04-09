@@ -16,6 +16,7 @@ import { newAlbums } from "@/api/album";
 import { toplists } from "@/api/playlist";
 import { appleMusicData } from "@/static/homeData";
 import NProgress from 'nprogress';
+import { useConfig } from "@/hooks/useConfig";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -24,6 +25,7 @@ const Home = () => {
   const [recommendArtists, setRecommendArtists] = useState<any>({ items: [], indexList: [] });
   const [newReleasesAlbum, setNewReleasesAlbum] = useState<any>({ items: [] });
   const [topList, setTopList] = useState<any>({ items: [], ids: [19723756, 180106, 60198, 3812895, 60131], })
+  const [musicLanguage] = useConfig("musicLanguage", "ALL");
 
   useEffect(() => {
     loadData();
@@ -35,7 +37,7 @@ const Home = () => {
   const loadData = _.debounce(() => {
     NProgress.start();
     getRecommendPlayList(10, false).then((items: any) => {
-      setRecommendPlaylist({ items: _.uniqBy(items, 'id') });
+      items && setRecommendPlaylist({ items: _.uniqBy(items, 'id') });
       NProgress.done();
     });
     const topListOfArtistsAreaTable: any = {
@@ -46,7 +48,7 @@ const Home = () => {
       kr: 3,
     };
     topListOfArtists(
-      topListOfArtistsAreaTable[settings.musicLanguage ?? 'all']
+      topListOfArtistsAreaTable[musicLanguage ?? 'all']
     ).then((data: any) => {
       let indexList: any = [];
       while (indexList.length < 6) {
@@ -55,24 +57,24 @@ const Home = () => {
       }
       setRecommendArtists({
         indexList,
-        items: data.list.artists.filter((_l: any, index: number) =>
+        items: data?.list?.artists.filter((_l: any, index: number) =>
           indexList.includes(index)
-        )
+        ) ?? []
       })
     });
     newAlbums({
-      area: settings.musicLanguage ?? 'ALL',
+      area: musicLanguage ?? 'ALL',
       limit: 10,
     }).then((data: any) => {
       setNewReleasesAlbum({
-        items: data.albums
+        items: data?.albums ?? []
       });
     });
     toplists().then((data: any) => {
       setTopList({
-        items: data.list.filter((l: any) =>
+        items: data?.list.filter((l: any) =>
           topList.ids.includes(l.id)
-        ),
+        ) ?? [],
         ids: topList.ids
       })
     });

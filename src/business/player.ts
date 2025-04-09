@@ -764,7 +764,7 @@ class Player implements PlayerSubject {
         if (!nextTrackID) return;
         if (this._personalFMTrack.id == nextTrackID) return;
         getTrackDetail(nextTrackID).then((data) => {
-            let track = data.songs[0];
+            let track = data?.songs[0];
             this._getAudioSource(track);
         });
     }

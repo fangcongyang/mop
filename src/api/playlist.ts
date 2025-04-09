@@ -18,7 +18,7 @@ export function getPlaylistDetail(id: any, noCache: boolean | undefined = false)
     let params: any = { id };
     if (noCache) params.timestamp = new Date().getTime();
     do_invoke('get_playlist_detail', { data: params }).then((data: any) => {
-      if (data.playlist) {
+      if (data?.playlist) {
         data.playlist.tracks = auth.mapTrackPlayableStatus(
           data.playlist.tracks,
           data.privileges || []

@@ -52,7 +52,7 @@ const WinTool = () => {
           >
             <SvgIcon
               svgName="wintool-ontop"
-              svgTitle="data.isAlwaysOnTop ? '取消置顶' : '置顶'"
+              svgTitle={isAlwaysOnTop ? '取消置顶' : '置顶'}
               svgStyle={svgStyle}
               color={isAlwaysOnTop ? '#555555' : '#ffffff'}
             ></SvgIcon>
@@ -72,7 +72,7 @@ const WinTool = () => {
           >
             <SvgIcon
               svgName="wintool-max"
-              svgTitle="data.isMaximized ? '还原' : '最大化'"
+              svgTitle={fullscreen ? '还原' : '最大化'}
               svgStyle={svgStyle}
               color="#ffffff"
             ></SvgIcon>

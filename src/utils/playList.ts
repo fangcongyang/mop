@@ -26,15 +26,15 @@ export async function getRecommendPlayList(limit: number, removePrivateRecommand
             dailyRecommendPlaylist(),
             recommendPlaylist({ limit }),
         ]);
-        let recommend = playlists[0].recommend ?? [];
+        let recommend = playlists[0]?.recommend ?? [];
         if (recommend.length) {
             if (removePrivateRecommand) recommend = recommend.slice(1);
             await replaceRecommendResult(recommend);
         }
-        return recommend.concat(playlists[1].result).slice(0, limit);
+        return recommend.concat(playlists[1]?.result ?? []).slice(0, limit);
     } else {
         const response: any = await recommendPlaylist({ limit });
-        return response.result;
+        return response?.result;
     }
 }
 

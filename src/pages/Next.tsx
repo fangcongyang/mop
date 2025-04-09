@@ -63,7 +63,9 @@ const Next = () => {
                 setPlayNextTracks(player.playNextList.map(tid => {
                     return newTracks.find((t: any) => t.id === tid);
                 }));
-                setPlayTrackList(newTracks.filter((t: any) => trackIds.includes(t.id)));
+                setPlayTrackList(trackIds.map(tid => {
+                    return newTracks.find((t: any) => t.id === tid)
+                }));
                 setTracks(newTracks);
             });
         } else {
