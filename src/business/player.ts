@@ -103,6 +103,7 @@ class Player implements PlayerSubject {
     private _curr_error_track_id: string;
     private _retryTrackPlayCount: number;
     private _sendTimeInterval?: NodeJS.Timeout;
+    private _playNextTrackTimeout?: NodeJS.Timeout;
     private _observers: Set<PlayerObserver>;
 
     constructor() {
@@ -528,6 +529,11 @@ class Player implements PlayerSubject {
         const data = await getTrackDetail(id);
         if (data == null || data.songs.length == 0) {
             this._setLoading(false);
+            messageEventEmitter.emit(
+                "MESSAGE:INFO",
+                `获取歌曲${id}详情失败，即将播放下一首`
+            );
+            this._timeoutPlayNextTrack();
             return;
         }
         const track_1 = data.songs[0];
@@ -539,6 +545,16 @@ class Player implements PlayerSubject {
             true,
             ifUnplayableThen
         );
+    }
+
+    _timeoutPlayNextTrack(fun: () => void = () => {this.playPersonNextTrack();}) {
+        if (this._playNextTrackTimeout) {
+            clearTimeout(this._playNextTrackTimeout);
+        } 
+        this._playNextTrackTimeout = setTimeout(() => {
+            fun();
+            this._playNextTrackTimeout = undefined; 
+        }, 5000)
     }
 
     _updateMediaSessionMetaData(track: any) {
@@ -649,9 +665,7 @@ class Player implements PlayerSubject {
             // code 3: MEDIA_ERR_DECODE
             if (errCode === 3) {
                 this._setLoading(false);
-                setTimeout(() => {
-                    this._playNextTrack(this._isPersonalFM);
-                }, 5000)
+                this._timeoutPlayNextTrack();
             } else if (errCode === 4) {
                 const trackId = this._currentTrack.id;
                 messageEventEmitter.emit(
@@ -671,9 +685,7 @@ class Player implements PlayerSubject {
                         deleteTrackSource(trackId)
                         this._replaceCurrentTrack(this.currentTrackId, true)
                     } else {
-                        setTimeout(() => {
-                            this.playPersonNextTrack();
-                        }, 5000)
+                        this._timeoutPlayNextTrack();
                     }
                 })
             } else {
@@ -681,7 +693,7 @@ class Player implements PlayerSubject {
                 if (this._shouldSkipCurrentTrack()) {
                     return;
                 }
-                setTimeout(() => {
+                this._timeoutPlayNextTrack(() => {
                     this._replaceCurrentTrackAudio(
                         this.currentTrack,
                         false,
@@ -694,7 +706,7 @@ class Player implements PlayerSubject {
                             this.play();
                         }
                     });
-                }, 5000)
+                 });
             }
         });
         if (autoplay) {
