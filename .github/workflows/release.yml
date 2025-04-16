@@ -29,8 +29,8 @@ jobs:
 
           jq ".version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"" src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
 
-          python3 -c "import re;f='src-tauri/Cargo.toml';d=open(f).read();d=re.sub(r'^version = \"[0-9a-zA-Z\.-]+\"', f'version = \"'+$(git describe --tags | sed 's/-[0-9]*-.*//g')+'\"', d, flags=re.MULTILINE);open(f, 'w').write(d)"
-
+          sed -i "s/version = \"0.0.0\"/version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"/g" src-tauri/Cargo.toml
+          
           echo $(git describe --tags | sed 's/-[0-9]*-.*//g')
 
       - name: Upload Artifacts for Windows
