@@ -134,6 +134,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: source
+      - name: Install OpenSSL via Chocolatey
+        shell: powershell
+        run: |
+            choco install openssl -y
       - name: Setup Nodejs
         uses: actions/setup-node@v3
         with:

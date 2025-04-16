@@ -42,3 +42,17 @@ else
 fi
 
 bash .github/actions/build.sh
+# 如果上面的路径不正确，尝试使用相对路径
+if [ ! -f .github/actions/build.sh ]; then
+    echo "找不到build.sh，尝试其他路径"
+    # 尝试在当前目录查找
+    if [ -f build.sh ]; then
+        bash build.sh
+    # 尝试在父目录查找
+    elif [ -f ../build.sh ]; then
+        bash ../build.sh
+    else
+        echo "无法找到build.sh文件，构建失败"
+        exit 1
+    fi
+fi
