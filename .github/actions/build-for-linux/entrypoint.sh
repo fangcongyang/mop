@@ -8,6 +8,8 @@ npm install pnpm -g
 rustup target add "$INPUT_TARGET"
 rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 
+apt-get install -y libglib2.0-dev pkg-config openssl libssl-dev
+
 if [ "$INPUT_TARGET" = "x86_64-unknown-linux-gnu" ]; then
     apt-get update
     apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
