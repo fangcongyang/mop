@@ -34,7 +34,7 @@ jobs:
           echo $(git describe --tags | sed 's/-[0-9]*-.*//g')
 
       - name: Upload Artifacts for Windows
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: source
           path: ./*
@@ -83,13 +83,13 @@ jobs:
           sudo mv src-tauri/target/x86_64-apple-darwin/release/bundle/macos/mop.app.tar.gz src-tauri/target/x86_64-apple-darwin/release/bundle/macos/mop_${{needs.change-version.outputs.version}}_x64.app.tar.gz
           sudo mv src-tauri/target/x86_64-apple-darwin/release/bundle/macos/mop.app.tar.gz.sig src-tauri/target/x86_64-apple-darwin/release/bundle/macos/mop_${{needs.change-version.outputs.version}}_x64.app.tar.gz.sig
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos_${{ matrix.target }}_dmg
           path: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
           if-no-files-found: error
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: macos_${{ matrix.target }}_updater
           path: src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app*
@@ -152,7 +152,7 @@ jobs:
           $env:TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}"
           pnpm tauri build -b nsis,updater --target ${{ matrix.target }}
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: windows_${{ matrix.target }}
           path: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*setup*
@@ -204,14 +204,14 @@ jobs:
             target: ${{ matrix.target }}
             toolchain: ${{ matrix.toolchain }}
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux_${{ matrix.target }}_deb
           path: src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
           if-no-files-found: error
       - name: Upload Artifacts
         if: matrix.target == 'x86_64-unknown-linux-gnu'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: linux_${{ matrix.target }}_appimage
           path: src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage*
