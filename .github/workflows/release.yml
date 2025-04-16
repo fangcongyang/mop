@@ -25,11 +25,11 @@ jobs:
           echo "VERSION=$(git describe --tags | sed 's/-[0-9]*-.*//g')" >> "$GITHUB_OUTPUT"
       - name: Change Version for Windows
         run: |
-          sed -i "s/\"version\":.*/\"version\": \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\",/g" package.json
+          jq ".version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"" package.json > package.json.tmp && mv package.json.tmp package.json
 
           jq ".version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"" src-tauri/tauri.conf.json > src-tauri/tauri.conf.json.tmp && mv src-tauri/tauri.conf.json.tmp src-tauri/tauri.conf.json
 
-          sed -i "s/version = \"0.0.0\"/version = \"$(git describe --tags | sed 's/-[0-9]*-.*//g')\"/g" src-tauri/Cargo.toml
+          python3 -c "import re;f='src-tauri/Cargo.toml';d=open(f).read();d=re.sub(r'^version = \"[0-9a-zA-Z\.-]+\"', f'version = \"'+$(git describe --tags | sed 's/-[0-9]*-.*//g')+'\"', d, flags=re.MULTILINE);open(f, 'w').write(d)"
 
           echo $(git describe --tags | sed 's/-[0-9]*-.*//g')
 

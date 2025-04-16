@@ -11,7 +11,7 @@ inputs:
         description: 'Rust Toolchain'
 runs:
     using: 'docker'
-    image: './Dockerfile'
+    image: 'Dockerfile'
     args:
         - ${{ inputs.target }}
         - ${{ inputs.toolchain }}
