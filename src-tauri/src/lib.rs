@@ -203,7 +203,9 @@ fn create_window(app: &App<Wry>) -> anyhow::Result<WebviewWindow<Wry>, Box<dyn s
             .resizable(true)
             .decorations(false);
         #[cfg(not(target_os = "macos"))]
-        webview_window = webview_window.transparent(true);
+        {
+            webview_window = webview_window.transparent(true);
+        }
     }
 
     #[allow(unused_assignments)]
