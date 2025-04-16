@@ -44,7 +44,7 @@ impl DownloadStatus {
     fn to_string(&self) -> String {
         match self {
             DownloadStatus::BEGIN => "begin".to_owned(),
-            DownloadStatus::PROGRESS => "process".to_owned(),
+            DownloadStatus::PROGRESS => "progress".to_owned(),
             DownloadStatus::END => "end".to_owned(),
             DownloadStatus::ERROR => "error".to_owned(),
         }
@@ -134,7 +134,6 @@ pub async fn download_file_task_async(
             while let Ok(Some(chunk)) = stream.try_next().await {
                 file.write_all(&chunk).await?;
                 downloaded += chunk.len() as u64;
-
                 tx.send(downloaded).ok(); // **更新进度**
             }
 
