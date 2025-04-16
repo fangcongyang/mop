@@ -49,6 +49,8 @@ jobs:
 
     runs-on: ${{ matrix.platform }}
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
       - uses: actions/download-artifact@v4
         with:
           name: source
@@ -59,7 +61,7 @@ jobs:
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
       - name: Install OpenSSL for macOS
-        run: brew install openssl
+        run: brew install openssl openssl@3
       - name: install dependencies
         run: |
           rustup target add ${{ matrix.target }}
@@ -138,8 +140,8 @@ jobs:
           node-version: 18
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
-      - name: Install OpenSSL for macOS
-        run: brew install openssl
+      # Windows doesn't need OpenSSL installation via brew
+      # OpenSSL is typically bundled with Rust on Windows
       - name: install dependencies
         run: |
           rustup target add ${{ matrix.target }}
