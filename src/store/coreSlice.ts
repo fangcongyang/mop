@@ -266,7 +266,7 @@ export const likeATrack = createAsyncThunk(
             );
         });
 
-        thunkAPI.dispatch(fetchLikedSongsWithDetails);
+        thunkAPI.dispatch(fetchLikedSongsWithDetails())
         if (like === false) {
             return state.core.liked.songs.filter((d: number) => d !== id);
         } else {
