@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useAppDispatch } from "@/store/hooks";
-import styles from './loginAccount.module.scss';
+import styles from './LoginAccount.module.scss';
 import SvgIcon from '@/components/SvgIcon';
 import auth from '@/utils/auth';
 import QRCode from 'qrcode';
