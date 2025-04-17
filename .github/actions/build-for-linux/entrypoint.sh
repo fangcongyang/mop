@@ -24,7 +24,7 @@ case "$INPUT_TARGET" in
         apt-get install -y --no-install-recommends --no-install-suggests pkg-config   libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev build-essential libfuse2 file
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
-        export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+        export PKG_CONFIG_LIBDIR=/usr/lib/x86_64-linux-gnu/pkgconfig
         # 验证pkg-config配置
         if ! pkg-config --exists glib-2.0; then
             echo "ERROR: glib-2.0.pc configuration verification failed"
@@ -40,7 +40,7 @@ case "$INPUT_TARGET" in
                         libglib2.0-dev:i386 libwebkit2gtk-4.1-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
                         librsvg2-dev:i386 patchelf:i386 libxdo-dev:i386 libxcb1:i386 libxrandr2:i386 libdbus-1-3:i386 \
                         libayatana-appindicator3-dev:i386 build-essential:i386 libfuse2:i386 file:i386
-        export PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
+        export PKG_CONFIG_LIBDIR=/usr/lib/i386-linux-gnu/pkgconfig
         export PKG_CONFIG_SYSROOT_DIR=/
         ;;
     aarch64-unknown-linux-gnu)
@@ -56,7 +56,7 @@ case "$INPUT_TARGET" in
         export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
         export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
         export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
-        export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
+        export PKG_CONFIG_LIBDIR=/usr/lib/aarch64-linux-gnu/pkgconfig
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     armv7-unknown-linux-gnueabihf)
@@ -71,7 +71,7 @@ case "$INPUT_TARGET" in
         export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
         export CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc
         export CXX_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-g++
-        export PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
+        export PKG_CONFIG_LIBDIR=/usr/lib/arm-linux-gnueabihf/pkgconfig
         export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     *)
@@ -79,6 +79,6 @@ case "$INPUT_TARGET" in
         ;;
 esac
 
-echo '编译时环境变量 PKG_CONFIG_PATH=$PKG_CONFIG_PATH'
+echo '编译时环境变量 PKG_CONFIG_LIBDIR=$PKG_CONFIG_LIBDIR'
 pkg-config --cflags --libs glib-2.0
 bash .github/actions/build.sh
