@@ -23,6 +23,7 @@ case "$INPUT_TARGET" in
         apt-get update
         apt-get install -y libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
+        echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
         ;;
@@ -45,6 +46,7 @@ case "$INPUT_TARGET" in
                            g++-aarch64-linux-gnu libc6-dev-arm64-cross libglib2.0-dev:arm64 libssl-dev:arm64 \
                            libwebkit2gtk-4.0-dev:arm64 libgtk-3-dev:arm64 patchelf:arm64 librsvg2-dev:arm64 \
                            libxdo-dev:arm64 libxcb1:arm64 libxrandr2:arm64 libdbus-1-3:arm64 libayatana-appindicator3-dev:arm64
+        echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
         export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
         export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
