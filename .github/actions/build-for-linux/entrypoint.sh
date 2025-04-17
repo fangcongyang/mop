@@ -65,6 +65,7 @@ case "$INPUT_TARGET" in
         export CXX_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-g++
         export PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig
         export PKG_CONFIG_ALLOW_CROSS=1
+        ;;
     *)
         echo "Unknown target: $INPUT_TARGET" && exit 1
         ;;
