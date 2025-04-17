@@ -16,8 +16,8 @@ apt-get install -y pkg-config openssl libssl-dev
 # 安装 glib 依赖
 sudo apt-get update
 sudo dpkg --add-architecture amd64
-sudo apt-get install -y libglib2.0-dev:amd64 libssl-dev:amd64 pkg-config:amd64
-sudo apt-get install -y --reinstall glib-2.0-dev:amd64
+sudo apt-get install -y libglib2.0-dev libssl-dev pkg-config
+sudo apt-get install -y --reinstall glib-2.0-dev
 
 echo "验证glib安装状态:"
 dpkg -l | grep glib-2.0
