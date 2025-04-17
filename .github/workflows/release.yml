@@ -44,6 +44,8 @@ jobs:
           if-no-files-found: error
   build:
     needs: change-version
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -52,18 +54,8 @@ jobs:
             args: ''
           - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin --target x86_64-apple-darwin'
-          - os: ubuntu-22.04
-            target: x86_64-unknown-linux-gnu
-            toolchain: stable-x86_64-unknown-linux-gnu
-          # - os: ubuntu-22.04
-          #   target: i686-unknown-linux-gnu
-          #   toolchain: stable-i686-unknown-linux-gnu
-          - os: ubuntu-22.04
-            target: aarch64-unknown-linux-gnu
-            toolchain: stable-aarch64-unknown-linux-gnu
-          # - os: ubuntu-22.04
-          #   target: armv7-unknown-linux-gnueabihf
-          #   toolchain: stable-armv7-unknown-linux-gnueabihf
+          - platform: 'ubuntu-22.04'
+            args: ''
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/download-artifact@v4
