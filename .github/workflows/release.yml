@@ -9,7 +9,7 @@ permissions: write-all
  
 jobs:
   change-version:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       version: ${{ steps.outputstep.outputs.VERSION }}
     steps:
@@ -237,7 +237,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [ubuntu-latest]
+        platform: [ubuntu-22.04]
         target:
           [
             x86_64-unknown-linux-gnu,
@@ -246,16 +246,16 @@ jobs:
             # armv7-unknown-linux-gnueabihf,
           ]
         include:
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
             toolchain: stable-x86_64-unknown-linux-gnu
-          # - os: ubuntu-latest
+          # - os: ubuntu-22.04
           #   target: i686-unknown-linux-gnu
           #   toolchain: stable-i686-unknown-linux-gnu
-          - os: ubuntu-latest
+          - os: ubuntu-22.04
             target: aarch64-unknown-linux-gnu
             toolchain: stable-aarch64-unknown-linux-gnu
-          # - os: ubuntu-latest
+          # - os: ubuntu-22.04
           #   target: armv7-unknown-linux-gnueabihf
           #   toolchain: stable-armv7-unknown-linux-gnueabihf
     runs-on: ${{ matrix.platform }}
