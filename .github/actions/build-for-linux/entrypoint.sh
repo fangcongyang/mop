@@ -10,7 +10,7 @@ rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 
 # 安装通用依赖
 apt-get update
-apt-get install -y pkg-config openssl libssl-dev libglib2.0-dev
+apt-get install -y pkg-config openssl libssl-dev
 
 if [ "$INPUT_TARGET" = "x86_64-unknown-linux-gnu" ]; then
     apt-get update

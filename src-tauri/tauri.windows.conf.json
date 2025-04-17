@@ -1,7 +1,7 @@
 {
     "identifier": "com.tauri.mop",
     "bundle": {
-        "resources": ["./resources", "./initData", "./assets"],
+        "resources": ["./initData", "./assets"],
         "windows": {
             "allowDowngrades": true,
             "certificateThumbprint": null,

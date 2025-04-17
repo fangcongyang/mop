@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo apt-get update
+sudo apt-get install -y libglib2.0-dev
+
 # pnpm install --resolution-only
 pnpm install
 if [ "$INPUT_TARGET" = "x86_64-unknown-linux-gnu" ]; then

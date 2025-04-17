@@ -60,10 +60,21 @@ jobs:
           node-version: 18
       - name: Install Rust Stable
         uses: dtolnay/rust-toolchain@stable
-      - name: Install OpenSSL for macOS
+      - name: Install OpenSSL for macOS (arm64)
+        if: matrix.target == 'aarch64-apple-darwin'
         run: |
           brew install openssl@3 pkg-config
           OPENSSL_PREFIX=$(brew --prefix openssl@3)
+          echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
+          echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$OPENSSL_PREFIX/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$OPENSSL_PREFIX/include" >> $GITHUB_ENV
+      - name: Install OpenSSL for macOS (x86_64)
+        if: matrix.target == 'x86_64-apple-darwin'
+        run: |
+          brew install openssl@1.1 pkg-config
+          OPENSSL_PREFIX=$(brew --prefix openssl@1.1)
           echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
           echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
@@ -88,11 +99,6 @@ jobs:
           echo "OPENSSL_DIR: $OPENSSL_DIR"
           pkg-config --cflags --libs openssl  # Verify OpenSSL path
           pnpm tauri build --target ${{ matrix.target }}
-      - name: Change File Name
-        if: matrix.target == 'aarch64-apple-darwin'
-        run: |
-          sudo mv src-tauri/target/aarch64-apple-darwin/release/bundle/macos/mop.app.tar.gz src-tauri/target/aarch64-apple-darwin/release/bundle/macos/mop_${{needs.change-version.outputs.version}}_aarch64.app.tar.gz
-          sudo mv src-tauri/target/aarch64-apple-darwin/release/bundle/macos/mop.app.tar.gz.sig src-tauri/target/aarch64-apple-darwin/release/bundle/macos/mop_${{needs.change-version.outputs.version}}_aarch64.app.tar.gz.sig
       - name: Change File Name
         if: matrix.target == 'x86_64-apple-darwin'
         run: |
