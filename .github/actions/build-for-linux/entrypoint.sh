@@ -12,6 +12,19 @@ rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 apt-get update
 apt-get install -y pkg-config openssl libssl-dev
 
+
+# 安装 glib 依赖
+sudo apt-get update
+sudo dpkg --add-architecture amd64
+sudo apt-get install -y libglib2.0-dev:amd64 libssl-dev:amd64 pkg-config:amd64
+sudo apt-get install -y --reinstall glib-2.0-dev:amd64
+
+echo "验证glib安装状态:"
+dpkg -l | grep glib-2.0
+echo "当前PKG_CONFIG_PATH配置:"
+echo $PKG_CONFIG_PATH
+pkg-config --modversion glib-2.0
+
 if [ "$INPUT_TARGET" = "x86_64-unknown-linux-gnu" ]; then
     apt-get update
     apt-get install -y libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
