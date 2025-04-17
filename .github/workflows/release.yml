@@ -63,12 +63,12 @@ jobs:
       - name: Install OpenSSL for macOS
         run: |
           brew install openssl@3 pkg-config
-          openssl_prefix=$(brew --prefix openssl@3)
-          echo "OPENSSL_DIR=$openssl_prefix" >> $GITHUB_ENV
-          echo "OPENSSL_ROOT_DIR=$openssl_prefix" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$openssl_prefix/lib/pkgconfig" >> $GITHUB_ENV
-          echo "LDFLAGS=-L$openssl_prefix/lib" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I$openssl_prefix/include" >> $GITHUB_ENV
+          OPENSSL_PREFIX=$(brew --prefix openssl@3)
+          echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
+          echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
+          echo "LDFLAGS=-L$OPENSSL_PREFIX/lib" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$OPENSSL_PREFIX/include" >> $GITHUB_ENV
       - name: install dependencies
         run: |
           rustup target add ${{ matrix.target }}
@@ -80,14 +80,13 @@ jobs:
         run: pnpm install --no-frozen-lockfile
       - name: Build and Package
         env:
-          OPENSSL_DIR: $(brew --prefix openssl@3)
           OPENSSL_NO_VENDOR: 1
           TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           PKG_CONFIG_ALLOW_SYSTEM_CFLAGS: 1
         run: |
           echo "OPENSSL_DIR: $OPENSSL_DIR"
-          pkg-config --cflags --libs openssl  # 验证 OpenSSL 路径
+          pkg-config --cflags --libs openssl  # Verify OpenSSL path
           pnpm tauri build --target ${{ matrix.target }}
       - name: Change File Name
         if: matrix.target == 'aarch64-apple-darwin'
@@ -154,9 +153,12 @@ jobs:
       - name: Set OpenSSL Path
         shell: powershell
         run: |
-          $OPENSSL_DIR = "C:\Program Files\OpenSSL\bin"
-          echo "Adding OpenSSL to PATH: $opensslPath"
-          Add-Content $env:GITHUB_PATH "$opensslPath"
+          $opensslPath = "C:\Program Files\OpenSSL"
+          echo "Adding OpenSSL to PATH: $opensslPath\bin"
+          Add-Content $env:GITHUB_PATH "$opensslPath\bin"
+          echo "OPENSSL_DIR=$opensslPath" >> $env:GITHUB_ENV
+          echo "OPENSSL_ROOT_DIR=$opensslPath" >> $env:GITHUB_ENV
+          echo "PKG_CONFIG_PATH=$opensslPath\lib\pkgconfig" >> $env:GITHUB_ENV
       - name: Setup Nodejs
         uses: actions/setup-node@v3
         with:
@@ -177,10 +179,11 @@ jobs:
         run: pnpm install
       - name: Build and Package
         env:
-          OPENSSL_DIR: $OPENSSL_DIR
+          OPENSSL_NO_VENDOR: 1
         run: |
           $env:TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
           $env:TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}"
+          echo "Using OpenSSL from: $env:OPENSSL_DIR"
           pnpm tauri build -b nsis,updater --target ${{ matrix.target }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
