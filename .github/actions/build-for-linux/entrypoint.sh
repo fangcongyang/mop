@@ -20,11 +20,11 @@ rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 # Add architecture and install target-specific dependencies
 case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
-        apt-get update
-        apt-get install -y --no-install-recommends --no-install-suggests pkg-config   libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends --no-install-suggests pkg-config libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev build-essential libfuse2 file
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
-        # export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+        export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
         # 验证pkg-config配置
         if ! pkg-config --exists glib-2.0; then
             echo "ERROR: glib-2.0.pc configuration verification failed"
