@@ -21,10 +21,15 @@ rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
         apt-get update
-        apt-get install -y libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
+        apt-get install -y pkg-config libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
+        # 验证pkg-config配置
+        if ! pkg-config --exists glib-2.0; then
+            echo "ERROR: glib-2.0.pc configuration verification failed"
+            exit 1
+        fi
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
         ;;
     i686-unknown-linux-gnu)
@@ -73,4 +78,6 @@ case "$INPUT_TARGET" in
         ;;
 esac
 
+echo '编译时环境变量 PKG_CONFIG_PATH=$PKG_CONFIG_PATH'
+pkg-config --cflags --libs glib-2.0
 bash .github/actions/build.sh
