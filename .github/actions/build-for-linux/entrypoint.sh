@@ -17,27 +17,11 @@ fi
 rustup target add "$INPUT_TARGET"
 rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 
-# Install common dependencies
-apt-get update
-apt-get install -y pkg-config openssl libssl-dev glib2.0-dev
-apt-get clean
-rm -rf /var/lib/apt/lists/*
-
-# Install pkg-config if not already installed
-which pkg-config || apt-get update && apt-get install -y pkg-config
-
-# Verify glib-2.0.pc is available in the system
-find /usr -name "glib-2.0.pc" || echo "Warning: glib-2.0.pc not found in /usr"
-
-# Ensure PKG_CONFIG_PATH is initialized
-export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-}
-
-
 # Add architecture and install target-specific dependencies
 case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
         apt-get update
-        apt-get install -y glib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
+        apt-get install -y libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
         export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
@@ -49,7 +33,7 @@ case "$INPUT_TARGET" in
         dpkg --add-architecture i386
         apt-get update
         apt-get install -y libstdc++6:i386 libgdk-pixbuf2.0-dev:i386 libatomic1:i386 gcc-multilib g++-multilib \
-                           glib2.0-dev:i386 libwebkit2gtk-4.0-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
+                           libglib2.0-dev:i386 libwebkit2gtk-4.0-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
                            librsvg2-dev:i386 patchelf:i386 libxdo-dev:i386 libxcb1:i386 libxrandr2:i386 libdbus-1-3:i386 \
                            libayatana-appindicator3-dev:i386
         export PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
@@ -65,7 +49,7 @@ case "$INPUT_TARGET" in
         fi
         apt-get update
         apt-get install -y libncurses6:arm64 libtinfo6:arm64 linux-libc-dev:arm64 libncursesw6:arm64 libcups2:arm64 \
-                           g++-aarch64-linux-gnu libc6-dev-arm64-cross glib2.0-dev:arm64 libssl-dev:arm64 \
+                           g++-aarch64-linux-gnu libc6-dev-arm64-cross libglib2.0-dev:arm64 libssl-dev:arm64 \
                            libwebkit2gtk-4.0-dev:arm64 libgtk-3-dev:arm64 patchelf:arm64 librsvg2-dev:arm64 \
                            libxdo-dev:arm64 libxcb1:arm64 libxrandr2:arm64 libdbus-1-3:arm64 libayatana-appindicator3-dev:arm64
         export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
@@ -84,7 +68,7 @@ case "$INPUT_TARGET" in
         fi
         apt-get update
         apt-get install -y libncurses6:armhf libtinfo6:armhf linux-libc-dev:armhf libncursesw6:armhf libcups2:armhf \
-                           g++-arm-linux-gnueabihf libc6-dev-armhf-cross glib2.0-dev:armhf libssl-dev:armhf \
+                           g++-arm-linux-gnueabihf libc6-dev-armhf-cross libglib2.0-dev:armhf libssl-dev:armhf \
                            libwebkit2gtk-4.0-dev:armhf libgtk-3-dev:armhf patchelf:armhf librsvg2-dev:armhf \
                            libxdo-dev:armhf libxcb1:armhf libxrandr2:armhf libdbus-1-3:armhf libayatana-appindicator3-dev:armhf
         export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
