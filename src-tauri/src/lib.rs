@@ -74,23 +74,6 @@ pub fn run() {
                 );
             }
 
-            #[cfg(target_os = "linux")]
-            {
-                let app_name = app
-                    .app_handle()
-                    .config()
-                    .product_name
-                    .clone()
-                    .unwrap_or("".to_owned());
-                mpris_linux::init_mpris(app_name);
-
-                app.listen("updateTrackInfo", move |event| {
-                    let track =
-                        serde_json::from_str::<mpris_linux::TrackInfo>(event.payload()).unwrap();
-                    mpris_linux::update_track_info(track);
-                });
-            }
-
             #[cfg(desktop)]
             {
                 use app::menu::{self};
