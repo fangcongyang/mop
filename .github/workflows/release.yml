@@ -72,14 +72,12 @@ jobs:
           echo "CPPFLAGS=-I$OPENSSL_PREFIX/include" >> $GITHUB_ENV
       - name: Install OpenSSL for macOS (x86_64)
         if: matrix.target == 'x86_64-apple-darwin'
+        id: openssl_x86 # Add an ID to this step
         run: |
-          brew install openssl@1.1 pkg-config
-          OPENSSL_PREFIX=$(brew --prefix openssl@1.1)
-          echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
-          echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
-          echo "LDFLAGS=-L$OPENSSL_PREFIX/lib" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I$OPENSSL_PREFIX/include" >> $GITHUB_ENV
+          # Ensure Homebrew uses x86_64 architecture
+          arch -x86_64 brew install openssl@1.1 pkg-config
+          # Output the prefix path for later use
+          echo "openssl_prefix=$(arch -x86_64 brew --prefix openssl@1.1)" >> $GITHUB_OUTPUT
       - name: install dependencies
         run: |
           rustup target add ${{ matrix.target }}
@@ -92,13 +90,42 @@ jobs:
       - name: Build and Package
         env:
           OPENSSL_NO_VENDOR: 1
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          # Explicitly link OpenSSL libraries for Windows
+          RUSTFLAGS: -L native=C:\Program Files\OpenSSL\lib
           TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
           PKG_CONFIG_ALLOW_SYSTEM_CFLAGS: 1
+          # Conditionally set core OpenSSL env vars using step output for x86_64 or GITHUB_ENV for arm64
+          OPENSSL_DIR: ${{ matrix.target == 'x86_64-apple-darwin' && steps.openssl_x86.outputs.openssl_prefix || env.OPENSSL_DIR }}
+          OPENSSL_ROOT_DIR: ${{ matrix.target == 'x86_64-apple-darwin' && steps.openssl_x86.outputs.openssl_prefix || env.OPENSSL_ROOT_DIR }}
+          # Other vars (LIB_DIR, INCLUDE_DIR, PKG_CONFIG_PATH, LDFLAGS, CPPFLAGS) will be set in the run script
         run: |
           echo "OPENSSL_DIR: $OPENSSL_DIR"
-          pkg-config --cflags --libs openssl  # Verify OpenSSL path
-          pnpm tauri build --target ${{ matrix.target }}
+          echo "OPENSSL_ROOT_DIR: $OPENSSL_ROOT_DIR"
+
+          if [ "${{ matrix.target }}" = "x86_64-apple-darwin" ]; then
+            # Export paths specifically for the x86_64 build environment using step output
+            export OPENSSL_LIB_DIR="${{ steps.openssl_x86.outputs.openssl_prefix }}/lib"
+            export OPENSSL_INCLUDE_DIR="${{ steps.openssl_x86.outputs.openssl_prefix }}/include"
+            export PKG_CONFIG_PATH="${{ steps.openssl_x86.outputs.openssl_prefix }}/lib/pkgconfig"
+            export LDFLAGS="-L${{ steps.openssl_x86.outputs.openssl_prefix }}/lib"
+            export CPPFLAGS="-I${{ steps.openssl_x86.outputs.openssl_prefix }}/include"
+            export LIBRARY_PATH="${{ steps.openssl_x86.outputs.openssl_prefix }}/lib"
+            echo "Exported OPENSSL_LIB_DIR: $OPENSSL_LIB_DIR"
+            echo "Exported OPENSSL_INCLUDE_DIR: $OPENSSL_INCLUDE_DIR"
+            echo "Exported PKG_CONFIG_PATH: $PKG_CONFIG_PATH"
+            echo "Exported LDFLAGS: $LDFLAGS"
+            echo "Exported CPPFLAGS: $CPPFLAGS"
+            echo "Exported LIBRARY_PATH: $LIBRARY_PATH"
+            arch -x86_64 pkg-config --cflags --libs openssl  # Verify OpenSSL path
+            arch -x86_64 pnpm tauri build --target ${{ matrix.target }}
+          else # aarch64
+            # Use paths set via GITHUB_ENV in the arm64 install step
+            echo "Using PKG_CONFIG_PATH (from GITHUB_ENV): $PKG_CONFIG_PATH"
+            echo "Using LDFLAGS (from GITHUB_ENV): $LDFLAGS"
+            echo "Using CPPFLAGS (from GITHUB_ENV): $CPPFLAGS"
+            pkg-config --cflags --libs openssl  # Verify OpenSSL path
+            pnpm tauri build --target ${{ matrix.target }}
+          fi
       - name: Change File Name
         if: matrix.target == 'x86_64-apple-darwin'
         run: |
@@ -121,14 +148,14 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: CHANGELOG.md
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/dmg/*.dmg
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v1
         with:
           body_path: CHANGELOG.md
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/macos/*.app*
   build-for-windows:
     needs: change-version
@@ -186,10 +213,16 @@ jobs:
       - name: Build and Package
         env:
           OPENSSL_NO_VENDOR: 1
+          # OPENSSL_DIR is set in a previous step
         run: |
           $env:TAURI_PRIVATE_KEY="${{ secrets.TAURI_PRIVATE_KEY }}"
           $env:TAURI_KEY_PASSWORD="${{ secrets.TAURI_KEY_PASSWORD }}"
+          # Set OpenSSL lib and include directories for openssl-sys crate
+          $env:OPENSSL_LIB_DIR = "$($env:OPENSSL_DIR)\lib"
+          $env:OPENSSL_INCLUDE_DIR = "$($env:OPENSSL_DIR)\include"
           echo "Using OpenSSL from: $env:OPENSSL_DIR"
+          echo "Setting OPENSSL_LIB_DIR=$env:OPENSSL_LIB_DIR"
+          echo "Setting OPENSSL_INCLUDE_DIR=$env:OPENSSL_INCLUDE_DIR"
           pnpm tauri build -b nsis,updater --target ${{ matrix.target }}
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -202,7 +235,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: CHANGELOG.md
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/nsis/*setup*
   build-for-linux:
     needs: change-version
@@ -263,14 +296,14 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: CHANGELOG.md
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/appimage/*.AppImage*
       - name: Upload Release
         if: startsWith(github.ref, 'refs/tags')
         uses: softprops/action-gh-release@v1
         with:
           body_path: CHANGELOG.md
-          token: ${{ secrets.TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: src-tauri/target/${{ matrix.target }}/release/bundle/deb/*.deb
   update:
     needs: [build-for-macos, build-for-windows, build-for-linux]
