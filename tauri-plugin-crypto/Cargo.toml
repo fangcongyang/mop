@@ -15,8 +15,8 @@ thiserror = "2.0.12"
 base64 = "0.22"
 hex = "0.4" 
 log = "0.4.19"
-openssl-sys =  { version = "0.9.103", features = [] }
-openssl = { version = "0.10.71", features = [] }
+openssl-sys =  { version = "0.9.107", features = ["vendored"] }
+openssl = { version = "0.10.72", features = ["vendored"] }
 
 [target.'cfg(target_os = "windows")'.dependencies]
 

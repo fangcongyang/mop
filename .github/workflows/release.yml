@@ -82,27 +82,14 @@ jobs:
         if: matrix.platform == 'windows-latest' # This must match the platform value defined above.
         run: |
           choco install openssl -y
-          $opensslPath = "C:\Program Files\OpenSSL"
-          echo "Adding OpenSSL to PATH: $opensslPath\bin"
-          Add-Content $env:GITHUB_PATH "$opensslPath\bin"
-          echo "OPENSSL_DIR=$opensslPath" >> $env:GITHUB_ENV
-          echo "OPENSSL_ROOT_DIR=$opensslPath" >> $env:GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$opensslPath\lib\pkgconfig" >> $env:GITHUB_ENV
+          echo "::set-env name=OPENSSL_DIR::C:\OpenSSL-Win64"
+          echo "::set-env name=LIB::$OPENSSL_DIR\lib"
+          echo "::set-env name=INCLUDE::$OPENSSL_DIR\include"
       - name: install dependencies (macos only)
-        if: matrix.target == 'aarch64-apple-darwin'
+        if: matrix.platform == 'macos-latest'
         run: |
           brew install openssl@3 pkg-config
           OPENSSL_PREFIX=$(brew --prefix openssl@3)
-          echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
-          echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
-          echo "LDFLAGS=-L$OPENSSL_PREFIX/lib" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I$OPENSSL_PREFIX/include" >> $GITHUB_ENV
-      - name: Install OpenSSL for macOS (x86_64)
-        if: matrix.target == 'x86_64-apple-darwin'
-        run: |
-          arch -x86_64 brew install openssl@1.1 pkg-config
-          OPENSSL_PREFIX=$(arch -x86_64 brew --prefix openssl@1.1)
           echo "OPENSSL_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
           echo "OPENSSL_ROOT_DIR=$OPENSSL_PREFIX" >> $GITHUB_ENV
           echo "PKG_CONFIG_PATH=$OPENSSL_PREFIX/lib/pkgconfig" >> $GITHUB_ENV
