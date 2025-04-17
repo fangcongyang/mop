@@ -21,7 +21,7 @@ rustup toolchain install --force-non-host "$INPUT_TOOLCHAIN"
 case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
         apt-get update
-        apt-get install -y pkg-config libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
+        apt-get install -y pkg-config libwebkitgtk rust-gtk-sys-devel libproxy-webkitgtk4 webkitgtk4 libsoup libsoup-devel webkitgtk4-devel libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev libssl-dev:i386
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
@@ -37,7 +37,7 @@ case "$INPUT_TARGET" in
         dpkg --add-architecture i386
         apt-get update
         apt-get install -y libstdc++6:i386 libgdk-pixbuf2.0-dev:i386 libatomic1:i386 gcc-multilib g++-multilib \
-                           libglib2.0-dev:i386 libwebkit2gtk-4.0-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
+                           libwebkitgtk rust-gtk-sys-devel libproxy-webkitgtk4 webkitgtk4 libsoup libsoup-devel webkitgtk4-devel libglib2.0-dev:i386 libwebkit2gtk-4.0-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
                            librsvg2-dev:i386 patchelf:i386 libxdo-dev:i386 libxcb1:i386 libxrandr2:i386 libdbus-1-3:i386 \
                            libayatana-appindicator3-dev:i386
         export PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig
@@ -50,7 +50,7 @@ case "$INPUT_TARGET" in
         apt-get update
         apt-get install -y libncurses6:arm64 libtinfo6:arm64 linux-libc-dev:arm64 libncursesw6:arm64 libcups2:arm64 \
                            g++-aarch64-linux-gnu libc6-dev-arm64-cross libglib2.0-dev:arm64 libssl-dev:arm64 \
-                           libwebkit2gtk-4.0-dev:arm64 libgtk-3-dev:arm64 patchelf:arm64 librsvg2-dev:arm64 \
+                           libwebkitgtk rust-gtk-sys-devel libproxy-webkitgtk4 webkitgtk4 libsoup libsoup-devel webkitgtk4-devel libwebkit2gtk-4.0-dev:arm64 libgtk-3-dev:arm64 patchelf:arm64 librsvg2-dev:arm64 \
                            libxdo-dev:arm64 libxcb1:arm64 libxrandr2:arm64 libdbus-1-3:arm64 libayatana-appindicator3-dev:arm64
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
@@ -66,7 +66,7 @@ case "$INPUT_TARGET" in
         apt-get update
         apt-get install -y libncurses6:armhf libtinfo6:armhf linux-libc-dev:armhf libncursesw6:armhf libcups2:armhf \
                            g++-arm-linux-gnueabihf libc6-dev-armhf-cross libglib2.0-dev:armhf libssl-dev:armhf \
-                           libwebkit2gtk-4.0-dev:armhf libgtk-3-dev:armhf patchelf:armhf librsvg2-dev:armhf \
+                           libwebkitgtk rust-gtk-sys-devel libproxy-webkitgtk4 webkitgtk4 libsoup libsoup-devel webkitgtk4-devel libwebkit2gtk-4.0-dev:armhf libgtk-3-dev:armhf patchelf:armhf librsvg2-dev:armhf \
                            libxdo-dev:armhf libxcb1:armhf libxrandr2:armhf libdbus-1-3:armhf libayatana-appindicator3-dev:armhf
         export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
         export CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc
