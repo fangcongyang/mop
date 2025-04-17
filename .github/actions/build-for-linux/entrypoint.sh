@@ -23,14 +23,27 @@ apt-get install -y pkg-config openssl libssl-dev glib2.0-dev
 apt-get clean
 rm -rf /var/lib/apt/lists/*
 
+# Install pkg-config if not already installed
+which pkg-config || apt-get update && apt-get install -y pkg-config
+
+# Verify glib-2.0.pc is available in the system
+find /usr -name "glib-2.0.pc" || echo "Warning: glib-2.0.pc not found in /usr"
+
+# Ensure PKG_CONFIG_PATH is initialized
+export PKG_CONFIG_PATH=${PKG_CONFIG_PATH:-}
+
+
 # Add architecture and install target-specific dependencies
 case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
         apt-get update
         apt-get install -y glib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
                            librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
-        export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
+        # Verify PKG_CONFIG_PATH and glib-2.0.pc
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        pkg-config --exists --print-errors glib-2.0 || echo "Warning: glib-2.0 not found by pkg-config"
         ;;
     i686-unknown-linux-gnu)
         dpkg --add-architecture i386
@@ -39,9 +52,12 @@ case "$INPUT_TARGET" in
                            glib2.0-dev:i386 libwebkit2gtk-4.0-dev:i386 libssl-dev:i386 libgtk-3-dev:i386 \
                            librsvg2-dev:i386 patchelf:i386 libxdo-dev:i386 libxcb1:i386 libxrandr2:i386 libdbus-1-3:i386 \
                            libayatana-appindicator3-dev:i386
-        export PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=/usr/lib/i386-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
         export PKG_CONFIG_SYSROOT_DIR=/
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
+        # Verify PKG_CONFIG_PATH and glib-2.0.pc
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        pkg-config --exists --print-errors glib-2.0 || echo "Warning: glib-2.0 not found by pkg-config"
         ;;
     aarch64-unknown-linux-gnu)
         if ! dpkg --print-foreign-architectures | grep -q arm64; then
@@ -55,9 +71,12 @@ case "$INPUT_TARGET" in
         export CARGO_TARGET_AARCH64_UNKNOWN_LINUX_GNU_LINKER=aarch64-linux-gnu-gcc
         export CC_aarch64_unknown_linux_gnu=aarch64-linux-gnu-gcc
         export CXX_aarch64_unknown_linux_gnu=aarch64-linux-gnu-g++
-        export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
         export PKG_CONFIG_ALLOW_CROSS=1
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
+        # Verify PKG_CONFIG_PATH and glib-2.0.pc
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        pkg-config --exists --print-errors glib-2.0 || echo "Warning: glib-2.0 not found by pkg-config"
         ;;
     armv7-unknown-linux-gnueabihf)
         if ! dpkg --print-foreign-architectures | grep -q armhf; then
@@ -71,9 +90,12 @@ case "$INPUT_TARGET" in
         export CARGO_TARGET_ARMV7_UNKNOWN_LINUX_GNUEABIHF_LINKER=arm-linux-gnueabihf-gcc
         export CC_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-gcc
         export CXX_armv7_unknown_linux_gnueabihf=arm-linux-gnueabihf-g++
-        export PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig:$PKG_CONFIG_PATH
+        export PKG_CONFIG_PATH=/usr/lib/arm-linux-gnueabihf/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig:$PKG_CONFIG_PATH
         export PKG_CONFIG_ALLOW_CROSS=1
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
+        # Verify PKG_CONFIG_PATH and glib-2.0.pc
+        echo "PKG_CONFIG_PATH=$PKG_CONFIG_PATH"
+        pkg-config --exists --print-errors glib-2.0 || echo "Warning: glib-2.0 not found by pkg-config"
         ;;
     *)
         echo "Unknown target: $INPUT_TARGET" && exit 1
