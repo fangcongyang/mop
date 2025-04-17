@@ -22,7 +22,7 @@ case "$INPUT_TARGET" in
     x86_64-unknown-linux-gnu)
         apt-get update
         apt-get install -y pkg-config libglib2.0-dev libgtk-3-dev libwebkit2gtk-4.0-dev libayatana-appindicator3-dev \
-                           librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev
+                           librsvg2-dev patchelf libxdo-dev libxcb1 libxrandr2 libdbus-1-3 libssl-dev libssl-dev:i386
         echo "Found glib-2.0.pc at: $(find / -name glib-2.0.pc)"
         export PKG_CONFIG_PATH=/usr/lib/x86_64-linux-gnu/pkgconfig
         # 验证pkg-config配置
@@ -31,6 +31,7 @@ case "$INPUT_TARGET" in
             exit 1
         fi
         export PKG_CONFIG_ALLOW_SYSTEM_CFLAGS=1
+        export PKG_CONFIG_ALLOW_CROSS=1
         ;;
     i686-unknown-linux-gnu)
         dpkg --add-architecture i386
