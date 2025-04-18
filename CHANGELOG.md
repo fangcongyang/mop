@@ -7,6 +7,15 @@
 
 
 
+# [0.0.0](https://github.com/fangcongyang/mop/compare/0.0.51...0.0.0) (2025-04-18)
+
+
+### ✨ Features | 新功能
+
+* 添加自动更新功能并配置相关依赖 ([](https://github.com/fangcongyang/mop/commit/d476f8f))
+
+
+
 ## [0.0.51](https://github.com/fangcongyang/mop/compare/0.0.50...0.0.51) (2025-04-18)
 
 
@@ -156,48 +165,7 @@
 
 
 
-## [0.0.11](https://github.com/fangcongyang/mop/compare/0.0.10...0.0.11) (2025-04-16)
-
-
-### 🐛 Bug Fixes | Bug 修复
-
-* 修复likeATrack中dispatch调用缺少括号的问题 ([](https://github.com/fangcongyang/mop/commit/56759d4))
-
-
-
-## [0.0.10](https://github.com/fangcongyang/mop/compare/0.0.9...0.0.10) (2025-04-16)
-
-
-
-## [0.0.9](https://github.com/fangcongyang/mop/compare/0.0.8...0.0.9) (2025-04-16)
-
-
-
-## [0.0.8](https://github.com/fangcongyang/mop/compare/0.0.7...0.0.8) (2025-04-16)
-
-
-
-## [0.0.6](https://github.com/fangcongyang/mop/compare/v0.0.5...v0.0.6) (2025-04-16)
-
-
-
-## [0.0.5](https://github.com/fangcongyang/mop/compare/v0.0.4...v0.0.5) (2025-04-16)
-
-
-
-## [0.0.4](https://github.com/fangcongyang/mop/compare/v0.0.3...v0.0.4) (2025-04-16)
-
-
-
-## [0.0.3](https://github.com/fangcongyang/mop/compare/v0.0.2...v0.0.3) (2025-04-16)
-
-
-
-## [0.0.2](https://github.com/fangcongyang/mop/compare/v0.0.1...v0.0.2) (2025-04-16)
-
-
-
-## [0.0.1](https://github.com/fangcongyang/mop/compare/9edb66f...v0.0.1) (2025-04-16)
+## [0.0.11](https://github.com/fangcongyang/mop/compare/9edb66f...0.0.11) (2025-04-16)
 
 
 ### ✨ Features | 新功能
@@ -220,6 +188,7 @@
 * 修复歌曲信息获取失败导致一直提示歌曲加载中问题 ([](https://github.com/fangcongyang/mop/commit/a4eb3e0))
 * 修复歌曲loading bug ([](https://github.com/fangcongyang/mop/commit/a9649b6))
 * 修复配置get_string方法无法获取number值问题 ([](https://github.com/fangcongyang/mop/commit/3ae3d2c))
+* 修复likeATrack中dispatch调用缺少括号的问题 ([](https://github.com/fangcongyang/mop/commit/56759d4))
 * bug修复 ([](https://github.com/fangcongyang/mop/commit/d601126))
 * bug修复 ([](https://github.com/fangcongyang/mop/commit/1aa4c85))
 * ytdl代理问题 ([](https://github.com/fangcongyang/mop/commit/9edb66f))
