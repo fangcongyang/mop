@@ -75,7 +75,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           # Those targets are only used on macos runners so it's in an `if` to slightly speed up windows and linux builds.
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || matrix.patform == 'windows-latest' && 'aarch64-pc-windows-msvc' || '' }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
       - name: install dependencies (ubuntu only)
         if: matrix.platform == 'ubuntu-22.04' # This must match the platform value defined above.
         run: |
@@ -92,6 +92,7 @@ jobs:
           $opensslPath = "${env:ProgramFiles}\OpenSSL\bin"
           echo "OPENSSL_HOME=${env:ProgramFiles}\OpenSSL" >> $env:GITHUB_ENV
           echo "$opensslPath" >> $env:GITHUB_PATH
+          rustup target add aarch64-pc-windows-msvc
       - name: install dependencies (macos only)
         if: matrix.platform == 'macos-latest'
         run: |
@@ -109,6 +110,8 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
           releaseName: 'App v__VERSION__'
