@@ -81,10 +81,13 @@ jobs:
       - name: install dependencies (windows only)
         if: matrix.platform == 'windows-latest' # This must match the platform value defined above.
         run: |
-          choco install openssl -y
-          echo "::set-env name=OPENSSL_DIR::C:\OpenSSL-Win64"
-          echo "::set-env name=LIB::$OPENSSL_DIR\lib"
-          echo "::set-env name=INCLUDE::$OPENSSL_DIR\include"
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+          iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+          choco install openssl -y --no-progress
+          $opensslPath = "${env:ProgramFiles}\OpenSSL\bin"
+          echo "OPENSSL_HOME=${env:ProgramFiles}\OpenSSL" >> $env:GITHUB_ENV
+          echo "$opensslPath" >> $env:GITHUB_PATH
       - name: install dependencies (macos only)
         if: matrix.platform == 'macos-latest'
         run: |
