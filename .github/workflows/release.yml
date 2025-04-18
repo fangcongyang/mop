@@ -51,7 +51,11 @@ jobs:
       matrix:
         include:
           - platform: 'windows-latest'
-            args: ''
+            args: '--target x86_64-pc-windows-msvc'
+          - platform: 'windows-latest'
+            args: '--target i686-pc-windows-msvc'
+          - platform: 'windows-latest'
+            args: '--target aarch64-pc-windows-msvc'
           - platform: 'macos-latest' # for Arm based macs (M1 and above).
             args: '--target aarch64-apple-darwin'
           - platform: 'macos-latest' # for Intel based macs.
@@ -112,3 +116,37 @@ jobs:
           releaseDraft: true
           prerelease: false
           args: ${{ matrix.args }}
+  update:
+    needs: [build]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - uses: pnpm/action-setup@v2
+        name: Install pnpm
+        id: pnpm-install
+        with:
+          version: 8
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: pnpm
+      - run: pnpm install --no-frozen-lockfile
+
+      - name: Updater JSON
+        run: pnpm updater
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Deploy install.json
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./updater
+
+      - name: Query version number
+        run: echo "version=${GITHUB_REF:11}" >> $GITHUB_ENV

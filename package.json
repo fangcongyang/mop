@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "updater": "node updater/updater.mjs",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -n ./changelog-option.cjs"
   },
   "dependencies": {
     "@emotion/react": "^11.11.1",
@@ -22,6 +24,7 @@
     "@tauri-apps/plugin-os": "2.2.1",
     "@tauri-apps/plugin-process": "~2",
     "@tauri-apps/plugin-store": "2.2.0",
+    "@tauri-apps/plugin-updater": "~2",
     "color": "^4.2.3",
     "crypto-js": "^4.2.0",
     "dayjs": "^1.11.10",
@@ -30,6 +33,7 @@
     "i18next": "^23.7.18",
     "js-cookie": "^3.0.5",
     "lodash": "^4.17.21",
+    "node-fetch": "^3.3.2",
     "node-vibrant": "3.2.1-alpha.1",
     "nprogress": "^0.2.0",
     "plyr": "^3.7.8",

@@ -19,5 +19,12 @@
                 "type": "downloadBootstrapper"
             }
         }
+    },
+    "plugins": {
+        "updater": {
+          "windows": {
+            "installMode": "passive"
+          }
+        }
     }
 }
