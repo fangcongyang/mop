@@ -85,20 +85,20 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
         <h3>{t("update.changelog")}</h3>
         <div dangerouslySetInnerHTML={{ __html: body as string }} />
       </div>
-      <div>
+      <Box sx={{ display: 'flex', alignItems: 'center' }}>
         {isStarted && (
           <>
             <Box sx={{ width: "100%", mr: 1 }}>
               <LinearProgress variant="determinate" value={progress} />
             </Box>
-            <Box sx={{ minWidth: 120 }}>
+            <Box sx={{ minWidth: 35 }}>
               <Typography variant="body2" color="text.secondary">
                 {`${Math.round(progress)}%`}
               </Typography>
             </Box>
           </>
         )}
-      </div>
+      </Box>
       <div className={styles.actions}>
         {latestVersion !== currentVersion && (
           <ButtonTwoTone onClick={doUpdate} color="primary">

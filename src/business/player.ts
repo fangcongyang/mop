@@ -870,7 +870,8 @@ class Player implements PlayerSubject {
     async _getAudioSourceFromNetease(track: any) {
         let source;
         if (auth.isAccountLoggedIn()) {
-            getMP3(track.id.toString()).then((result_1: any) => {
+            try {
+                const result_1: any = await getMP3(track.id.toString())
                 if (!result_1.data[0]) return null;
                 if (!result_1.data[0].url) return null;
                 if (result_1.data[0].freeTrialInfo !== null) return null; // 跳过只能试听的歌曲
@@ -880,9 +881,9 @@ class Player implements PlayerSubject {
                     source,
                     br: result_1.data[0].br,
                 });
-            }).catch(() => {
+            } catch(_e) {
                 return null
-            })
+            }
         } else {
             source = `https://music.163.com/song/media/outer/url?id=${track.id}`;
         }

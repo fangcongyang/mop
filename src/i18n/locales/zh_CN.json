@@ -76,8 +76,7 @@
         },
         "update": {
             "title": "检查更新",
-            "text": "更新",
-            "changelog": "更新日志"
+            "text": "更新"
         },
         "cacheTitle": "缓存",
         "automaticallyCacheSongs": "自动缓存歌曲",

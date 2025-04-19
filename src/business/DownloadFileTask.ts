@@ -44,7 +44,6 @@ export class DownloadFileTask {
     async initEventListen() {
         this.unlisten = await listen<DownloadInfo>(this.downloadTaskInfo.event_id, (event) => {
             const eventName = event.payload.status as EventName;
-            console.log(123, event)
             switch (eventName) {
                 case "begin":
                     this.events[eventName].forEach((fn) => fn(event.payload));

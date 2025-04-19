@@ -73,6 +73,10 @@
             "high": "High",
             "lossless": "Lossless"
         },
+        "update": {
+            "title": "Check for Updates",
+            "text": "Update"
+        },
         "cacheTitle": "Cache",
         "automaticallyCacheSongs": "Automatically Cache Songs",
         "cacheLimit": {
@@ -300,11 +304,10 @@
         "searchFor": "搜索"
     },
     "update": {
-        "newVersionAvailable": "New Version Available",
-        "currentVersion": "Current Version",
-        "latestVersion": "Latest Version",
+        "newVersion": "New Version",
         "updateNow": "Update Now",
-        "remindLater": "Remind Later"
+        "remindLater": "Remind Later",
+        "changelog": "Update Log"
     },
     "common": {
         "play": "PLAY",

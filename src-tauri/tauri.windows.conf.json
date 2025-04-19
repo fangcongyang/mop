@@ -12,6 +12,11 @@
                 "installMode": "both",
                 "languages": ["SimpChinese", "TradChinese", "English"]
             },
+            "wix": {
+                "bannerPath": "icons/icon.ico",
+                "dialogImagePath": "icons/icon.ico",
+                "language": ["zh-CN", "zh-TW", "en-US"]
+            },
             "timestampUrl": null,
             "tsp": false,
             "webviewInstallMode": {
@@ -23,7 +28,7 @@
     "plugins": {
         "updater": {
           "windows": {
-            "installMode": "passive"
+            "installMode": "basicUi"
           }
         }
     }

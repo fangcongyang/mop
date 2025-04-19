@@ -27,10 +27,13 @@
       "identifier": "fs:scope",
       "allow": [
         {
-          "path": "D:\\**"
+          "path": "$APPCONFIG/**"
         },
         {
-          "path": "$APPCONFIG/*"
+          "path": "$APPCONFIG/**"
+        },
+        {
+          "path": "$APP/**"
         }
       ]
     },
