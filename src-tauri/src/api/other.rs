@@ -89,9 +89,15 @@ pub async fn fm_trash(data: FmTrashReq) -> serde_json::Value {
     request_handler(&url, data, options).await
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
+pub struct GithubLatestReleaseInfo {
+    pub tag_name: Option<String>,
+    pub body: Option<String>,
+}
+
 #[command]
 #[cached(time = 86400, option = false)]
-pub async fn github_repos_info_version(owner: String, repo: String) -> Option<String> {
+pub async fn github_repos_info_version(owner: String, repo: String) -> Option<GithubLatestReleaseInfo> {
     let url = format!(
         "https://api.github.com/repos/{}/{}/releases/latest",
         owner, repo
@@ -115,7 +121,10 @@ pub async fn github_repos_info_version(owner: String, repo: String) -> Option<St
             let data: Map<String, Value> = serde_json::from_str(&d).unwrap();
             if let Some(v) = data.get("tag_name") {
                 match v {
-                    Value::String(tag_name) => Some(tag_name.to_owned()),
+                    Value::String(tag_name) => Some(GithubLatestReleaseInfo{
+                        tag_name: Some(tag_name.to_owned()),
+                        body: Some(data.get("body").unwrap().to_owned().to_string()),
+                    }),
                     _ => None,
                 }
             } else {

@@ -299,6 +299,13 @@
         "noResult": "No Result",
         "searchFor": "搜索"
     },
+    "update": {
+        "newVersionAvailable": "New Version Available",
+        "currentVersion": "Current Version",
+        "latestVersion": "Latest Version",
+        "updateNow": "Update Now",
+        "remindLater": "Remind Later"
+    },
     "common": {
         "play": "PLAY",
         "songs": "Songs",

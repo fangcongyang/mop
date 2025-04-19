@@ -74,6 +74,11 @@
             "high": "极高",
             "lossless": "无损"
         },
+        "update": {
+            "title": "检查更新",
+            "text": "更新",
+            "changelog": "更新日志"
+        },
         "cacheTitle": "缓存",
         "automaticallyCacheSongs": "自动缓存歌曲",
         "cacheLimit": {
@@ -300,6 +305,12 @@
         "searchFor": "搜索",
         "mv": "MV",
         "playlist": "歌单"
+    },
+    "update": {
+        "newVersion": "新版本",
+        "updateNow": "立即更新",
+        "remindLater": "稍后提醒",
+        "changelog": "更新日志"
     },
     "common": {
         "play": "播放",
