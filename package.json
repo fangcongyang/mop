@@ -1,14 +1,14 @@
 {
   "name": "mop",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.2",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 1 -n ./changelog-option.cjs",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 -n ./changelog-option.cjs",
     "latest-changelog": "conventional-changelog -p angular -i LATEST_CHANGELOG.md -s -r 1 -n ./changelog-option.cjs"
   },
   "dependencies": {
