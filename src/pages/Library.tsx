@@ -149,7 +149,12 @@ const Library: FunctionComponent<LibraryProps> = (props) => {
         return playlists;
     }, [playlistFilter, liked.playlists]);
 
+    const playlistId = useMemo(() => {
+        return liked.playlists.length > 0 ? liked.playlists[0].id : 0;
+    }, [liked.playlists]);
+
     const openPlayModeTabMenu = (e: MouseEvent) => {
+        e.stopPropagation();
         playModeTabMenu.current!.openMenu(e);
     };
 
@@ -304,12 +309,9 @@ const Library: FunctionComponent<LibraryProps> = (props) => {
                     </div>
                 </div>
                 <div className="songs">
+                    
                     <TrackList
-                        id={
-                            liked.playlists.length > 0
-                                ? liked.playlists[0].id
-                                : 0
-                        }
+                        id={playlistId}
                         tracks={liked.songsWithDetails}
                         columnNumber={3}
                         dbClickTrackFunc="playPlaylistByID"

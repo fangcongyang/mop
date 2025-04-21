@@ -8,7 +8,7 @@ import CoverRow from "@/components/CoverRow";
 import styles from "./home.module.scss";
 import { Link } from "react-router-dom";
 import { getRecommendPlayList } from "@/utils/playList";
-import _ from "lodash";
+import { debounce } from "lodash";
 import DailyTracksCard from "@/components/DailyTracksCard";
 import FMCard from "@/components/FMCard";
 import { topListOfArtists } from "@/api/artist";
@@ -34,7 +34,7 @@ const Home = () => {
     }
   }, [])
 
-  const loadData = _.debounce(() => {
+  const loadData = debounce(() => {
     NProgress.start();
     getRecommendPlayList(10, false).then((items: any) => {
       items && setRecommendPlaylist({ items });

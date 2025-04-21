@@ -68,6 +68,10 @@ export async function cachePlaylistDetail(id: number, playlistDetail: any) {
     await db.playlistDetail.put(playlistDetail);
 }
 
+export async function removePlaylistDetail(id: number){
+    await db.playlistDetail.delete(Number(id));
+}
+
 export async function selectPlaylistDetail(id: number) {
     const playlistDetail = await db.playlistDetail.get(Number(id));
     if (!playlistDetail) return undefined;
@@ -112,6 +116,12 @@ export async function getLocalLikeTrackIds(playListId: number){
     return tracks.map((track: any) => {
         return track.trackId;
     });
+}
+
+export async function getLocalLikeTracks(playListId: number){
+    const tracks = await db.localStarTrackId.where("playListId").equals(Number(playListId)).toArray();
+    if (tracks.length === 0) return undefined;
+    return tracks;
 }
 
 export async function cacheTrackSource(

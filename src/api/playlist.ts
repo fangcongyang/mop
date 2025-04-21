@@ -1,6 +1,8 @@
 import auth from '@/utils/auth';
 import { invoke } from "@tauri-apps/api/core";
 import { do_invoke } from './fetch';
+import { getLocalLikeTracks } from '@/db';
+import { getTrackDetail } from './track';
 
 /**
  * 获取歌单详情
@@ -27,6 +29,38 @@ export function getPlaylistDetail(id: any, noCache: boolean | undefined = false)
       resolve(data);
     });
   });
+}
+
+export async function appendLocalStarTrack(playListId: number, data: any){
+  const localLikeTracks = await getLocalLikeTracks(playListId)
+  if (localLikeTracks === undefined || localLikeTracks.length === 0) return;
+  
+  // 使用 forEach 代替 map，因为不需要返回值
+  localLikeTracks.forEach((track: any) => {
+    data.playlist.trackIds.push(track.trackInfo);
+    data.privileges.push(track.privileges);
+  });
+  
+  // 获取本地收藏歌曲ID并获取详情
+  const lids = localLikeTracks.map((track: any) => track.trackId);
+  const tracks = await getTrackDetail(lids.join(','));
+  
+  // 合并歌曲列表
+  const allTracks = data.playlist.tracks.concat(tracks.songs);
+  
+  // 按时间排序
+  data.playlist.trackIds.sort((a: any, b: any) => b.at - a.at);
+  
+  // 创建 ID 到歌曲的映射，提高查找效率
+  const trackMap = new Map();
+  allTracks.forEach((track: any) => {
+    if (track) trackMap.set(track.id, track);
+  });
+  
+  // 按排序后的 trackIds 顺序重建歌曲列表
+  data.playlist.tracks = data.playlist.trackIds
+    .map((id: any) => trackMap.get(id.id))
+    .filter(Boolean); // 过滤掉可能的 undefined 值
 }
 
 /**

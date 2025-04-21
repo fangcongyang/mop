@@ -12,6 +12,7 @@ import {
     deletePlaylist,
     getPlaylistDetail,
     subscribePlaylist,
+    appendLocalStarTrack
 } from "@/api/playlist";
 import NProgress from "nprogress";
 import { getTrackDetail } from "@/api/track";
@@ -23,6 +24,7 @@ import SvgIcon from "@/components/SvgIcon";
 import { confirm, message } from "@tauri-apps/plugin-dialog";
 import { player } from "@/business/player";
 import "./playlist.scss";
+import { useGetState } from "@/hooks";
 
 const Playlist = () => {
     const { t } = useTranslation();
@@ -32,7 +34,7 @@ const Playlist = () => {
     let location = useLocation();
     let { id } = useParams();
     const playlistMenu = useRef<ContextMenuHandle>(null);
-    const [playlist, setPlaylist] = useState({
+    const [playlist, setPlaylist, getPlaylist] = useGetState({
         id: 0,
         name: "",
         coverImgUrl: "",
@@ -67,6 +69,7 @@ const Playlist = () => {
             loadData(data.likedSongPlaylistID);
         } else {
             loadData(Number.parseInt(id!));
+            enableMainScrolling(true);
         }
     }, []);
 
@@ -77,31 +80,26 @@ const Playlist = () => {
     const loadData = (id: number) => {
         NProgress.start();
         getPlaylistDetail(id, false)
-            .then((data: any) => {
-                if (data.playlist) {
-                    data.playlist.tracks = auth.mapTrackPlayableStatus(
-                        data.playlist.tracks,
-                        data.privileges || []
-                    );
+            .then(async (data: any) => {
+                if (!data) {
+                    return;
                 }
-                return data;
-            })
-            .then((data) => {
+                await appendLocalStarTrack(id, data);
                 setPlaylist(data.playlist);
                 setTracks(data.playlist.tracks);
-                NProgress.done();
                 lastLoadedTrackIndex.current = data.playlist.tracks.length - 1;
-                return data;
-            })
-            .then(() => {
-                if (playlist.trackCount > tracks.length) {
+                if (data.playlist.trackCount > data.playlist.tracks.length) {
                     loadMore();
                 }
+            })
+            .finally(() => {
+                NProgress.done();
             });
     };
 
     const loadMore = (loadNum = 100) => {
-        let trackIds: any[] = playlist.trackIds.filter(
+        const lpl = getPlaylist();
+        let trackIds: any[] = lpl.trackIds.filter(
             (t: any, index: number) => {
                 if (
                     index > lastLoadedTrackIndex.current &&
@@ -115,7 +113,7 @@ const Playlist = () => {
         getTrackDetail(trackIds.join(",")).then((data) => {
             tracks.push(...data.songs);
             lastLoadedTrackIndex.current += trackIds.length;
-            if (lastLoadedTrackIndex.current + 1 === playlist.trackIds.length) {
+            if (lastLoadedTrackIndex.current + 1 === lpl.trackIds.length) {
                 setHasMore(false);
             } else {
                 setHasMore(true);
@@ -236,7 +234,7 @@ const Playlist = () => {
             return;
         }
         const confirmed = await confirm(
-            t("playlist.playlistDelete", playlist),
+            t("playlist.playlistDelete", {name: playlist.name}),
             { title: t("common.delete"), kind: "error" }
         );
         if (confirmed) {
