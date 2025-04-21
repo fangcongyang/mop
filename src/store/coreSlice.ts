@@ -14,9 +14,8 @@ import { playlistCategories } from "@/utils/staticData";
 import { albumSublist } from "@/api/album";
 import { artistSubList } from "@/api/artist";
 import { mvSublist } from "@/api/mv";
-import _ from "lodash";
 import messageEventEmitter from "@/event/messageEventEmitter";
-import { cachePlaylistDetail, cacheUserPlaylist, getUserPlaylist, localLikeTrack, selectPlaylistDetail } from "@/db";
+import { cachePlaylistDetail, cacheUserPlaylist, getUserPlaylist, localLikeTrack, removePlaylistDetail, selectPlaylistDetail } from "@/db";
 
 const enabledPlaylistCategories = playlistCategories
     .filter((c) => c.enable)
@@ -259,6 +258,9 @@ export const likeATrack = createAsyncThunk(
                     localLikeTrack(state.core.data.user?.userId, state.core.data.likedSongPlaylistID, data, like)
                 });
             }
+            if (data.code === 200 && data.data.code === 200 && like) {
+                removePlaylistDetail(state.core.data.likedSongPlaylistID);    
+            }
         }).catch((_e) => {
             messageEventEmitter.emit(
                 "MESSAGE:INFO",
@@ -279,24 +281,30 @@ export const likeATrack = createAsyncThunk(
 
 export const fetchLikedAlbums = createAsyncThunk(
     "users/fetchLikedAlbums",
-    async (_) => {
+    async (_, thunkAPI) => {
         if (!auth.isAccountLoggedIn()) return;
+        const state: any = thunkAPI.getState();
+        if (state.core.liked.albums.length > 0) return;
         return await albumSublist({ limit: 200 });
     }
 );
 
 export const fetchLikedArtists = createAsyncThunk(
     "users/fetchLikedArtists",
-    async (_) => {
+    async (_, thunkAPI) => {
         if (!auth.isAccountLoggedIn()) return;
+        const state: any = thunkAPI.getState();
+        if (state.core.liked.artists.length > 0) return;
         return await artistSubList({ limit: 200 });
     }
 );
 
 export const fetchLikedMVs = createAsyncThunk(
     "users/fetchLikedMVs",
-    async (_) => {
+    async (_, thunkAPI) => {
         if (!auth.isAccountLoggedIn()) return;
+        const state: any = thunkAPI.getState();
+        if (state.core.liked.mvs.length > 0) return;
         return await mvSublist({ limit: 200 });
     }
 );

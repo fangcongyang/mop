@@ -53,7 +53,7 @@ export async function getTrackDetail(ids: string | number) {
             data.songs = auth.mapTrackPlayableStatus(data.songs, data.privileges);
             return data;
         } catch (e) {
-            console.log(123, e)
+            console.error(123, e)
             return null;
         }
     };
@@ -70,7 +70,7 @@ export async function getTrackDetail(ids: string | number) {
             result_1.privileges
         );
     }
-    return fetchLatest();
+    return result_1 ?? fetchLatest();
 }
 
 /**

@@ -76,7 +76,7 @@ const Search = () => {
         requestAll(requests2);
     }, 500)
 
-    const onSearch = (type = 'all') => {
+    const onSearch = async (type = 'all') => {
         const typeTable: any = {
             all: 1018,
             musicVideos: 1004,
@@ -85,17 +85,18 @@ const Search = () => {
             artists: 100,
             playlists: 1000,
         };
-        return search({
-            keywords: searchKeywords,
-            type: typeTable[type],
-            limit: 16,
-        }).then((result: any) => {
+        try {
+            const result = await search({
+                keywords: searchKeywords,
+                type: typeTable[type],
+                limit: 16,
+            });
             return { result: result.result, type };
-        }).catch((err: any) => {
+        } catch (err: any) {
             showToast(err.response ?
                 (err.response.data.msg || err.response.data.message) : err);
             return { result: [], type };
-        })
+        }
     }
 
     const haveResult = useMemo(() => {
