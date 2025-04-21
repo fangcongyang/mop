@@ -110,7 +110,7 @@ jobs:
       - name: 提取 CHANGELOG 最新内容
         id: changelog
         run: |
-          awk '/^# \[/{if(NR!=1)exit;print;next}NR!=1{print}' CHANGELOG.md > LATEST_CHANGELOG.md
+          awk '/^#+ \[/{if(NR!=1)exit;print;next}NR!=1{print}' CHANGELOG.md > LATEST_CHANGELOG.md
           echo "CHANGELOG_BODY<<EOF" >> $GITHUB_ENV
           cat LATEST_CHANGELOG.md >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
