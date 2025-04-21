@@ -258,7 +258,7 @@ export const likeATrack = createAsyncThunk(
                     localLikeTrack(state.core.data.user?.userId, state.core.data.likedSongPlaylistID, data, like)
                 });
             }
-            if (data.code === 200 && data.data.code === 200 && like) {
+            if (data.code === 200 && data.data.code === 200) {
                 removePlaylistDetail(state.core.data.likedSongPlaylistID);    
             }
         }).catch((_e) => {
