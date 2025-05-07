@@ -1,8 +1,9 @@
-## [0.1.4](https://github.com/fangcongyang/mop/compare/v0.1.3...v0.1.4) (2025-04-21)
+## [0.1.4](https://github.com/fangcongyang/mop/compare/v0.1.3...v0.1.4) (2025-05-07)
 
 
 ### 🐛 Bug Fixes | Bug 修复
 
+* 修复请求超时问题 ([](https://github.com/fangcongyang/mop/commit/ae94c1d))
 * 移除多余的like条件检查以修复逻辑错误 ([](https://github.com/fangcongyang/mop/commit/60e8a0c))
 
 
