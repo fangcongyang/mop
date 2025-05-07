@@ -95,7 +95,10 @@ pub fn read_init_data_file(data_name: &str) -> String {
 }
 
 pub fn create_request_builder() -> ClientBuilder {
-    let client_builder = reqwest::ClientBuilder::new();
+    let client_builder = reqwest::ClientBuilder::new()
+        .connect_timeout(std::time::Duration::from_secs(10))
+        .timeout(std::time::Duration::from_secs(10))
+        .read_timeout(std::time::Duration::from_secs(10));
     if get_string("proxyProtocol") == "noProxy" || get_string("proxyProtocol") == "" {
         client_builder.no_proxy()
     } else {
