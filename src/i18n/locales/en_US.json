@@ -304,6 +304,7 @@
         "searchFor": "搜索"
     },
     "update": {
+        "noUpdate": "## No Update",
         "newVersion": "New Version",
         "updateNow": "Update Now",
         "remindLater": "Remind Later",

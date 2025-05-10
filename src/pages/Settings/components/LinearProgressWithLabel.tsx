@@ -6,7 +6,7 @@ const LinearProgressWithLabel = (props: LinearProgressProps & { downloadspeed: n
             <LinearProgress variant="determinate" {...props} />
         </Box>
         <Box sx={{ minWidth: 120 }}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="inherit">
                 {`${Math.round(props.value!)}% ${props.downloadspeed}MB/s`}
             </Typography>
         </Box>

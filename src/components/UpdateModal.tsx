@@ -33,7 +33,13 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
       repo: "mop",
     }).then((githubLatestReleaseInfo: GithubLatestReleaseInfo) => {
       setLatestVersion(githubLatestReleaseInfo.tag_name);
-      setBody(marked.parse(githubLatestReleaseInfo.body));
+      console.log(currentVersion);
+      if (githubLatestReleaseInfo.tag_name === 'v' + currentVersion) {
+        setBody(t("update.noUpdate"));
+        return;
+      }
+      const body = githubLatestReleaseInfo.body.replace(/\\n/g, "<br>");
+      setBody(marked.parse(body));
     });
   }, []);
 
@@ -100,14 +106,18 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
         )}
       </Box>
       <div className={styles.actions}>
-        {latestVersion !== currentVersion && (
-          <ButtonTwoTone onClick={doUpdate} color="primary">
-            {t("update.updateNow")}
-          </ButtonTwoTone>
-        )}
-        <ButtonTwoTone onClick={onClose} color="secondary">
-          {t("update.remindLater")}
-        </ButtonTwoTone>
+        {
+          latestVersion !== 'v' + currentVersion && (
+            <>
+              <ButtonTwoTone onClick={doUpdate} color="primary">
+                {t("update.updateNow")}
+              </ButtonTwoTone>
+              <ButtonTwoTone onClick={onClose} color="secondary">
+                {t("update.remindLater")}
+              </ButtonTwoTone>
+              </>
+          )
+        }
       </div>
     </Modal>
   );

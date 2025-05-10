@@ -1,6 +1,6 @@
 {
     "productName": "mop",
-    "version": "0.0.1",
+    "version": "0.1.4",
     "identifier": "com.tauri.mop",
     "build": {
         "beforeDevCommand": "pnpm dev",

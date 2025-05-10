@@ -35,7 +35,6 @@ interface Settings {
     enableDiscordRichPresence: boolean;
     showLyricsTranslation: boolean;
     lyricsBackground: string;
-    showLyricsTime: boolean;
     lyricFontSize: number;
     enableUnblockNeteaseMusic: boolean;
     unmSource: string;
@@ -105,7 +104,6 @@ const initialState: CoreState = {
         enableDiscordRichPresence: false,
         showLyricsTranslation: true,
         lyricsBackground: "true",
-        showLyricsTime: true,
         lyricFontSize: 28,
         enableUnblockNeteaseMusic: true,
         unmSource: "",

@@ -28,6 +28,7 @@ import { lyricParser } from "@/utils/lyrics";
 import _ from "lodash";
 import dayjs from "dayjs";
 import { PlayerObserver } from "@/type/player";
+import { useConfig } from "@/hooks/useConfig";
 
 interface LyricsProperties {
     className?: string;
@@ -57,6 +58,7 @@ const Lyrics = forwardRef<HTMLDivElement, LyricsProperties>((props, ref) => {
     const [shuffle, setShuffle] = useState(player.shuffle);
     const [volume, setVolume] = useState(player.volume);
     const [mute, setMute] = useState(player.mute);
+    const [showLyricsTime] = useConfig("showLyricsTime", true);
     const lyricsPlayerObserver: PlayerObserver = new PlayerObserver("lyrics");
 
     const isCurrentTrackLiked = useMemo(() => {
@@ -409,7 +411,7 @@ const Lyrics = forwardRef<HTMLDivElement, LyricsProperties>((props, ref) => {
             )}
             <div className={styles.leftSide}>
                 <div>
-                    {settings.showLyricsTime ? (
+                    {showLyricsTime ? (
                         <div className="date">{date}</div>
                     ) : (
                         ""

@@ -18,7 +18,8 @@ const eventNames = [
     "cacheLimit",
     "enableGlobalShortcut",
     "appearance",
-    "musicLanguage"
+    "musicLanguage",
+    "showLyricsTime",
 ] as const;
 
 export type StoreEventName = (typeof eventNames)[number];

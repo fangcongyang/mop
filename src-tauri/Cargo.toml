@@ -1,6 +1,6 @@
 [package]
 name = "mop"
-version = "0.0.1"
+version = "0.1.4"
 description = "mop"
 authors = ["fangcongyang"]
 license = ""

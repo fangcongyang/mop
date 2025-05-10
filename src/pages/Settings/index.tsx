@@ -95,6 +95,7 @@ const Settings = () => {
   );
   const [cacheLimit, setCacheLimit] = useConfig("cacheLimit", "8192");
   const [isCheckingUpdate, setIsCheckingUpdate] = useState(false); // 添加状态
+  const [showLyricsTime, setShowLyricsTime] = useConfig("showLyricsTime", true);
 
   useEffect(() => {
     init();
@@ -508,8 +509,9 @@ const Settings = () => {
         <SettingsSwitch
           inputId="show-lyrics-time"
           title="settings.lyric.showLyricsTime"
-          initValue={settings.showLyricsTime}
+          initValue={showLyricsTime}
           fieldKey="showLyricsTime"
+          callback={setShowLyricsTime}
         />
         <SettingsSelect
           title="settings.lyricFontSize.text"

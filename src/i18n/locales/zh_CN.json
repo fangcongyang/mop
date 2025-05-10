@@ -306,6 +306,7 @@
         "playlist": "歌单"
     },
     "update": {
+        "noUpdate": "## 当前已是最新版本",
         "newVersion": "新版本",
         "updateNow": "立即更新",
         "remindLater": "稍后提醒",
