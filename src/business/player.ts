@@ -238,13 +238,19 @@ class Player implements PlayerSubject {
     }
 
     saveSelfToLocalStorage() {
-        let player: any = {};
-        for (let [key, value] of Object.entries(this)) {
-            if (excludeSaveKeys.includes(key)) continue;
-            player[key] = value;
+        try {
+            const player: any = {};
+            for (const [key, value] of Object.entries(this)) {
+                if (excludeSaveKeys.includes(key)) continue;
+                player[key] = value;
+            }
+            
+            const playerData = JSON.stringify(player);
+            localStorage.setItem("player", playerData);
+        } catch (error) {
+            console.error('Failed to save player state to localStorage:', error);
+            // 可以考虑使用备用存储方案
         }
-
-        localStorage.setItem("player", JSON.stringify(player));
     }
 
     pause() {
@@ -548,9 +554,7 @@ class Player implements PlayerSubject {
     }
 
     _timeoutPlayNextTrack(fun: () => void = () => {this.playPersonNextTrack();}) {
-        if (this._playNextTrackTimeout) {
-            clearTimeout(this._playNextTrackTimeout);
-        } 
+        this._clearTimeoutPlayNextTrack();
         this._playNextTrackTimeout = setTimeout(() => {
             fun();
             this._playNextTrackTimeout = undefined; 
@@ -682,6 +686,7 @@ class Player implements PlayerSubject {
                 // 播放失败，证明歌曲缓存错误。1、歌曲缓存不完整 2、yt-dlp版本更新导致搜索结果不是音乐
                 getTrackSource(trackId).then(trackSource => {
                     if (trackSource) {
+                        this._clearTimeoutPlayNextTrack();
                         deleteTrackSource(trackId)
                         this._replaceCurrentTrack(this.currentTrackId, true)
                     } else {
@@ -726,12 +731,20 @@ class Player implements PlayerSubject {
             this._retryTrackPlayCount += 1
         }
         if (this._retryTrackPlayCount >= 3) {
+            this._clearTimeoutPlayNextTrack();
             this._setLoading(false);
             this._retryTrackPlayCount = 0
             this.playPersonNextTrack();
             return true
         }
         return false
+    }
+
+    _clearTimeoutPlayNextTrack() {
+        if (this._playNextTrackTimeout) {
+            clearTimeout(this._playNextTrackTimeout)
+            this._playNextTrackTimeout = undefined
+        }
     }
 
     _nextTrackCallback() {
@@ -1145,12 +1158,32 @@ playerEventEmitter.on(
     }
 );
 
+// 防抖保存机制
+let saveTimeout: NodeJS.Timeout | null = null;
+const SAVE_DEBOUNCE_DELAY = 500;
+
 player = new Proxy(player, {
     set(target: any, prop, val) {
         target[prop] = val;
-        if (prop === "_howler") return true;
-        target.saveSelfToLocalStorage();
-        //   target.sendSelfToIpcMain();
+        
+        // 跳过不需要保存的属性，避免频繁写入
+        if (prop === "_howler" || prop === "_playing" || prop === "_loading") {
+            return true;
+        }
+        
+        // 防抖保存，避免频繁的 localStorage 写入
+        if (saveTimeout) {
+            clearTimeout(saveTimeout);
+        }
+        
+        saveTimeout = setTimeout(() => {
+            try {
+                target.saveSelfToLocalStorage();
+            } catch (error) {
+                console.warn('Player state save failed:', error);
+            }
+        }, SAVE_DEBOUNCE_DELAY);
+        
         return true;
     },
 });

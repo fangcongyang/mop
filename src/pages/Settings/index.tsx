@@ -313,7 +313,7 @@ const Settings = () => {
     recordedShortcut.current = [];
   };
 
-  const formatShortcut = (shortcut: String) => {
+  const formatShortcut = (shortcut: string) => {
     shortcut = shortcut
       .replace("+", " + ")
       .replace("Up", "↑")
