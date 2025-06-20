@@ -151,11 +151,14 @@ pub async fn download_file_task_async(
         }
         .await
         {
-            log::error!("Error downloading file: {}", e);
+            // 区分错误类型：网络连接错误和文件系统错误
+            let (error_type, error_message) = categorize_error(&e);
+            log::error!("[{}] Error downloading file: {}", error_type, error_message);
+            
             app.emit(
                 &download_task_info.event_id,
                 DownloadInfo {
-                    status: DownloadStatus::ERROR.to_string(),
+                    status: format!("{}_{}", DownloadStatus::ERROR.to_string(), error_type.to_lowercase()),
                     progress: None,
                     speed: None,
                     content_length: None,
@@ -165,4 +168,76 @@ pub async fn download_file_task_async(
         }
     });
     let _ = handle.await;
+}
+
+/// 根据错误类型分类错误
+fn categorize_error(error: &Box<dyn std::error::Error>) -> (&'static str, String) {
+    let error_string = error.to_string().to_lowercase();
+    let error_message = error.to_string();
+    
+    // 网络连接相关错误
+    if error_string.contains("connection") 
+        || error_string.contains("timeout") 
+        || error_string.contains("dns") 
+        || error_string.contains("network") 
+        || error_string.contains("unreachable") 
+        || error_string.contains("refused") 
+        || error_string.contains("reset") 
+        || error_string.contains("broken pipe") {
+        return ("NETWORK", error_message);
+    }
+    
+    // HTTP 状态码错误
+    if error_string.contains("404") 
+        || error_string.contains("403") 
+        || error_string.contains("401") 
+        || error_string.contains("500") 
+        || error_string.contains("502") 
+        || error_string.contains("503") {
+        return ("NETWORK", error_message);
+    }
+    
+    // 文件系统相关错误
+    if error_string.contains("permission") 
+        || error_string.contains("access") 
+        || error_string.contains("denied") 
+        || error_string.contains("no space") 
+        || error_string.contains("disk full") 
+        || error_string.contains("read-only") 
+        || error_string.contains("file exists") 
+        || error_string.contains("directory") 
+        || error_string.contains("path") {
+        return ("FILESYSTEM", error_message);
+    }
+    
+    // 检查具体的错误类型
+    if let Some(io_error) = error.downcast_ref::<std::io::Error>() {
+        match io_error.kind() {
+            std::io::ErrorKind::PermissionDenied => return ("FILESYSTEM", error_message),
+            std::io::ErrorKind::NotFound => return ("FILESYSTEM", error_message),
+            std::io::ErrorKind::AlreadyExists => return ("FILESYSTEM", error_message),
+            std::io::ErrorKind::InvalidInput => return ("FILESYSTEM", error_message),
+            std::io::ErrorKind::InvalidData => return ("FILESYSTEM", error_message),
+            std::io::ErrorKind::TimedOut => return ("NETWORK", error_message),
+            std::io::ErrorKind::ConnectionRefused => return ("NETWORK", error_message),
+            std::io::ErrorKind::ConnectionReset => return ("NETWORK", error_message),
+            std::io::ErrorKind::ConnectionAborted => return ("NETWORK", error_message),
+            std::io::ErrorKind::NotConnected => return ("NETWORK", error_message),
+            std::io::ErrorKind::UnexpectedEof => return ("NETWORK", error_message),
+            _ => {}
+        }
+    }
+    
+    // 检查 reqwest 错误类型
+    if let Some(reqwest_error) = error.downcast_ref::<reqwest::Error>() {
+        if reqwest_error.is_timeout() || reqwest_error.is_connect() {
+            return ("NETWORK", error_message);
+        }
+        if reqwest_error.is_request() {
+            return ("NETWORK", error_message);
+        }
+    }
+    
+    // 默认归类为未知错误
+    ("UNKNOWN", error_message)
 }
