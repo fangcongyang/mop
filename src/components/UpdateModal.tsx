@@ -23,7 +23,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const [latestVersion, setLatestVersion] = useState("");
-  const [body, setBody] = useState<String | Promise<string>>("");
+  const [body, setBody] = useState<string | Promise<string>>("");
   const [isStarted, setIsStarted] = useState(false); // Add isStarted
   const [progress, setProgress] = useState(0); // Add progres
 
