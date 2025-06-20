@@ -1,4 +1,19 @@
-## [0.1.4](https://github.com/fangcongyang/mop/compare/v0.1.3...v0.1.4) (2025-05-07)
+## [0.1.5](https://github.com/fangcongyang/mop/compare/v0.1.4...v0.1.5) (2025-06-20)
+
+
+### ✨ Features | 新功能
+
+* 更新版本至0.1.4并优化更新提示 ([](https://github.com/fangcongyang/mop/commit/c9db223))
+* 完善项目说明 ([](https://github.com/fangcongyang/mop/commit/afe3b68))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* 修复网络错误、文件操作错误无提示问题 ([](https://github.com/fangcongyang/mop/commit/9583740))
+
+
+
+## [0.1.4](https://github.com/fangcongyang/mop/compare/0.1.4...v0.1.4) (2025-05-07)
 
 
 ### 🐛 Bug Fixes | Bug 修复
