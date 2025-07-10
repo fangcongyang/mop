@@ -33,13 +33,15 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
       repo: "mop",
     }).then((githubLatestReleaseInfo: GithubLatestReleaseInfo) => {
       setLatestVersion(githubLatestReleaseInfo.tag_name);
-      console.log(currentVersion);
       if (githubLatestReleaseInfo.tag_name === 'v' + currentVersion) {
         setBody(t("update.noUpdate"));
         return;
       }
-      const body = githubLatestReleaseInfo.body.replace(/\\n/g, "<br>");
-      setBody(marked.parse(body));
+      let bodyWithBreaks = githubLatestReleaseInfo.body.replace(/"/g, '');
+      bodyWithBreaks = bodyWithBreaks
+        .replace(/\\n+/g, '\\n')  // 将连续的多个\n转换为单个\n
+        .replace(/\\n/g, '\n'); // 添加Markdown强制换行语法
+      setBody(marked.parse(bodyWithBreaks));
     });
   }, []);
 
@@ -107,7 +109,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
       </Box>
       <div className={styles.actions}>
         {
-          latestVersion !== 'v' + currentVersion && (
+          latestVersion !== `v${currentVersion}` && (
             <>
               <ButtonTwoTone onClick={doUpdate} color="primary">
                 {t("update.updateNow")}

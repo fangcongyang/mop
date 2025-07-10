@@ -6,60 +6,331 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
-import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
+import android.media.MediaPlayer
+import android.media.AudioManager
+import android.media.AudioAttributes
+import android.net.Uri
+import androidx.media.session.MediaButtonReceiver
+import androidx.media.session.MediaSessionCompat
+import androidx.media.MediaSessionManager
 import androidx.core.app.NotificationCompat
+import androidx.media.session.PlaybackStateCompat
+import androidx.media.MediaMetadataCompat
+import android.os.Handler
+import android.os.Looper
 import android.os.Binder as AndroidBinder
 
 
 class MopNotificationService: Service() {
     private var mediaSession: MediaSessionCompat? = null
-    private var mediaController: MediaControllerCompat? = null
     private var mopNotificationManager: MopNotificationManager? = null
+    private var cryptoPlugin: CryptoPlugin? = null
+    
+    // MediaPlayer相关
+    private var mediaPlayer: MediaPlayer? = null
+    private var isPlaying = false
+    private var currentTrackUri: Uri? = null
+    private var currentPosition = 0L
+    private var duration = 0L
+    
+    // 进度更新处理器
+    private val handler = Handler(Looper.getMainLooper())
+    private val progressUpdateRunnable = object : Runnable {
+        override fun run() {
+            updateProgress()
+            if (isPlaying) {
+                handler.postDelayed(this, 1000) // 每秒更新一次
+            }
+        }
+    }
 
     // 创建一个 Binder 对象
     val binder = Binder()
 
     inner class Binder : AndroidBinder() {
         fun getService(): MopNotificationService = this@MopNotificationService
+        
+        fun setCryptoPlugin(plugin: CryptoPlugin) {
+            this@MopNotificationService.cryptoPlugin = plugin
+        }
+        
+        // 音频播放控制方法
+        fun playTrack(uri: String) {
+            this@MopNotificationService.playTrack(Uri.parse(uri))
+        }
+        
+        fun play() {
+            this@MopNotificationService.play()
+        }
+        
+        fun pause() {
+            this@MopNotificationService.pause()
+        }
+        
+        fun stop() {
+            this@MopNotificationService.stop()
+        }
+        
+        fun seekTo(position: Long) {
+            this@MopNotificationService.seekTo(position)
+        }
+        
+        fun isPlaying(): Boolean {
+            return this@MopNotificationService.isPlaying
+        }
+        
+        fun getCurrentPosition(): Long {
+            return this@MopNotificationService.getCurrentPosition()
+        }
+        
+        fun getDuration(): Long {
+            return this@MopNotificationService.getDuration()
+        }
+    }
+    
+    // 触发Rust事件的方法
+    private fun triggerRustEvent(eventName: String) {
+        try {
+            cryptoPlugin?.triggerMediaEvent(eventName)
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to trigger Rust event: $eventName", e)
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder {
         mopNotificationManager = MopNotificationManager(this)
         mopNotificationManager?.createNotificationChannel()
         mediaSession = MediaSessionCompat(this, "mopMediaSession")
-        mediaController = mediaSession?.controller
-        // 设置媒体会话为活动状态
-        mediaSession?.isActive = true
-        // 设置媒体会话回调，监听媒体控制
         mediaSession?.setCallback(object : MediaSessionCompat.Callback() {
             override fun onPlay() {
-//                trigger("onPlay", JSObject())
-                mediaController?.transportControls?.play()
+                // 执行真正的播放操作
+                play()
+                // 同时触发Rust事件
+                triggerRustEvent("media_play")
             }
 
             override fun onPause() {
-//                trigger("onPause", JSObject())
-                mediaController?.transportControls?.pause()
+                // 执行真正的暂停操作
+                pause()
+                // 同时触发Rust事件
+                triggerRustEvent("media_pause")
             }
 
             override fun onSkipToNext() {
-//                trigger("onSkipToNext", JSObject())
-                mediaController?.transportControls?.skipToNext()
+                // 触发下一首事件（由Rust端处理音频切换）
+                triggerRustEvent("media_next")
             }
 
             override fun onSkipToPrevious() {
-//                trigger("onSkipToPrevious", JSObject())
-                mediaController?.transportControls?.skipToPrevious()
+                // 触发上一首事件（由Rust端处理音频切换）
+                triggerRustEvent("media_previous")
+            }
+            
+            override fun onSeekTo(pos: Long) {
+                // 执行真正的跳转操作
+                seekTo(pos)
+                triggerRustEvent("media_seek")
+            }
+            
+            override fun onStop() {
+                // 执行真正的停止操作
+                stop()
+                triggerRustEvent("media_stop")
             }
         })
+        mediaSession?.isActive = true
         updateNotification()
         return binder
+    }
+    
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // 处理来自广播接收器的媒体事件
+        intent?.getStringExtra("media_action")?.let { action ->
+            triggerRustEvent(action)
+        }
+        return START_STICKY
     }
 
     override fun onDestroy() {
         super.onDestroy()
+        releaseMediaPlayer()
+        handler.removeCallbacks(progressUpdateRunnable)
+        mediaSession?.release()
         stopForeground(true) // 停止前台服务并移除通知
+    }
+    
+    // MediaPlayer控制方法
+    private fun initializeMediaPlayer() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer().apply {
+                setAudioAttributes(
+                    AudioAttributes.Builder()
+                        .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
+                        .setUsage(AudioAttributes.USAGE_MEDIA)
+                        .build()
+                )
+                
+                setOnPreparedListener { mp ->
+                    duration = mp.duration.toLong()
+                    updateMediaSessionMetadata()
+                    updatePlaybackState()
+                }
+                
+                setOnCompletionListener {
+                    isPlaying = false
+                    handler.removeCallbacks(progressUpdateRunnable)
+                    updatePlaybackState()
+                    triggerRustEvent("media_completed")
+                }
+                
+                setOnErrorListener { _, what, extra ->
+                    android.util.Log.e("MopNotificationService", "MediaPlayer error: what=$what, extra=$extra")
+                    triggerRustEvent("media_error")
+                    true
+                }
+            }
+        }
+    }
+    
+    private fun releaseMediaPlayer() {
+        mediaPlayer?.apply {
+            if (isPlaying()) {
+                stop()
+            }
+            release()
+        }
+        mediaPlayer = null
+        isPlaying = false
+    }
+    
+    fun playTrack(uri: Uri) {
+        try {
+            currentTrackUri = uri
+            initializeMediaPlayer()
+            
+            mediaPlayer?.apply {
+                reset()
+                setDataSource(this@MopNotificationService, uri)
+                prepareAsync()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to play track: $uri", e)
+            triggerRustEvent("media_error")
+        }
+    }
+    
+    fun play() {
+        try {
+            mediaPlayer?.let { mp ->
+                if (!mp.isPlaying) {
+                    mp.start()
+                    isPlaying = true
+                    handler.post(progressUpdateRunnable)
+                    updatePlaybackState()
+                    updateNotification()
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to play", e)
+        }
+    }
+    
+    fun pause() {
+        try {
+            mediaPlayer?.let { mp ->
+                if (mp.isPlaying) {
+                    mp.pause()
+                    isPlaying = false
+                    handler.removeCallbacks(progressUpdateRunnable)
+                    updatePlaybackState()
+                    updateNotification()
+                }
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to pause", e)
+        }
+    }
+    
+    fun stop() {
+        try {
+            mediaPlayer?.let { mp ->
+                if (mp.isPlaying) {
+                    mp.stop()
+                }
+                isPlaying = false
+                currentPosition = 0L
+                handler.removeCallbacks(progressUpdateRunnable)
+                updatePlaybackState()
+                updateNotification()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to stop", e)
+        }
+    }
+    
+    fun seekTo(position: Long) {
+        try {
+            mediaPlayer?.let { mp ->
+                mp.seekTo(position.toInt())
+                currentPosition = position
+                updatePlaybackState()
+            }
+        } catch (e: Exception) {
+            android.util.Log.e("MopNotificationService", "Failed to seek", e)
+        }
+    }
+    
+    fun getCurrentPosition(): Long {
+        return try {
+            mediaPlayer?.currentPosition?.toLong() ?: currentPosition
+        } catch (e: Exception) {
+            currentPosition
+        }
+    }
+    
+    fun getDuration(): Long {
+        return try {
+            mediaPlayer?.duration?.toLong() ?: duration
+        } catch (e: Exception) {
+            duration
+        }
+    }
+    
+    private fun updateProgress() {
+        currentPosition = getCurrentPosition()
+        updatePlaybackState()
+    }
+    
+    private fun updatePlaybackState() {
+        val state = if (isPlaying) {
+            PlaybackStateCompat.STATE_PLAYING
+        } else {
+            PlaybackStateCompat.STATE_PAUSED
+        }
+        
+        val playbackState = PlaybackStateCompat.Builder()
+            .setState(state, currentPosition, 1.0f)
+            .setActions(
+                PlaybackStateCompat.ACTION_PLAY or
+                PlaybackStateCompat.ACTION_PAUSE or
+                PlaybackStateCompat.ACTION_SKIP_TO_NEXT or
+                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or
+                PlaybackStateCompat.ACTION_SEEK_TO or
+                PlaybackStateCompat.ACTION_STOP
+            )
+            .build()
+            
+        mediaSession?.setPlaybackState(playbackState)
+    }
+    
+    private fun updateMediaSessionMetadata() {
+        val metadata = MediaMetadataCompat.Builder()
+            .putString(MediaMetadataCompat.METADATA_KEY_TITLE, "Current Track")
+            .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, "Artist Name")
+            .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, duration)
+            .build()
+            
+        mediaSession?.setMetadata(metadata)
     }
 
 //   fun notification(): Notification? {
