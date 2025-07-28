@@ -14,7 +14,7 @@ import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
 import SvgIcon from "@/components/SvgIcon";
 import { bytesToSize, changeLanguage, storeData } from "@/utils";
 import _ from "lodash";
-import { clearDB, countDatabaseSize } from "@/db";
+import { clearDB, countDatabaseSize, clearUserPlaylist } from "@/db";
 import { lastfmAuth } from "@/api/lastfm";
 import SettingsSelect from "./components/SettingsSelect";
 import {
@@ -200,6 +200,22 @@ const Settings = () => {
     clearDB().then(() => {
       countDbSize();
     });
+  };
+
+  /**
+   * 清除用户播放列表
+   */
+  const clearUserPlaylistCache = () => {
+    if (data.user.userId) {
+      clearUserPlaylist(data.user.userId.toString()).then(() => {
+        storeData.showToast("用户播放列表已清除");
+      }).catch((error) => {
+        console.error("清除用户播放列表失败:", error);
+        storeData.showToast("清除用户播放列表失败");
+      });
+    } else {
+      storeData.showToast("请先登录");
+    }
   };
 
   const lastfmDisconnect = () => {
@@ -488,6 +504,22 @@ const Settings = () => {
           <div className="right">
             <button onClick={clearCache}>
               {t("settings.clearSongsCache")}
+            </button>
+          </div>
+        </div>
+        
+        <div className={styles.item}>
+          <div className="left">
+            <div className="title">
+              清除用户播放列表
+            </div>
+            <div className="desc">
+              清除当前用户的所有播放列表缓存数据
+            </div>
+          </div>
+          <div className="right">
+            <button onClick={clearUserPlaylistCache}>
+              清除播放列表
             </button>
           </div>
         </div>

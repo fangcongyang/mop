@@ -62,6 +62,15 @@ export async function getUserPlaylist(userId: string) {
     return {playlist: playlists};
 }
 
+export async function clearUserPlaylist(userId: string){
+    const playlists = await db.userPlaylist.where("userId").equals(Number(userId)).toArray();
+    if (playlists.length === 0) return;
+    playlists.map(async (playlist: any) => {
+        await removePlaylistDetail(Number(playlist.id));
+    });
+    await db.userPlaylist.where("userId").equals(Number(userId)).delete();
+}
+
 export async function cachePlaylistDetail(id: number, playlistDetail: any) {
     playlistDetail.updateTime = new Date().getTime();
     playlistDetail.id = Number(id);

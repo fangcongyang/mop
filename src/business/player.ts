@@ -894,7 +894,7 @@ class Player implements PlayerSubject {
                     source,
                     br: result_1.data[0].br,
                 });
-            } catch(_e) {
+            } catch {
                 return null
             }
         } else {
