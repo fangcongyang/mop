@@ -1,4 +1,19 @@
-## [0.1.5](https://github.com/fangcongyang/mop/compare/v0.1.4...v0.1.5) (2025-06-20)
+## [0.1.6](https://github.com/fangcongyang/mop/compare/v0.1.5...v0.1.6) (2025-07-28)
+
+
+### ✨ Features | 新功能
+
+* **播放列表:** 添加清除用户播放列表缓存功能 ([](https://github.com/fangcongyang/mop/commit/871fd24))
+* **media:** 实现Android媒体播放控制功能 ([](https://github.com/fangcongyang/mop/commit/9c9e66f))
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* **类型定义:** 将String类型改为string以符合TypeScript规范 ([](https://github.com/fangcongyang/mop/commit/16961a5))
+
+
+
+## [0.1.5](https://github.com/fangcongyang/mop/compare/0.1.5...v0.1.5) (2025-06-20)
 
 
 ### ✨ Features | 新功能
