@@ -32,15 +32,19 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
       owner: "fangcongyang",
       repo: "mop",
     }).then((githubLatestReleaseInfo: GithubLatestReleaseInfo) => {
-      setLatestVersion(githubLatestReleaseInfo.tag_name);
-      if (githubLatestReleaseInfo.tag_name === 'v' + currentVersion) {
-        setBody(t("update.noUpdate"));
+      if (!githubLatestReleaseInfo) {
+        setBody(marked.parse("## 获取最新版本信息失败"));
         return;
       }
-      let bodyWithBreaks = githubLatestReleaseInfo.body.replace(/"/g, '');
+      setLatestVersion(githubLatestReleaseInfo?.tag_name);
+      if (githubLatestReleaseInfo.tag_name === "v" + currentVersion) {
+        setBody(marked.parse(t("update.noUpdate")));
+        return;
+      }
+      let bodyWithBreaks = githubLatestReleaseInfo.body.replace(/"/g, "");
       bodyWithBreaks = bodyWithBreaks
-        .replace(/\\n+/g, '\\n')  // 将连续的多个\n转换为单个\n
-        .replace(/\\n/g, '\n'); // 添加Markdown强制换行语法
+        .replace(/\\n+/g, "\\n") // 将连续的多个\n转换为单个\n
+        .replace(/\\n/g, "\n"); // 添加Markdown强制换行语法
       setBody(marked.parse(bodyWithBreaks));
     });
   }, []);
@@ -93,7 +97,7 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
         <h3>{t("update.changelog")}</h3>
         <div dangerouslySetInnerHTML={{ __html: body as string }} />
       </div>
-      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ display: "flex", alignItems: "center" }}>
         {isStarted && (
           <>
             <Box sx={{ width: "100%", mr: 1 }}>
@@ -108,18 +112,16 @@ const UpdateModal: React.FC<UpdateModalProps> = ({
         )}
       </Box>
       <div className={styles.actions}>
-        {
-          latestVersion !== `v${currentVersion}` && (
-            <>
-              <ButtonTwoTone onClick={doUpdate} color="primary">
-                {t("update.updateNow")}
-              </ButtonTwoTone>
-              <ButtonTwoTone onClick={onClose} color="secondary">
-                {t("update.remindLater")}
-              </ButtonTwoTone>
-              </>
-          )
-        }
+        {latestVersion !== `v${currentVersion}` && (
+          <>
+            <ButtonTwoTone onClick={doUpdate} color="primary">
+              {t("update.updateNow")}
+            </ButtonTwoTone>
+            <ButtonTwoTone onClick={onClose} color="secondary">
+              {t("update.remindLater")}
+            </ButtonTwoTone>
+          </>
+        )}
       </div>
     </Modal>
   );

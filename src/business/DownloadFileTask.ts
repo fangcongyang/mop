@@ -3,12 +3,12 @@ import { listen, UnlistenFn } from '@tauri-apps/api/event';
 
 export interface DownloadTaskInfo {
     event_id: string;
-    download_url: String;
-    file_path: String;
+    download_url: string;
+    file_path: string;
 }
 
 export interface DownloadInfo {
-    status: String;
+    status: string;
     progress?: number;
     speed?: number;
     content_length?: number;
